@@ -1,0 +1,121 @@
+.display-user-management-list {
+  .title {
+    display: flex;
+    color: #000000;
+    font-size: 24px;
+    font-weight: 700;
+  }
+
+  .outside-frame {
+    margin-top: 30px;
+    border-radius: 10px;
+    border: 1px solid #A0A0A0;
+    padding: 34px 42px 34px 42px;
+
+    .inside-frame {
+      border-radius: 10px;
+      border: 1px solid #A0A0A0;
+
+      .left-col {
+        flex: 2;
+        padding: 20px;
+        align-items: center;
+        background-color: #E9E9E9;
+        border-bottom: 1px solid #C6C6C6;
+
+        span {
+          font-weight: 600;
+        }
+      }
+
+      .first-left-col {
+        border-top-left-radius: 10px;
+      }
+
+      .last-left-col {
+        border-bottom-left-radius: 10px;
+      }
+
+      .right-col {
+        flex: 8;
+        padding: 20px;
+        align-items: center;
+        background-color: #FFFFFF;
+        border-bottom: 1px solid #C6C6C6;
+
+        .checkbox-label {
+          display: flex;
+          font-size: 16px;
+          margin-top: 2px;
+        }
+
+        .date-description {
+          display: flex;
+          font-size: 16px;
+          margin-top: 6px;
+          margin-left: 10px;
+          margin-right: 10px;
+        }
+
+        .specify-button {
+          width: 150px;
+          height: 45px;
+          color: #304CAD;
+          font-weight: 600;
+          border: 1px solid #304CAD;
+          background-color: #FFFFFF;
+          box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+
+          &:hover {
+            opacity: .6;
+            cursor: pointer;
+            background-color: #FFFFFF;
+          }
+        }
+      }
+
+      .first-right-col {
+        border-top-right-radius: 10px;
+      }
+
+      .last-right-col {
+        border-bottom-right-radius: 10px;
+      }
+    }
+
+    .footer {
+      margin-top: 30px;
+
+      .search-button {
+        border: none;
+        width: 350px;
+        height: 60px;
+        border-radius: 10px;
+        background-color: #5EB236;
+        
+        span {
+          color: #FFFFFF;
+          font-weight: 600;
+        }
+
+        .icon {
+          float: right;
+          font-size: 20px;
+          line-height: 22px;
+        }
+      }
+
+      .clear-setting-button {
+        display: flex;
+        color: #969696;
+        font-size: 14px;
+        margin-top: 15px;
+        text-decoration: underline;
+
+        &:hover {
+          cursor: pointer;
+        }
+      }
+    }
+  }
+}

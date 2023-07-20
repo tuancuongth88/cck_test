@@ -1,0 +1,185 @@
+// common
+.btn {
+	// border: 1px solid red !important;
+	// display: flex;
+	// justify-content: center;
+	// align-items: center;
+	// gap: 0.25rem;
+	cursor: pointer !important;
+	user-select: none !important;
+	transition: all 0.3s ease !important;
+	&:hover {
+		opacity: 0.7 !important;
+	}
+	&:active {
+		opacity: 1 !important;
+	}
+}
+.btn-effect {
+	cursor: pointer !important;
+	user-select: none !important;
+	transition: all 0.3s ease !important;
+	&:hover {
+		opacity: 0.7 !important;
+	}
+	&:active {
+		opacity: 1 !important;
+	}
+}
+
+.cck-input {
+	border: 1px solid #CDCDCD !important;
+
+	&:focus {
+		color: #495057 !important;
+		background-color: #fff !important;
+		border-color: #80bdff !important;
+		outline: 0 !important;
+		// box-shadow: 0 0 0 0.2rem rgba(255, 0, 208, 0.25) !important;
+		box-shadow: none;
+	}
+}
+
+.border-none {
+	border: none !important;
+}
+
+.rotate-90deg {
+	transform: rotate(90deg);
+	transition: all 0.3s ease;
+}
+
+.one-line-paragraph {
+	display: block; /* Fallback trong trường hợp trình duyệt không hỗ trợ display dạng box */
+	display: -webkit-box;
+	line-height: 16px; /* Fallback  */
+	max-height: 74px; /* Fallback số dòng bạn muốn giới hạn */
+	-webkit-line-clamp: 1; /* Số dòng bạn muốn giới hạn */
+	-webkit-box-orient: vertical;
+	visibility: visible;
+	text-overflow: ellipsis;
+	overflow:hidden;
+	// max-width: 300px;
+	// width: 100%;
+}
+
+// Remove Arrows/Spinners
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.bg-light {
+	background-color: transparent !important;
+	color: #fff !important;
+}
+
+::v-deep .table>thead {
+	// border: 1px solid red !important;
+	background: #1D266A !important;
+	font-size: 14px;
+	line-height: 17px;
+	color: #FFFFFF;
+
+	& tr>th {
+		border: 1px solid #ffffff;
+		vertical-align: middle;
+		text-align: center;
+		user-select: none;
+	}
+}
+
+::v-deep textarea {
+	overflow-y: auto !important;
+}
+
+// // Validate css
+// // ::v-deep
+// ::v-deep input.form-control.is-valid, .was-validated input.form-control:valid {
+// 	border-color: #28a745;
+// 	padding-right: calc(1.5em + 0.75rem);
+// 	background-image: none !important;
+// }
+//
+// ::v-deep .form-control.is-invalid, .was-validated input.form-control:invalid {
+// 	border-color: #dc3545;
+// 	padding-right: calc(1.5em + 0.75rem);
+// 	background-image: none !important;
+// }
+//
+// .custom-select.is-valid, .was-validated .custom-select:valid {
+// 	border-color: #28a745;
+// 	background-image: none !important;
+// }
+//
+// ::v-deep .custom-select.is-invalid,.was-validated .custom-select:invalid {
+// 	border-color: #dc3545;
+// 	background-image: none !important;
+// }
+
+.border-t {
+	border-top: 1px solid #ADADAD;
+}
+
+.border-r {
+	border-right: 1px solid #ADADAD;
+}
+
+.border-l {
+	border-left: 1px solid #ADADAD;
+}
+
+.border-b {
+	border-bottom: 1px solid #ADADAD;
+}
+
+.flex-row {
+	flex-direction: row !important;
+}
+.flex-column {
+	flex-direction: column !important;
+}
+.flex-column-reverse {
+	flex-direction: column-reverse !important;
+}
+.justify-start {
+	justify-content: flex-start !important;
+}
+.justify-end {
+	justify-content: flex-end !important;
+
+}
+.justify-center {
+	justify-content: center !important;
+}
+.justify-space-between {
+	justify-content: space-between !important;
+}
+.justify-space-around {
+	justify-content: space-around !important;
+}
+.justify-space-evenly {
+	justify-content: space-evenly !important;
+}
+.align-start {
+	align-items: flex-start !important;
+}
+.align-end {
+	align-items: flex-end !important;
+}
+.align-center {
+	align-items: center !important;
+}
+.align-baseline {
+	align-items: baseline !important;
+}
+.align-stretch {
+	align-items: stretch !important;
+}

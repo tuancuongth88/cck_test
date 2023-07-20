@@ -1,0 +1,272 @@
+@import '@/scss/_variables.scss';
+@import '@/scss/modules/common/common.scss';
+
+.hr-detail {
+	// border: 1px solid;
+	width: 100%;
+	min-height: 100vh;
+	height: 100%;
+	padding: 0 0 7.3rem 0;
+	display: flex;
+	justify-content: center;
+	align-items: stretch;
+	gap: 1.75rem;
+}
+
+//
+.hr-basic-information-wrap {
+	// border:  1px solid;
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: stretch;
+}
+
+.hr-basic-information-avata {
+	// border:  1px solid;
+}
+
+.hr-basic-informationg-general {
+	// border:  1px solid;
+}
+
+.ID {
+	// border:  1px solid;
+}
+
+.btn-add-to-favorite {
+	// border:  1px solid;
+}
+
+.btn-make-an-offer {
+	// border:  1px solid;
+}
+
+.btn-change-status-public {
+	// border:  1px solid;
+}
+
+.btn-change-status-private {
+	// border:  1px solid;
+}
+
+.btn-get-cv {
+	// border:  1px solid;
+}
+
+.btn-get-curriculum-vitae {
+	// border:  1px solid;
+}
+
+//
+.hr-detail-information {
+	flex: 1;
+	display: flex;
+	justify-content: center;
+	align-items: stretch;
+}
+
+.hr-detail-information_wrap {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: stretch;
+}
+
+.hr-detail_information-head {
+	// border:  1px solid;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.hr-basic-head-title {
+	// height: 100%;
+	display: flex;
+	justify-content: flex-start;
+	align-items: stretch;
+	gap: 1rem;
+
+	& div {
+		display: flex;
+		justify-content: flex-start;
+		align-items: center;
+
+		& span {
+			font-weight: 700;
+			font-size: 24px;
+			line-height: 29px;
+			color: #000000;
+		}
+	}
+
+}
+
+.line {
+	border: 1px solid #304CAD;
+	background: #304CAD;
+	border-radius: 10px;
+	width: 4px;
+	// height: 36px;
+}
+
+// title
+// btn
+.hr-detail_information-tabs {
+	flex: 1;
+	padding-top: 0.75rem;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: stretch;
+}
+
+//
+.hr-detail-head-btns {
+	// border: 1px solid;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 0.75rem;
+}
+
+.btn-light {
+	border: 1px solid #8F8F8F;
+	background: #8F8F8F;
+	border-radius: 50px;
+	height: 30px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 0.25rem;
+
+	& span {
+		font-weight: 400;
+		font-size: 16px;
+		line-height: 24px;
+		text-align: right;
+		color: #FFFFFF;
+		display: flex;
+		align-items: center;
+		text-align: center;
+	}
+}
+
+.btn-bold {
+	border: 1px solid #F9BE00 !important;
+	border-radius: 50px !important;
+	background: #F9BE00 !important;
+}
+
+// Ghi đè CSS head table
+::v-deep .table>thead {
+	background: #1D266A !important;
+	font-size: 14px;
+	line-height: 17px;
+	color: #FFFFFF;
+
+	& tr>th {
+		background: #1D266A !important;
+		text-align: center;
+	}
+}
+
+::v-deep .card {
+	border: none;
+	height: 100%;
+
+	& .tabs {
+		height: 100%;
+
+		& .card-header {
+			padding: 0;
+			border-radius: 10px 0px 10px 0px;
+
+			& .card-header-tabs {
+				// border-top: 1px solid #dee2e6;
+				// border-right: 1px solid #dee2e6;
+				// border-left: 1px solid #dee2e6;
+				// border-radius: 0.25rem 0 0 0.25rem;
+				margin: 0;
+				border: 0;
+
+				& li {
+					border-color: #dee2e6 #dee2e6;
+					flex: 1;
+					height: 50px;
+					display: flex;
+					justify-content: center;
+					align-self: center;
+
+					box-shadow: 0px 4px 4px rgba(132, 132, 132, 0.25);
+					border-radius: 10px 0px 0px 0px;
+
+					& a {
+						// border: none;
+						// border: 1px solid red !important;
+						border-radius: 0;
+						width: 100%;
+						padding-top: 10%;
+						font-weight: 700;
+						font-size: 15px;
+						line-height: 18px;
+						text-align: center;
+						color: #1D266A;
+						vertical-align: middle;
+					}
+				}
+
+				&>li:first-child {
+					border: 1px solid #dee2e6 #dee2e6 #fff;
+					border-radius: 10px 0px 0px 0px;
+
+					& a {
+						border: none;
+						border-radius: 10px 0px 0px 0px;
+					}
+				}
+
+				&>li:last-child {
+					border: 1px solid #dee2e6 #dee2e6 #fff;
+					border-radius: 0 10px 0 0;
+
+					& a {
+						border: none;
+						border-radius: 0 10px 0 0;
+					}
+				}
+
+			}
+		}
+
+		// Content tab
+		.tab-content {
+			// border: 1px solid red;
+			margin-top: 0.75rem;
+			height: 100%;
+
+			& .tab-content>.active {
+				// border: 1px solid red;
+				height: 100%;
+			}
+
+			& .card-body {
+				height: 100%;
+				// border: 1px solid red;
+				padding: 0 0 1rem 0;
+
+				& .card-text {
+					height: 100%;
+				}
+			}
+		}
+	}
+}
+
+// Ghi đè button
+::v-deep .btn-secondary {
+	background: #F9BE00;
+	border-color: #F9BE00;
+	border-radius: 50px;
+}

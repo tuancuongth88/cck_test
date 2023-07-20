@@ -1,0 +1,94 @@
+.page-degitacho-create {
+	margin-bottom: 10px;
+	font-size: 15px;
+
+	.btn-return {
+		cursor: pointer;
+
+		i {
+			margin-right: 5px;
+			color: $sorbus;
+		}
+
+		&:hover {
+			color: $sorbus;
+		}
+	}
+
+	.display-zone-input-degitacho {
+		margin-top: 15px;
+
+		div {
+			margin-bottom: 8px;
+
+			label {
+				font-weight: 500;
+			}
+
+			.form-group {
+				margin-bottom: 0;
+
+				::v-deep legend {
+					font-weight: 500 !important;
+				}
+			}
+		}
+
+		.zone-date {
+			.zone-date-item {
+				margin-bottom: 5px;
+			}
+		}
+
+		.zone-device-information {
+			> fieldset {
+				border: 1px solid $silver !important;
+				border-radius: 0.25rem;
+
+				> legend {
+					font-size: 15px;
+					font-weight: 600;
+					color: $sorbus;
+				}
+			}
+		}
+
+		.zone-vehicle-information {
+			fieldset {
+				border: 1px solid $silver !important;
+				border-radius: 0.25rem;
+
+				legend {
+					font-size: 15px;
+					font-weight: 600;
+					color: $sorbus;
+				}
+			}
+		}
+	}
+
+	.zone-button-sign-up {
+		text-align: center;
+		margin-top: 20px;
+
+		.btn-sign-up {
+			min-width: 200px;
+			font-weight: 500;
+			background-color: $sorbus;
+			border: none;
+
+			&:hover {
+				opacity: 0.8;
+			}
+
+			&:focus {
+				background-color: $sorbus;
+				opacity: 0.8;
+			}
+
+			i {
+				margin-right: 10px;
+			}
+		}
+	}
+}

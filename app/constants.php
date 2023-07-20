@@ -1,0 +1,255 @@
+<?php
+
+define('DEFAULT_ZERO_PAD', 5);
+define('DEFAULT_STR_ZERO', '0');
+
+define('CODE_SUCCESS', 200);
+define('CODE_CREATE_FAILED', 201);
+define('CODE_DELETE_FAILED', 202);
+define('CODE_MULTI_STATUS', 207);
+define('CODE_NO_ACCESS', 403);
+define('CODE_NOT_FOUND', 404);
+define('CODE_ERROR_SERVER', 500);
+define('CODE_UNAUTHORIZED', 401);
+define('HTTP_FORBIDDEN', 403);
+define('HTTP_UNPROCESSABLE_ENTITY', 422);
+
+define('IMAGE', 'upload/image');
+
+define('JOB_TYPE', 1);
+define('MAJOR_CLASSIFICATION', 2);
+
+define('EXAMINATION_PENDING', 1);
+define('CONFIRM', 2);
+define('REJECT', 3);
+define('STOP_USING', 4);
+
+define('SUPER_ADMIN', 1);
+define('COMPANY_MANAGER', 2);
+define('HR_MANAGER', 3);
+define('COMPANY', 4);
+define('HR', 5);
+
+define('ACC_PUBLIC', 1);
+define('ACC_PRIVATE', 2);
+define('ACC_OFFICIAL_OFFER_CONFIRM', 3);
+
+const TYPE_NOTIFY = [
+    'register_company' => 1,
+    'register_hr' => 2,
+    'remind_account' => 3
+];
+
+
+//define work table
+const WORK_FULL_TIME_EMPLOYEE = 1;
+const WORK_CONTRACT_EMPLOYEE = 2;
+const WORK_TEMPORARY_EMPLOYEE = 3;
+const WORK_OTHER_EMPLOYEE = 4;
+
+const WORK_CONFIRM_YES = 1;
+const WORK_CONFIRM_NO = 2;
+
+const WORK_FIRST_INTERVIEW = 1;
+const WORK_SECOND_INTERVIEW = 2;
+const WORK_THIRD_INTERVIEW = 3;
+const WORK_FOURTH_INTERVIEW = 4;
+const WORK_FIFTH_INTERVIEW = 5;
+
+const WORK_STATUS_RECRUITING = 1;
+const WORK_STATUS_PAUSED = 2;
+const WORK_STATUS_OUT_OF_RECRUITMENT_PERIOD = 3;
+//end define work
+
+//entry table
+const ENTRY_STATUS_REQUESTING = 1;
+const ENTRY_STATUS_REJECT = 2;
+const ENTRY_STATUS_DECLINE = 3;
+const ENTRY_STATUS_CONFIRM = 4;
+const ENTRY_STATUS_TEXTS = [
+    ENTRY_STATUS_REQUESTING => '申請中',
+    ENTRY_STATUS_REJECT => '却下',
+    ENTRY_STATUS_DECLINE => '辞退',
+    ENTRY_STATUS_CONFIRM => '確認'
+];
+
+const WHY_REJECTS = [
+    1 => '他社内定',
+    2 => '就業継続（転職断念）',
+    3 => '条件不一致（年収）',
+    4 => '条件不一致（勤務地）',
+    5 => '条件不一致（その他待遇）',
+    6 => '就業環境',
+    7 => '家族の反対',
+    8 => '在留資格不一致',
+    9 => '本人との連絡不通',
+    10 => 'その他'
+];
+
+//hrs table
+const HRS_STATUS_PUBLIC = 1;
+const HRS_STATUS_PRIVATE = 2;
+const HRS_STATUS_CONFIRM = 3;
+
+const HRS_STATUS_TEXTS = [
+    HRS_STATUS_PUBLIC => '公開',
+    HRS_STATUS_PRIVATE => '非公開',
+    HRS_STATUS_CONFIRM => '内定承諾'
+];
+
+const HRS_GENDER_MALE = 1;
+const HRS_GENDER_FEMALE = 2;
+
+const HRS_FULL_TIME_EMPLOYEE = 1;
+const HRS_CONTRACT_EMPLOYEE = 2;
+const HRS_TEMPORARY_EMPLOYEE = 3;
+const HRS_OTHER_EMPLOYEE = 4;
+
+const HRS_WORK_FORM = [
+    HRS_FULL_TIME_EMPLOYEE, // 'Full-time employee',
+    HRS_CONTRACT_EMPLOYEE, // 'Contract employee',
+    HRS_TEMPORARY_EMPLOYEE, // 'Temporary employee',
+    HRS_OTHER_EMPLOYEE, // 'Others'
+];
+
+const HRS_WORK_FORM_TEXT = [
+    HRS_FULL_TIME_EMPLOYEE => '正社員', // 'Full-time employee',
+    HRS_CONTRACT_EMPLOYEE => '契約社員', // 'Contract employee',
+    HRS_TEMPORARY_EMPLOYEE => '派遣社員', // 'Temporary employee',
+    HRS_OTHER_EMPLOYEE => 'その他', // 'Others'
+];
+
+const HRS_CLASSIFICATION_GRADUATION = 1;
+const HRS_CLASSIFICATION_FINISH = 2;
+const HRS_CLASSIFICATION_DROPOUT = 3;
+const HR_FINAL_EDUCATION = [
+    HRS_CLASSIFICATION_GRADUATION,
+    HRS_CLASSIFICATION_FINISH,
+    HRS_CLASSIFICATION_DROPOUT
+];
+
+const HR_FINAL_EDUCATION_TEXT = [
+    HRS_CLASSIFICATION_GRADUATION => '卒業',
+    HRS_CLASSIFICATION_FINISH => '終了',
+    HRS_CLASSIFICATION_DROPOUT => '中退'
+];
+
+const HR_EDUCATION_DEGREES = [
+    1 => '博士',
+    2 => '修士',
+    3 => '学士',
+    4 => '短期大学卒業',
+    5 => '専門学校卒業',
+    6 => '高校卒業'
+];
+
+const HR_EDUCATION_DEGREES_TYPE = [
+    'university_or_more' => 1,
+    'aside_from_university' => 2
+];
+
+//result table
+const RESULT_STATUS_SELECTION_OFFER = 1;
+const RESULT_STATUS_SELECTION_NOT_PASS = 2;
+const RESULT_STATUS_SELECTION_OFFER_CONFIRM = 3;
+const RESULT_STATUS_SELECTION_OFFER_DECLINE = 4;
+const RESULT_STATUS_LIST = [
+    RESULT_STATUS_SELECTION_OFFER => '内定',
+    RESULT_STATUS_SELECTION_NOT_PASS => '不合格',
+    RESULT_STATUS_SELECTION_OFFER_CONFIRM => '内定承諾',
+    RESULT_STATUS_SELECTION_OFFER_DECLINE => '内定辞退'
+];
+
+const RESULT_STATUS_PERIOD_EXPIRATION = 1;
+const RESULT_STATUS_PERIOD_DATE = 2;
+
+//offer table
+const OFFER_STATUS_REQUESTING = 1;
+const OFFER_STATUS_DECLINE = 2;
+const OFFER_STATUS_CONFIRM = 3;
+
+const OFFER_STATUS_TEXTS = [
+    OFFER_STATUS_REQUESTING => '申請中',
+    OFFER_STATUS_DECLINE => '辞退',
+    OFFER_STATUS_CONFIRM => '承認',
+];
+
+
+//interview
+const INTERVIEW_TYPE_GROUP = 1;
+const INTERVIEW_TYPE_PRIVATE = 2;
+
+const INTERVIEW_STATUS_SELECTION_DOC_PASS = 1;
+const INTERVIEW_STATUS_SELECTION_OFFER_CONFIRM = 2;
+const INTERVIEW_STATUS_SELECTION_FIRST_PASS = 3;
+const INTERVIEW_STATUS_SELECTION_SECOND_PASS = 4;
+const INTERVIEW_STATUS_SELECTION_THIRD_PASS = 5;
+const INTERVIEW_STATUS_SELECTION_FOURTH_PASS = 6;
+const INTERVIEW_STATUS_SELECTION_FIFTH_PASS = 7;
+const INTERVIEW_STATUS_SELECTION_INTERVIEW_CANCEL = 8;
+const INTERVIEW_STATUS_SELECTION_INTERVIEW_DECLINE = 9;
+
+const REVIEW_PASS = 1;
+const REVIEW_PASS_AND_GO_NEXT_STEP = 1;
+const REVIEW_PASS_AND_GO_LAST_STEP = 2;
+const GOTOSTEPS = [
+    REVIEW_PASS_AND_GO_NEXT_STEP => 'next step',
+    REVIEW_PASS_AND_GO_LAST_STEP => 'last step'
+];
+
+const STATUS_SELECTIONS = [
+    INTERVIEW_STATUS_SELECTION_DOC_PASS => '書類通過',
+    INTERVIEW_STATUS_SELECTION_OFFER_CONFIRM => 'オファー承認',
+    INTERVIEW_STATUS_SELECTION_FIRST_PASS => '一次合格',
+    INTERVIEW_STATUS_SELECTION_SECOND_PASS => '二次合格',
+    INTERVIEW_STATUS_SELECTION_THIRD_PASS => '三次合格',
+    INTERVIEW_STATUS_SELECTION_FOURTH_PASS => '四次合格',
+    INTERVIEW_STATUS_SELECTION_FIFTH_PASS => '五次合格',
+    INTERVIEW_STATUS_SELECTION_INTERVIEW_CANCEL => '面接中止',
+    INTERVIEW_STATUS_SELECTION_INTERVIEW_DECLINE => '面接辞退'
+];
+
+const INTERVIEW_STATUS_INTERVIEW_ADJUSTMENT_BEFORE_ADJUSTMENT = 1;
+const INTERVIEW_STATUS_INTERVIEW_ADJUSTMENT_ADJUSTING = 2;
+const INTERVIEW_STATUS_INTERVIEW_ADJUSTMENT_URL_SETTING = 3;
+const INTERVIEW_STATUS_INTERVIEW_ADJUSTMENT_ADJUSTED = 4;
+
+const STATUS_ADJUSTINGS = [
+    INTERVIEW_STATUS_INTERVIEW_ADJUSTMENT_BEFORE_ADJUSTMENT => '調整前',
+    INTERVIEW_STATUS_INTERVIEW_ADJUSTMENT_ADJUSTING => '調整中',
+    INTERVIEW_STATUS_INTERVIEW_ADJUSTMENT_URL_SETTING => 'URL設定中',
+    INTERVIEW_STATUS_INTERVIEW_ADJUSTMENT_ADJUSTED => '調整済',
+];
+
+const CALENDAR_CONFIRMED = 1;
+const CALENDAR_DECLINE = 2;
+
+//hr-organization table
+const COUNTRY = [
+    '1' => 'ベトナム',
+    '2' => 'ミャンマー',
+    '3' => 'フィリピン ',
+    '7' => 'タイ',
+];
+
+const ACC_CLASS_OWN_PLATFORM = 1;
+const ACC_CLASS_SEND_AGENCY = 2;
+const ACC_CLASS_DISPATCH_AGENCY = 3;
+const ACC_CLASS_SCHOOL = 4;
+
+//user_favorite table
+const FAVORITE_TYPE_HRS = 1;
+const FAVORITE_TYPE_WORK = 2;
+
+// entries file type
+const MOTIVATION_FILE = 1;
+const RECOMMENDATION_FILE = 2;
+const OTHER_FILE = 3;
+const ENTRIES_FILE_TYPES = [
+    MOTIVATION_FILE,
+    RECOMMENDATION_FILE,
+    OTHER_FILE,
+];
+
+const JOB_TYPE_COL_1 = 1;
+const JOB_TYPE_COL_2 = 2;

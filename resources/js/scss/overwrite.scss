@@ -1,0 +1,36 @@
+.file-vehicle-inspection-certificate,
+.file-liability,
+.file-contract,
+.file-approval-application-form,
+.file-quotation-specifications,
+.file-inspection-record,
+.file-etc-setup-certificate,
+.file-other {
+  .custom-file-label {
+    height: calc(1.5em + 0.75rem + 3px);
+
+    &:after {
+      visibility: hidden;
+    }
+  }
+}
+
+.nav-item a:focus {
+  color: #1D266A !important;
+  background-color: #fff !important;
+}
+
+.nav-item .active {
+  color: #1D266A !important;
+  background-color: #fff !important;
+  border-bottom: 2px solid #1D266A !important;
+}
+
+.nav-item .error {
+  border-bottom: 2px solid #FF0000 !important;
+}
+
+.bg-light {
+  color: #fff !important;
+  background-color: #1D266A !important;
+}

@@ -1,0 +1,201 @@
+.display-etc-detail {
+	margin-bottom: 10px;
+	font-size: 15px;
+
+	.btn-return {
+		line-height: 36px;
+
+		i {
+			cursor: pointer;
+			margin-right: 5px;
+			color: $sorbus;
+
+			&:hover {
+				color: $sorbus;
+			}
+		}
+
+		span {
+			cursor: pointer;
+			&:hover {
+				color: $sorbus;
+			}
+		}
+	}
+
+	.btn-control {
+		text-align: right;
+
+		button {
+			min-width: 110px;
+			border: none;
+
+			i {
+				margin-right: 10px;
+			}
+
+			&:hover {
+				opacity: 0.8;
+			}
+
+			&:focus {
+				background-color: $sorbus;
+				opacity: 0.8;
+			}
+		}
+
+		button.btn-edit {
+			background-color: $pastel-green;
+		}
+	}
+
+	.zone-overlay {
+		margin-top: 15px;
+
+		.display-input-date-header-etc {
+			.zone-date-item {
+				margin-bottom: 10px;
+			}
+		}
+
+		.display-zone-input-etc {
+			margin-bottom: 15px;
+
+			div {
+				margin-bottom: 8px;
+
+				label {
+					font-weight: 500;
+				}
+
+				.form-group {
+					margin-bottom: 0;
+
+					::v-deep legend {
+						font-weight: 500 !important;
+					}
+				}
+			}
+
+			.zone-device-information {
+				> fieldset {
+					border: 1px solid $silver !important;
+					border-radius: 0.25rem;
+
+					> legend {
+						font-size: 15px;
+						font-weight: 600;
+						color: $sorbus;
+					}
+				}
+
+				.display-history {
+					text-align: right;
+					margin-bottom: 0;
+
+					span {
+						cursor: pointer;
+						color: $boston-blue;
+						font-weight: 600;
+
+						i {
+							margin-left: 5px;
+						}
+					}
+				}
+			}
+
+			.zone-vehicle-information {
+				> fieldset {
+					border: 1px solid $silver !important;
+					border-radius: 0.25rem;
+
+					> legend {
+						font-size: 15px;
+						font-weight: 600;
+						color: $sorbus;
+					}
+				}
+
+				.display-history {
+					text-align: right;
+					margin-bottom: 0;
+
+					span {
+						cursor: pointer;
+						color: $boston-blue;
+						font-weight: 600;
+
+						i {
+							margin-left: 5px;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	.collapsed > .when-open,
+	.not-collapsed > .when-closed {
+		display: none;
+	}
+
+	::v-deep .text-center.table-responsive-sm {
+		margin: 15px 0px;
+		border: none !important;
+		border-right: 0;
+		border-top: 0;
+
+		.b-table {
+			width: 100%;
+
+			th.b-table-sort-icon-left {
+				border: 0.7px solid #888888;
+				border-left: 0;
+			}
+
+			td {
+				border: 0.1px solid #888888;
+				background: $white;
+			}
+		}
+	}
+
+	::v-deep .table thead {
+		background: $mercury;
+	}
+
+	::v-deep td {
+		border: 0.1px solid #888888;
+		font-size: 14px;
+		padding: 0.75rem 0.45rem;
+		line-height: 36px;
+		word-break: break-all;
+	}
+
+	::v-deep .table th,
+	.table td {
+		border: 0.1px solid #888888;
+	}
+
+	th {
+		border: 0.9px solid #888888;
+		background-position: right calc(0.75rem / 2) center !important;
+	}
+
+	.show-text-warning {
+		text-align: right;
+		color: $carnation;
+		font-weight: 600;
+	}
+
+    .link-includes {
+        cursor: pointer;
+        color: $boston-blue;
+        font-weight: 600;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}

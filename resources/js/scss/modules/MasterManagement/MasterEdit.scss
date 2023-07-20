@@ -1,0 +1,109 @@
+.master-management-edit {
+	font-size: 15px;
+
+	.btn-return {
+		cursor: pointer;
+
+		i {
+			margin-right: 5px;
+			color: $sorbus;
+		}
+
+		&:hover {
+			color: $sorbus;
+		}
+	}
+
+	.edit-item {
+		border: 1px solid $silver;
+		border-radius: 0.25rem;
+		width: 100%;
+		height: 100%;
+		overflow: hidden;
+		margin-top: 15px;
+
+		.zone-edit-user {
+			margin: 20px;
+
+			div {
+				margin-bottom: 10px;
+			}
+		}
+	}
+
+	.btn-sign-up {
+		margin: 0 auto;
+		margin-top: 40px;
+
+		button {
+			min-width: 210px;
+			background-color: $sorbus;
+			border: none;
+
+			&:hover {
+				opacity: 0.8;
+			}
+
+			&:focus {
+				background-color: $sorbus;
+				opacity: 0.8;
+			}
+		}
+	}
+}
+
+.validate-warning {
+	background-color: $your-pink;
+}
+
+.border-bottom {
+	border-bottom: 1px solid black;
+}
+
+.dot {
+	text-align: center;
+	font-size: 30px;
+}
+
+.btn-add {
+	background-color: $pastel-green;
+	border: none;
+
+	&:hover {
+		background: $pastel-green;
+		color: $white;
+	}
+}
+
+.btn-edit {
+	background-color: $malibu;
+	border: none;
+
+	&:hover {
+		background: $malibu;
+		color: $white;
+	}
+}
+
+.btn-delete {
+	background-color: $carnation;
+	border: none;
+
+	&:hover {
+		background: $carnation;
+		color: $white;
+	}
+}
+
+.table_option {
+	border-left: 1px solid #dee2e6;
+	border-right: 1px solid #dee2e6;
+}
+
+label {
+	margin-top: 15px;
+}
+
+.break {
+	margin-top: 10px;
+}

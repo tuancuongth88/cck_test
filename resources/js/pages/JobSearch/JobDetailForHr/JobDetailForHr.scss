@@ -1,0 +1,205 @@
+@import '@/scss/_variables.scss';
+@import '@/scss/modules/common/common.scss';
+
+.job-detail-for-hr {
+	display: flex;
+	min-height: 100vh;
+	align-items: stretch;
+	padding-bottom: 2.5rem;
+	justify-content: center;
+}
+
+.job-detail-for-hr-container {
+	gap: 1rem;
+	width: 100%;
+	display: flex;
+	align-items: stretch;
+	justify-content: center;
+}
+
+.job-detail-for-hr-form {
+	width: 100%;
+	gap: 2.5rem;
+	display: flex;
+	max-width: 800px;
+	align-items: center;
+	flex-direction: column;
+	justify-content: flex-start;
+}
+
+.job-detail-for-hr-form__head {
+	width: 100%;
+	gap: 0.75rem;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.line {
+	width: 4px;
+	height: 100%;
+	border-radius: 10px;
+	background: #304CAD;
+	border: 1px solid #304CAD;
+}
+
+.job-detail-for-hr-form__head-title {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	& span {
+		color: $black;
+		font-size: 24px;
+		font-weight: 700;
+		line-height: 36px;
+	}
+}
+
+.job-detail-for-hr-form__head-btn {
+	gap: 1rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.btn-back {
+	height: 30px;
+	display: flex;
+	padding: 0 0.75rem;
+	background: #8F8F8F;
+	border-radius: 50px;
+	align-items: center;
+	justify-content: center;
+
+	& span {
+		color: $white;
+		font-size: 16px;
+		font-weight: 400;
+		line-height: 21px;
+	}
+}
+
+.job-detail-for-hr-form-autox {
+	width: 100%;
+	display: flex;
+	background: $white;
+	border-radius: 4px;
+	align-items: center;
+	flex-direction: column;
+	border: 1px solid #A0A0A0;
+	justify-content: flex-start;
+}
+
+.job-detail-for-hr-form-autox--entry {
+	height: 100%;
+	min-height: 500px;
+	max-height: 500px;
+}
+
+.job-detail-for-hr-form-page {
+	gap: 1rem;
+	width: 100%;
+	display: flex;
+	align-items: stretch;
+	flex-direction: column;
+	justify-content: flex-start;
+}
+
+.job-detail-for-hr-form-btn {
+	width: 100%;
+	display: flex;
+	max-width: 360px;
+	align-items: center;
+	justify-content: center;
+}
+
+
+.form-page-area {
+	width: 100%;
+	display: flex;
+	align-items: stretch;
+	flex-direction: column;
+	justify-content: flex-start;
+}
+
+.form-page-area__head {
+	width: 100%;
+	height: 56px;
+	display: flex;
+	padding: 0 1.25rem;
+	background: #E9E9E9;
+	align-items: center;
+	justify-content: flex-start;
+	border-radius: 4px 4px 0px 0px;
+
+	& span {
+		color: $black;
+		font-size: 16px;
+		font-weight: 700;
+		line-height: 19px;
+		letter-spacing: 0.1em;
+	}
+}
+
+.form-page-area__content {
+	width: 100%;
+	padding: 1.25rem 0.75rem;
+}
+
+.form-page-area-content-wrap {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	border-radius: 2px;
+	flex-direction: column;
+	align-items: flex-start;
+	justify-content: flex-start;
+	border: 1px solid $pass-back;
+}
+
+.form-item-row {
+	width: 100%;
+	display: flex;
+	min-height: 40px;
+  border-radius: 6px;
+	align-items: stretch;
+	color: $titleClassify;
+	justify-content: flex-start;
+}
+
+.form-item-row__title {
+	width: 33%;
+	display: flex;
+	min-width: 216px;
+	padding: 0.75rem 1.25rem;
+	align-items:  flex-start;
+	background: $bg-title-form;
+	justify-content: flex-start;
+
+	& > div {
+		font-size: 18px;
+		font-weight: bold;
+		line-height: 18px;
+	}
+}
+
+.form-item-row__inputs {
+	width: 77%;
+	display: flex;
+	padding: 0.75rem 1.25rem;
+	align-items:  flex-start;
+	justify-content: flex-start;
+
+	& > div {
+		width: 100%;
+		height: 100%;
+		display: flex;
+		font-size: 14px;
+		font-weight: 400;
+		line-height: 21px;
+		align-items: center;
+		justify-content: flex-start;
+	}
+
+}

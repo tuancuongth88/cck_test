@@ -1,0 +1,246 @@
+.page-vehicle-create {
+    margin-bottom: 10px;
+	font-size: 15px;
+
+	.btn-return {
+		cursor: pointer;
+
+		i {
+			margin-right: 5px;
+			color: $sorbus;
+		}
+
+		&:hover {
+			color: $sorbus;
+		}
+	}
+
+    .zone-display-input {
+        margin-top: 10px;
+
+        div {
+            label {
+                font-weight: 500;
+            }
+
+            .form-group {
+                margin-bottom: 0;
+
+                ::v-deep legend {
+                    font-weight: 500 !important;
+                }
+            }
+
+            select {
+                margin-bottom: 8px;
+            }
+
+            #first-year-registration-date,
+            #vehicle-inspection-expiration-date,
+            #voluntary-insurance-date,
+            #voluntary-insurance-cancellation-date,
+            #date-participation,
+            #date-cancellation,
+            #name-change-date {
+                margin-bottom: 8px;
+            }
+
+            .input-group {
+                margin-bottom: 8px;
+            }
+        }
+
+        fieldset {
+            margin-bottom: 8px;
+        }
+
+        .zone-input-date-header {
+			.zone-date-item {
+				margin-bottom: 5px;
+			}
+        }
+
+        // BASIC INFORMATION
+        .zone-basic-information {
+			> fieldset {
+				border: 1px solid $silver !important;
+				border-radius: 0.25rem;
+
+				> legend {
+					font-size: 15px;
+					font-weight: 600;
+					color: $sorbus;
+				}
+
+                > div {
+                    margin-bottom: 8px;
+                }
+
+                .vehicle-registration-number {
+                    .form-control {
+                        margin-bottom: 8px;
+                    }
+                }
+			}
+        }
+
+        // SPECIFICATION
+        .zone-specification {
+			> fieldset {
+				border: 1px solid $silver !important;
+				border-radius: 0.25rem;
+
+				> legend {
+					font-size: 15px;
+					font-weight: 600;
+					color: $sorbus;
+				}
+
+                > div {
+                    margin-bottom: 8px;
+                }
+			}
+        }
+
+        // SPECIFICATIONS BOX
+        .specifications-box {
+			> fieldset {
+				border: 1px solid $silver !important;
+				border-radius: 0.25rem;
+
+				> legend {
+					font-size: 15px;
+					font-weight: 600;
+					color: $sorbus;
+				}
+
+                > div {
+                    margin-bottom: 8px;
+                }
+			}
+        }
+
+        // INSURANCE INFORMATION
+        .insurance-information {
+			> fieldset {
+				border: 1px solid $silver !important;
+				border-radius: 0.25rem;
+
+				> legend {
+					font-size: 15px;
+					font-weight: 600;
+					color: $sorbus;
+				}
+
+                > div {
+                    margin-bottom: 8px;
+                }
+			}
+        }
+
+        // BODY PURCHASE PRICE
+        .body-purchase-price {
+			> fieldset {
+				border: 1px solid $silver !important;
+				border-radius: 0.25rem;
+
+				> legend {
+					font-size: 15px;
+					font-weight: 600;
+					color: $sorbus;
+				}
+
+                > div {
+                    margin-bottom: 8px;
+                }
+			}
+        }
+
+        // SALE INFORMATION
+        .sale-information {
+			> fieldset {
+				border: 1px solid $silver !important;
+				border-radius: 0.25rem;
+
+				> legend {
+					font-size: 15px;
+					font-weight: 600;
+					color: $sorbus;
+				}
+
+                > div {
+                    margin-bottom: 8px;
+                }
+
+                #status.form-control,
+                #selling-destiantion.form-control,
+                #sale-date.form-control,
+                #alternative-vehicle.form-control {
+                    margin-bottom: 8px;
+                }
+			}
+        }
+
+        // DEVICE INFORMATION
+        .device-information {
+			> fieldset {
+				border: 1px solid $silver !important;
+				border-radius: 0.25rem;
+
+				> legend {
+					font-size: 15px;
+					font-weight: 600;
+					color: $sorbus;
+				}
+
+                > div {
+                    margin-bottom: 8px;
+                }
+			}
+        }
+
+        // ETC CARD INFORMATION
+        .etc-card-information {
+			> fieldset {
+				border: 1px solid $silver !important;
+				border-radius: 0.25rem;
+
+				> legend {
+					font-size: 15px;
+					font-weight: 600;
+					color: $sorbus;
+				}
+
+                > div {
+                    margin-bottom: 8px;
+                }
+			}
+        }
+    }
+
+    // ZONE BTN SIGN UP
+    .zone-btn-sign-up {
+        text-align: center;
+        margin-top: 20px;
+
+        .btn-sign-up {
+            min-width: 200px;
+            font-weight: 500;
+            background-color: $sorbus;
+            border: none;
+
+            &:hover {
+                opacity: 0.8;
+            }
+
+            &:focus {
+                background-color: $sorbus;
+                opacity: 0.8;
+            }
+
+            i {
+                margin-right: 10px;
+            }
+        }
+    }
+}

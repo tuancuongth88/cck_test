@@ -1,0 +1,221 @@
+.degitacho-list {
+	font-size: 15px;
+	.btn-return {
+		cursor: pointer;
+
+		i {
+			margin-right: 5px;
+			color: $sorbus;
+		}
+
+		&:hover {
+			color: $sorbus;
+		}
+	}
+	.btn-detail {
+		background-color: $casablanca;
+		border: none;
+		&:hover {
+			background: $casablanca;
+			color: #fff;
+		}
+	}
+	.degitacho-registration-section {
+		border: 1px solid $silver;
+		border-radius: 0.25rem;
+		width: 100%;
+		height: 100%;
+		margin-top: 15px;
+
+		.zone-edit-user {
+			margin: 20px;
+
+			div {
+				margin-bottom: 10px;
+			}
+		}
+	}
+
+	.btn-add {
+        background-color: $pastel-green;
+        border: none;
+        min-width: 150px;
+        &:hover {
+            opacity: 0.8;
+        }
+
+        &:focus {
+            background-color: $pastel-green;
+            opacity: 0.8;
+            border: none;
+        }
+	}
+}
+
+.validate-warning {
+	background-color: $your-pink;
+}
+
+.border-bottom {
+	border-bottom: 1px solid black;
+}
+
+.dot {
+	text-align: center;
+	font-size: 30px;
+}
+
+.btn-clean {
+    min-width: 150px;
+	border: none;
+    &:hover {
+        opacity: 0.8;
+    }
+
+    &:focus {
+        opacity: 0.8;
+    }
+}
+.fa{
+    cursor: pointer;
+}
+.btn-edit {
+	background-color: $malibu;
+	border: none;
+
+	&:hover {
+		background: $malibu;
+		color: $white;
+	}
+}
+
+.btn-delete {
+	background-color: $carnation;
+	border: none;
+
+	&:hover {
+		background: $carnation;
+		color: $white;
+	}
+}
+
+.table_option {
+	border-left: 1px solid #dee2e6;
+	border-right: 1px solid #dee2e6;
+}
+
+label {
+	margin-top: 15px;
+}
+
+.break {
+	margin-top: 10px;
+}
+
+#checkbox-group-2 {
+	margin-top: 20px;
+}
+
+.degitacho-list .degitacho-registration-section .zone-edit-user div {
+	margin-bottom: 0px;
+}
+
+input#free_text {
+	margin-top: 16px;
+}
+
+.plus {
+	margin-top: 50px;
+}
+
+.minus {
+	margin-top: 33px;
+}
+
+.tilde {
+	margin: 10px 5px 0 5px;
+}
+
+@media (max-width: 992px) {
+	#checkbox-group-2 {
+		margin-top: 0px;
+	}
+}
+
+.flex {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-around;
+}
+
+.real-width {
+	width: -webkit-fill-available;
+}
+
+.zone-search {
+	text-align: center;
+	margin-top: 10px;
+}
+
+.btn-search {
+	display: inline-block;
+	min-width: 210px;
+}
+
+.badge {
+	padding: 5px;
+}
+
+::v-deep .badge-information {
+	background-color: #aed7ed;
+	color: #000000;
+}
+
+::v-deep .badge-vehicle-master {
+	color: #000000;
+	background: #d9f6ff;
+}
+
+.category-color {
+	padding-bottom: 10px;
+	margin-bottom: 10px;
+	border-bottom: 1px solid black;
+}
+
+.marginDate {
+	margin-top: 15px;
+}
+
+.zone-add {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1em;
+    flex-wrap: wrap;
+}
+@media (max-width: 470px) {
+	.zone-add {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1em;
+        flex-wrap: wrap;
+        button{
+            flex: 1 1 100%;
+        }
+    }
+}
+
+
+ ::v-deep .table thead th {
+    vertical-align: middle !important;
+    min-width: 300px;
+}
+.badge{
+    font-size: 15px;
+    min-width: 250px !important;
+}
+::v-deep th.choose {
+    min-width: 150px !important;
+}
+::v-deep .table td {
+    vertical-align: middle !important;
+}

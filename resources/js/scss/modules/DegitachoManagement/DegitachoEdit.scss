@@ -1,0 +1,248 @@
+.display-degitacho-edit {
+	margin-bottom: 10px;
+	font-size: 15px;
+
+	.btn-return {
+		line-height: 36px;
+
+		i {
+			cursor: pointer;
+			margin-right: 5px;
+			color: $sorbus;
+
+			&:hover {
+				color: $sorbus;
+			}
+		}
+
+		span {
+			cursor: pointer;
+			&:hover {
+				color: $sorbus;
+			}
+		}
+	}
+	.zone-button-edit {
+		text-align: center;
+		margin-top: 20px;
+
+		.btn-edit {
+			min-width: 200px;
+			font-weight: 500;
+			background-color: $sorbus;
+			border: none;
+
+			&:hover {
+				opacity: 0.8;
+			}
+
+			&:focus {
+				background-color: $sorbus;
+				opacity: 0.8;
+			}
+
+			i {
+				margin-right: 10px;
+				color: $white;
+			}
+		}
+	}
+
+	.zone-overlay {
+		margin-top: 15px;
+
+		.display-input-date-header-degitacho {
+			.zone-date-item {
+				margin-bottom: 10px;
+			}
+		}
+
+		.display-zone-input-degitacho {
+			margin-bottom: 15px;
+
+			div {
+				margin-bottom: 8px;
+
+				label {
+					font-weight: 500;
+				}
+
+				.form-group {
+					margin-bottom: 0;
+
+					::v-deep legend {
+						font-weight: 500 !important;
+					}
+				}
+			}
+
+			.zone-device-information {
+				> fieldset {
+					border: 1px solid $silver !important;
+					border-radius: 0.25rem;
+
+					> legend {
+						font-size: 15px;
+						font-weight: 600;
+						color: $sorbus;
+					}
+				}
+
+				.display-history {
+					text-align: right;
+					margin-bottom: 0;
+
+					span {
+						cursor: pointer;
+						color: $boston-blue;
+						font-weight: 600;
+
+						i {
+							margin-left: 5px;
+						}
+					}
+				}
+			}
+
+			.zone-vehicle-information {
+				> fieldset {
+					border: 1px solid $silver !important;
+					border-radius: 0.25rem;
+
+					> legend {
+						font-size: 15px;
+						font-weight: 600;
+						color: $sorbus;
+					}
+				}
+
+				.display-history {
+					text-align: right;
+					margin-bottom: 0;
+
+					span {
+						cursor: pointer;
+						color: $boston-blue;
+						font-weight: 600;
+
+						i {
+							margin-left: 5px;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	.collapsed > .when-open,
+	.not-collapsed > .when-closed {
+		display: none;
+	}
+}
+
+	::v-deep .text-center.table-responsive-sm {
+		margin: 15px 0px;
+		border: none !important;
+		border-right: 0;
+		border-top: 0;
+
+		.b-table {
+			width: 100%;
+
+			th.b-table-sort-icon-left {
+				border: 0.7px solid #888888;
+				border-left: 0;
+			}
+
+			td {
+				border: 0.1px solid #888888;
+				background: $white;
+			}
+		}
+	}
+
+	::v-deep .table thead {
+		background: $mercury;
+	}
+
+	::v-deep td {
+		border: 0.1px solid #828282;
+		font-size: 14px;
+		padding: 0.75rem 0.45rem;
+        min-width: 180px;
+	}
+
+	::v-deep td.result {
+		div {
+			min-width: 110px;
+
+			i {
+				margin-right: 5px;
+				color: $carnation;
+			}
+		}
+	}
+
+	::v-deep .table th,
+	.table td {
+		border: 0.1px solid #888888;
+	}
+
+    .table td.delete {
+        i {
+            color: $carnation;
+        }
+    }
+
+	th {
+		border: 0.9px solid #888888;
+		background-position: right calc(0.75rem / 2) center !important;
+	}
+	.show-text-warning {
+		text-align: right;
+		color: $carnation;
+		font-weight: 600;
+	}
+
+    .link-includes {
+        cursor: pointer;
+        color: $boston-blue;
+        font-weight: 600;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+
+    .btn-delete {
+        background-color: $carnation;
+        color: $white;
+        border-radius: 5px;
+        padding: 5px 2px;
+        cursor: pointer;
+
+        i {
+            color: $white !important;
+            margin-right: 5px;
+        }
+
+        &:hover {
+            opacity: .8;
+        }
+    }
+    .btn-selected-delete {
+        background-color: $carnation;
+        color: $white;
+        border-radius: 5px;
+        padding: 5px 2px;
+        cursor: pointer;
+
+        i {
+            color: $white !important;
+            margin-right: 5px;
+        }
+
+        &:hover {
+            opacity: .8;
+        }
+    }

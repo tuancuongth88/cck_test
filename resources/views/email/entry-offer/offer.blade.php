@@ -1,0 +1,66 @@
+<html lang="en">
+<body>
+<header>
+    <style>
+        table, td, th {
+            border: 1px solid;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+    </style>
+</header>
+<div style="padding: 0 120px; margin-top: 90px">
+    <div
+        style="border-top: 5px solid #289FE1; border-bottom: 5px solid #289FE1; padding-top: 20px; padding-bottom: 20px">
+        <div>
+            <div style='font-weight: 600; float: left'>
+                オファーが実行されました
+            </div>
+            <div style='font-weight: 600; text-align: right'>
+                {{ $data['date'] }}
+            </div>
+        </div>
+        <br>
+        <hr>
+        <div style="padding-left: 60px">
+            <p>
+                {{ $data['email'] }} 様
+            </p>
+            <p>
+                人材にオファーが実行されました。<br>
+                <a href="{{ url('offer/list') }}">こちら</a>よりエントリーの内容を確認してください。
+            </p>
+        </div>
+        <div style="padding-left: 120px">
+            <p>
+                <br>
+                <label style="font-size: 20px; font-family: Inter;">オファー求人情報 </label><br>
+            <table style="width: 100%; border-collapse: collapse; border: 1px solid">
+                <tr>
+                    <td style="border: 1px solid; font-size: 12px">求人名</td>
+                    <td style="border: 1px solid;font-size: 12px">企業名</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid;font-size: 12px">{{ $data['job'] }}</td>
+                    <td style="border: 1px solid;font-size: 12px">{{ $data['company'] }}</td>
+                </tr>
+            </table>
+            <br>
+            <p>
+                <label style="font-size: 20px; font-family: Inter;">オファー人材 </label><br>
+            <table style="width: 100%; border-collapse: collapse; border: 1px solid">
+                <tr>
+                    <td style="text-align: center;border: 1px solid; font-size: 12px">氏名</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid;font-size: 12px">{{ $data['full_name'] }} {{ $data['full_name_ja'] }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>
