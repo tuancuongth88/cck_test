@@ -59,6 +59,6 @@ class UploadFileRepository extends BaseRepository implements UploadFileRepositor
         $file = UploadFile::find($id);
         if (!$file) return ResponseService::responseData(CODE_NO_ACCESS, 'error', trans('messages.data_does_not_exist'));
         $convertNameFile = Str::replace('storage/','',$file->file_path);
-        return response()->download(storage_path('app/public/'.$file->file_path));
+        return response()->download(storage_path('app/public/'.$convertNameFile));
     }
 }

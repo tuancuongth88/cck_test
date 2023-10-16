@@ -1,193 +1,200 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import store from '@/store';
 import router from '@/router';
-import { postLogin } from '@/api/modules/login';
+// import { postLogin } from '@/api/modules/login';
+import { login } from '@/api/auth';
+import { handleRole } from '@/utils/handleRole';
+import { validEmail } from '@/utils/validate';
+
 import Login from '@/pages/Login/index.vue';
 
 describe('Test Component Login', () => {
-  const localVue = createLocalVue();
-  const wrapper = shallowMount(Login, { localVue, store, router });
+  test('Case 1: Check component render Login Template', () => {
+    const localVue = createLocalVue();
+    const wrapper = shallowMount(Login, {
+      localVue,
+      store,
+      router,
+    });
 
-  let TOKEN;
-  let PROFILE;
-  let USER;
+    const LoginTemplate = wrapper.findComponent({ name: 'Login' });
+    expect(LoginTemplate.exists()).toBe(true);
 
-  it('Case 1: Check component Login has data', () => {
-    expect(typeof Login.data).toBe('function');
+    wrapper.destroy();
   });
 
-  it('Case 2: Check Account (email, password) is blank', () => {
+  test('Case 2: Check component Login has data', () => {
+    const localVue = createLocalVue();
+    const wrapper = shallowMount(Login, { localVue, store, router });
+
+    expect(typeof Login.data).toBe('function');
+    const loginComponent = wrapper.find('.login-form');
+    expect(loginComponent.exists()).toBe(true);
+
+    const loginTitle = wrapper.find('.login-title');
+    expect(loginTitle.exists()).toBe(true);
+
+    const mailAddressInput = wrapper.find('#mail-address-input');
+    expect(mailAddressInput.exists()).toBe(true);
+
+    const passwordInput = wrapper.find('#password-input');
+    expect(passwordInput.exists()).toBe(true);
+
+    const btnLoginSubmit = wrapper.find('.login-submit');
+    expect(btnLoginSubmit.exists()).toBe(true);
+
+    const btnForgetPass = wrapper.find('#btn-forget-pass');
+    expect(btnForgetPass.exists()).toBe(true);
+
+    const btnCreateHr = wrapper.find('#btn-create-hr');
+    expect(btnCreateHr.exists()).toBe(true);
+
+    const btnCreateCompany = wrapper.find('#btn-create-company');
+    expect(btnCreateCompany.exists()).toBe(true);
+
+    wrapper.destroy();
+  });
+
+  test('Case 2: Check the initial empty input', () => {
+    const localVue = createLocalVue();
+    const wrapper = shallowMount(Login, { localVue, store, router });
+
+    const Account = {
+      mail_address: '',
+      password: '',
+    };
+
+    expect(wrapper.vm.account.mail_address).toBe(Account.mail_address);
+    expect(wrapper.vm.account.password).toBe(Account.password);
+
+    wrapper.destroy();
+  });
+
+  test('Case 3: Check required fields', async() => {
+    const localVue = createLocalVue();
+    const wrapper = shallowMount(Login, { localVue, store, router });
+
     const Account = {
       email: '',
       password: '',
     };
 
-    expect(wrapper.vm.account.email).toBe(Account.email);
-    expect(wrapper.vm.account.password).toBe(Account.password);
+    await wrapper.setData({ account: Account });
+
+    wrapper.vm.handleLogin();
+
+    const message = {
+      isShowMessage: true,
+      isMessage: 'ERROR_VALIDATE_EMAIL_PASSWORD',
+    };
+
+    expect(wrapper.vm.message).toStrictEqual(message);
+
+    wrapper.destroy();
   });
 
-  it('Case 3: Check Change Account (email, password)', async() => {
+  test('Case 4: Check the function that STORES DATA into STORE', async() => {
+    const localVue = createLocalVue();
+    const wrapper = shallowMount(Login, { localVue, store, router });
+
+    const params = {
+      mail_address: '1okuridashi_hanoi@gmail.vn',
+      password: '123456789CCk',
+    };
+
+    await login(params)
+      .then((response) => {
+        if (response['data']['code'] === 200) {
+          const TOKEN = response['data']['data']['access_token'];
+          const USER = response['data']['data']['profile'];
+
+          const { ROLES, PERMISSIONS } = handleRole([]);
+
+          const USER_INFO = {
+            token: TOKEN,
+            profile: USER,
+            roles: ROLES,
+            permissions: PERMISSIONS,
+          };
+
+          store.dispatch('user/saveLogin', USER_INFO);
+          expect(store.getters.token).toBe(TOKEN);
+          //
+        }
+      });
+
+    wrapper.destroy();
+  });
+
+  test('Case 5: Check Login wrong User ID', async() => {
+    const localVue = createLocalVue();
+    // const handleLogin = jest.fn();
+    // const validEmail = jest.fn();
+
+    const wrapper = shallowMount(Login, {
+      localVue,
+      store,
+      router,
+      methods: {
+        // handleLogin,
+        // validEmail,
+      },
+    });
+
     const Account = {
-      email: 'test@gmail.com',
-      password: '123456789',
+      mail_address: '1okuridashi_hanoi',
+      password: '123456789CCk',
+    };
+
+    // await wrapper.setData({ account: Account });
+    // const btnLoginSubmit = wrapper.find('.login-submit');
+    // expect(btnLoginSubmit.exists());
+    // btnLoginSubmit.trigger('click');
+    // expect(handleLogin).toHaveBeenCalled();
+
+    await wrapper.setData({ account: Account });
+    const resutltValidEmail = validEmail(wrapper.vm.account.mail_address);
+
+    expect(resutltValidEmail).toBe(false);
+    wrapper.destroy();
+  });
+
+  test('Case 5: Check wrong password', async() => {
+    const localVue = createLocalVue();
+    const wrapper = shallowMount(Login, { localVue, store, router });
+
+    const Account = {
+      mail_address: '1okuridashi_hanoi@gmail.vn',
+      password: '',
+    };
+
+    await login(Account)
+      .then((response) => {
+        // console.log('4 response: ', response);
+        expect(response['data']['code']).not.toBe(200);
+      });
+
+    wrapper.destroy();
+  });
+
+  test('Case 6: Check Change Account (email, password)', async() => {
+    const localVue = createLocalVue();
+    const wrapper = shallowMount(Login, { localVue, store, router });
+
+    const Account = {
+      mail_address: '1okuridashi_hanoi@gmail.vn',
+      password: '123456789CCk',
     };
 
     await wrapper.setData({
       account: Account,
     });
 
-    expect(wrapper.vm.account.email).toBe(Account.email);
+    expect(wrapper.vm.account.mail_address).toBe(Account.mail_address);
     expect(wrapper.vm.account.password).toBe(Account.password);
+
+    wrapper.destroy();
   });
 
-  it('Case 4: Check isProcess is Equal fasle when create component', () => {
-    expect(wrapper.vm.isProcess).toBe(false);
-  });
-
-  it('Case 5: Check object message when create component', () => {
-    const message = {
-      isShowMessage: false,
-      isMessage: '',
-    };
-
-    expect(wrapper.vm.message).toStrictEqual(message);
-  });
-
-  it('Case 6: Check if the login button is pressed, the system calls the login handler function or not?', () => {
-    const Account = {
-      email: 'test@gmail.com',
-      password: '123456789',
-    };
-
-    const spy = jest.spyOn(wrapper.vm, 'handleLogin');
-
-    wrapper.setData({ account: Account });
-
-    const Button = wrapper.find('#btn-login');
-
-    Button.trigger('click');
-
-    expect(spy).toHaveBeenCalled();
-  });
-
-  it('Case 7: Check the login with EMAIL AND PASSWORD INCORRECT', async() => {
-    const Account = {
-      email: 'nothing@gmail.com',
-      password: 'nothinghere1',
-    };
-
-    await wrapper.setData({ account: Account });
-
-    await wrapper.vm.handleLogin();
-
-    const message = {
-      isShowMessage: true,
-      isMessage: 'Sai tài khoản hoặc mật khẩu',
-    };
-
-    expect(wrapper.vm.message).toStrictEqual(message);
-  });
-
-  it('Case 8: Check the function that STORES DATA into STORE', async() => {
-    const url = '/auth/login';
-
-    const Account = {
-      user_name: 'test@gmail.com',
-      password: '123456789',
-    };
-
-    await postLogin(url, Account)
-      .then((res) => {
-        TOKEN = res.data.access_token;
-        PROFILE = res.data.profile;
-
-        USER = {
-          address: PROFILE.address || '',
-          avatar: PROFILE.avatar || '',
-          email: PROFILE.email || '',
-          fax: PROFILE.fax || '',
-          gender: PROFILE.gender || '',
-          id: PROFILE.id || '',
-          name: PROFILE.name || '',
-          phone: PROFILE.phone || '',
-          status: PROFILE.status || '',
-        };
-      });
-
-    await store.dispatch('user/saveLogin', { USER, TOKEN });
-
-    expect(store.getters.email).toBe(Account.user_name);
-
-    store.dispatch('user/saveLogin', { USER, TOKEN });
-
-    expect(store.getters.token).toBe(TOKEN);
-    expect(store.getters.profile).toStrictEqual(USER);
-  });
-
-  it('Case 9: Check the component Login (ACCOUNT CORRECT)', async() => {
-    const Account = {
-      email: 'test@gmail.com',
-      password: '123456789',
-    };
-
-    await wrapper.setData({ account: Account });
-
-    wrapper.vm.handleLogin();
-
-    expect(store.getters.token).toBeTruthy();
-  });
-
-  it('Case 10: Check the login with EMAIL NOTHING', async() => {
-    const Account = {
-      email: '',
-      password: '123456789',
-    };
-
-    await wrapper.setData({ account: Account });
-
-    wrapper.vm.handleLogin();
-
-    const message = {
-      isShowMessage: true,
-      isMessage: 'ERROR_VALIDATE_EMAIL_PASSWORD',
-    };
-
-    expect(wrapper.vm.message).toStrictEqual(message);
-  });
-
-  it('Case 11: Check the login with PASSWORD NOTHING', async() => {
-    const Account = {
-      email: 'test@gmail.com',
-      password: '',
-    };
-
-    await wrapper.setData({ account: Account });
-
-    wrapper.vm.handleLogin();
-
-    const message = {
-      isShowMessage: true,
-      isMessage: 'ERROR_VALIDATE_EMAIL_PASSWORD',
-    };
-
-    expect(wrapper.vm.message).toStrictEqual(message);
-  });
-
-  it('Case 12: Check the login with EMAIL AND PASSWORD NOTHING', async() => {
-    const Account = {
-      email: '',
-      password: '',
-    };
-
-    await wrapper.setData({ account: Account });
-
-    wrapper.vm.handleLogin();
-
-    const message = {
-      isShowMessage: true,
-      isMessage: 'ERROR_VALIDATE_EMAIL_PASSWORD',
-    };
-
-    expect(wrapper.vm.message).toStrictEqual(message);
-  });
+  //
 });

@@ -12,7 +12,7 @@
       <!-- 1 連絡先電話番号 - Telephone number -->
       <div class="hr-content-tab-item border-t border-l border-r">
         <div id="hr-type-edit" class="hr-content-tab-item__title">
-          <span>{{ $t('HR_LIST_FORM.TELEPHONE_NUMBER') }}</span><Arbitrarily v-if="type_form === 'edit'" />
+          <span>{{ $t('HR_LIST_FORM.TELEPHONE_NUMBER') }} </span><Arbitrarily v-if="type_form === 'edit'" />
         </div>
         <!-- Làm lại inpust khác vì là màn edit khác register -->
         <div class="hr-content-tab__data">
@@ -531,7 +531,6 @@ export default {
     },
     //
     getContentSelect(id) {
-      console.log('getContentSelect', id);
       if (id) {
         return id.content;
       }
@@ -556,7 +555,6 @@ export default {
         number_id_option.id === 1 &&
         type_number_phone === 'telephone_phone_number'
       ) {
-        console.log('pushAreaCode: ', number_id_option, type_number_phone);
         this.contact_init.telephone_phone_number_input =
           number_id_option.content;
       } else if (

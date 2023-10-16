@@ -28,3 +28,7 @@ export const getListEduCourse = async(params = {}) => {
 export const getListCountry = async(params = {}) => {
   return await axios.get('/city', { params });
 };
+
+export const updateStatusWork = async(params = {}) => {
+  return await axios.post(`/work/update-status-work/${params.id}`, { status: params.status });
+};

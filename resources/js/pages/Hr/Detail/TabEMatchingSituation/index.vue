@@ -3,7 +3,7 @@
     <div class="hr-detail-list-status-process">
       <div class="hr-detail-list-status-process-item border-t border-l border-r ">
         <div class="hr-detail-list-status-process-item--head  border-b">
-          <span>{{ $t('HR_LIST.ENTRY_APPLICATION') }}</span>
+          <span class="label-entry-applycation">{{ $t('HR_LIST.ENTRY_APPLICATION') }}</span>
         </div>
         <div class="hr-detail-list-status-process--content">
           <div class="hr-detail-list-status">
@@ -11,18 +11,18 @@
               <div>
                 <div class="hr-detail-list-status-item__status">
                   <div :class="entry_item.status" class="hr-status-block">
-                    <span class="one-line-paragraph">{{ handleRenderTextByStatus(1, entry_item.origin_status) }}</span>
+                    <span class="one-line-paragraph status-entry">{{ handleRenderTextByStatus(1, entry_item.origin_status) }}</span>
                   </div>
                 </div>
 
                 <div class="hr-detail-list-status-item__candidate-info">
-                  <span class="one-line-paragraph">{{ entry_item.remarks }}</span>
+                  <span class="one-line-paragraph entry-title-company" :title="`${entry_item.job_title}/${entry_item.company_name}`">{{ entry_item.job_title }}/{{ entry_item.company_name }}</span>
                 </div>
               </div>
               <div>
                 <div class="hr-detail-list-status-item__entry-date">
-                  <div>{{ $t('HR_LIST.ENTRY_DATE') }}：</div>
-                  <span class="one-line-paragraph">{{ entry_item.entry_date }}</span>
+                  <div class="label-entry-date">{{ $t('HR_LIST.ENTRY_DATE') }}：</div>
+                  <span class="one-line-paragraph entry-date">{{ entry_item.entry_date }}</span>
                 </div>
               </div>
             </div>
@@ -32,7 +32,7 @@
 
       <div class="hr-detail-list-status-process-item border-t border-l border-r ">
         <div class="hr-detail-list-status-process-item--head  border-b">
-          <span>{{ $t('HR_LIST.OFFER_RECEIVED') }}</span>
+          <span class="label-offer-received">{{ $t('HR_LIST.OFFER_RECEIVED') }}</span>
         </div>
 
         <div class="hr-detail-list-status-process--content">
@@ -41,19 +41,19 @@
               <div>
                 <div class="hr-detail-list-status-item__status">
                   <div :class="offer_item.status" class="hr-status-block">
-                    <span class="one-line-paragraph">{{ handleRenderTextByStatus(2, offer_item.origin_status) }}</span>
+                    <span class="one-line-paragraph offer-status">{{ handleRenderTextByStatus(2, offer_item.origin_status) }}</span>
                   </div>
                 </div>
 
                 <div class="hr-detail-list-status-item__candidate-info">
-                  <span class="one-line-paragraph">{{ offer_item.remarks }}</span>
+                  <span class="one-line-paragraph offer-title-company">{{ offer_item.job_title }}/{{ offer_item.company_name }}</span>
                 </div>
               </div>
 
               <div>
                 <div class="hr-detail-list-status-item__entry-date">
-                  <div>{{ $t('HR_LIST.ENTRY_DATE') }}：</div>
-                  <span class="one-line-paragraph">{{ offer_item.entry_date }}</span>
+                  <div class="label-offer-date">{{ $t('HR_LIST.ENTRY_DATE') }}：</div>
+                  <span class="one-line-paragraph offer-date">{{ offer_item.entry_date }}</span>
                 </div>
               </div>
             </div>
@@ -63,7 +63,7 @@
 
       <div class="hr-detail-list-status-process-item border-t border-l border-r ">
         <div class="hr-detail-list-status-process-item--head  border-b">
-          <span>{{ $t('HR_LIST.ARRINTERVIEW') }}</span>
+          <span class="label-arr-interview">{{ $t('HR_LIST.ARRINTERVIEW') }}</span>
         </div>
 
         <div class="hr-detail-list-status-process--content">
@@ -72,19 +72,19 @@
               <div>
                 <div class="hr-detail-list-status-item__status">
                   <div :class="inertview_item.status" class="hr-status-block">
-                    <span class="one-line-paragraph">{{ handleRenderTextByStatus(3, inertview_item.origin_status) }}</span>
+                    <span class="one-line-paragraph interview-status">{{ handleRenderTextByStatus(3, inertview_item.origin_status) }}</span>
                   </div>
                 </div>
 
                 <div class="hr-detail-list-status-item__candidate-info">
-                  <span class="one-line-paragraph">{{ inertview_item.remarks }}</span>
+                  <span class="one-line-paragraph interview-title-company">{{ inertview_item.job_title }}/{{ inertview_item.company_name }}</span>
                 </div>
               </div>
 
               <div>
                 <div class="hr-detail-list-status-item__entry-date">
-                  <div>{{ $t('HR_LIST.ENTRY_DATE') }}：</div>
-                  <span class="one-line-paragraph">{{ inertview_item.entry_date }}</span>
+                  <div class="label-interview-date">{{ $t('HR_LIST.ENTRY_DATE') }}：</div>
+                  <span class="one-line-paragraph interview-date">{{ inertview_item.entry_date }}</span>
                 </div>
               </div>
             </div>
@@ -94,7 +94,7 @@
 
       <div class="hr-detail-list-status-process-item border-t border-l border-r border-b">
         <div class="hr-detail-list-status-process-item--head  border-b">
-          <span>{{ $t('HR_LIST.RESULT') }}</span>
+          <span class="label-result">{{ $t('HR_LIST.RESULT') }}</span>
         </div>
 
         <div class="hr-detail-list-status-process--content">
@@ -103,19 +103,19 @@
               <div>
                 <div class="hr-detail-list-status-item__status">
                   <div :class="result_item.status" class="hr-status-block">
-                    <span class="one-line-paragraph">{{ handleRenderTextByStatus(4, result_item.origin_status) }}</span>
+                    <span class="one-line-paragraph result-status">{{ handleRenderTextByStatus(4, result_item.origin_status) }}</span>
                   </div>
                 </div>
 
                 <div class="hr-detail-list-status-item__candidate-info">
-                  <span class="one-line-paragraph">{{ result_item.remarks }}</span>
+                  <span class="one-line-paragraph result-title-company">{{ result_item.job_title }}/{{ result_item.company_name }}</span>
                 </div>
               </div>
 
               <div>
                 <div class="hr-detail-list-status-item__entry-date">
-                  <div>{{ $t('HR_LIST.ENTRY_DATE') }}：</div>
-                  <span class="one-line-paragraph">{{ result_item.entry_date }}</span>
+                  <div class="label-result-date">{{ $t('HR_LIST.ENTRY_DATE') }}：</div>
+                  <span class="one-line-paragraph result-date">{{ result_item.entry_date }}</span>
                 </div>
               </div>
             </div>
@@ -140,86 +140,17 @@ export default {
   },
   data() {
     return {
-      // dataEntries: [],
-      // dataOffers: [],
-      // dataInterviews: [],
-      // dataResults: [],
-      dataEntries: [
-        {
-          origin_status: 1,
-          status: 'applying',
-          remarks: '電気設計エンジニア／シティコンピュータ株式会社',
-          entry_date: '2023年3月1日',
-        },
-        {
-          origin_status: 1,
-          status: 'applying',
-          remarks: '電気設計エンジニア／シティコンピュータ株式会社',
-          entry_date: '2023年3月1日',
-
-        },
-        {
-          origin_status: 2,
-          status: 'approved',
-          remarks: '電気設計エンジニア／シティコンピュータ株式会社',
-          entry_date: '2023年3月1日',
-        },
-      ],
-      dataOffers: [
-        {
-          origin_status: 1,
-          status: 'applying',
-          remarks: '電気設計エンジニア／シティコンピュータ株式会社',
-          entry_date: '2023年3月1日',
-        },
-        {
-          origin_status: 2,
-          status: 'decline',
-          remarks: '電気設計エンジニア／シティコンピュータ株式会社',
-          entry_date: '2023年3月1日',
-        },
-      ],
-      dataInterviews: [
-        {
-          origin_status: 1,
-          status: 'preparing',
-          remarks: '電気設計エンジニア／シティコンピュータ株式会社',
-          entry_date: '2023年3月1日',
-        },
-        {
-          origin_status: 1,
-          status: 'preparing',
-          remarks: '電気設計エンジニア／シティコンピュータ株式会社',
-          entry_date: '2023年3月1日',
-        },
-        {
-          origin_status: 2,
-          status: 'first',
-          remarks: '電気設計エンジニア／シティコンピュータ株式会社',
-          entry_date: '2023年3月1日',
-        },
-      ],
-      dataResults: [
-        {
-          origin_status: 2,
-          status: 'unofficial',
-          remarks: '電気設計エンジニア／シティコンピュータ株式会社',
-          entry_date: '2023年3月1日',
-        },
-        {
-          origin_status: 4,
-          status: 'cancel',
-          remarks: '電気設計エンジニア／シティコンピュータ株式会社',
-          entry_date: '2023年3月1日',
-        },
-      ],
+      dataEntries: [],
+      dataOffers: [],
+      dataInterviews: [],
+      dataResults: [],
     };
   },
   watch: {
     detailData: {
       handler: function(props_data) {
         if (props_data) {
-          // this.handleConvertData(props_data);
+          this.handleConvertData(props_data);
         }
       },
       deep: true,
@@ -227,53 +158,61 @@ export default {
   },
   methods: {
     handleConvertData(DATA) {
-      if (DATA['entries']) {
-        DATA['entries'].forEach((item) => {
+      if (DATA['entry']) {
+        DATA['entry'].forEach((item) => {
           this.dataEntries.push(
             {
               origin_status: item['status'],
               status: this.handleTransformStatus(1, item['status']),
-              remarks: item['remarks'],
-              entry_date: this.handleTransformTimestamp(item['created_at']),
+              job_title: item['job_title'],
+              company_name: item['company_name'],
+              // entry_date: this.handleTransformTimestamp(item['updated_at']),
+              entry_date: item['updated_at'],
             }
           );
         });
       }
 
-      if (DATA['offers']) {
-        DATA['offers'].forEach((item) => {
+      if (DATA['offer']) {
+        DATA['offer'].forEach((item) => {
           this.dataOffers.push(
             {
               origin_status: item['status'],
               status: this.handleTransformStatus(2, item['status']),
-              remarks: item['remarks'],
-              entry_date: this.handleTransformTimestamp(item['created_at']),
+              job_title: item['job_title'],
+              company_name: item['company_name'],
+              // entry_date: this.handleTransformTimestamp(item['updated_at']),
+              entry_date: item['updated_at'],
             }
           );
         });
       }
 
-      if (DATA['interviews']) {
-        DATA['interviews'].forEach((item) => {
+      if (DATA['interview']) {
+        DATA['interview'].forEach((item) => {
           this.dataInterviews.push(
             {
-              origin_status: item['status_selection'],
-              status: this.handleTransformStatus(3, item['status_selection']),
-              remarks: item['remarks'],
-              entry_date: this.handleTransformTimestamp(item['created_at']),
+              origin_status: item['status'],
+              status: this.handleTransformStatus(3, item['status']),
+              job_title: item['job_title'],
+              company_name: item['company_name'],
+              // entry_date: this.handleTransformTimestamp(item['updated_at']),
+              entry_date: item['updated_at'],
             }
           );
         });
       }
 
-      if (DATA['results']) {
-        DATA['results'].forEach((item) => {
+      if (DATA['result']) {
+        DATA['result'].forEach((item) => {
           this.dataResults.push(
             {
-              origin_status: item['status_selection'],
-              status: this.handleTransformStatus(4, item['status_selection']),
-              remarks: item['remark'],
-              entry_date: this.handleTransformTimestamp(item['created_at']),
+              origin_status: item['status'],
+              status: this.handleTransformStatus(4, item['status']),
+              job_title: item['job_title'],
+              company_name: item['company_name'],
+              // entry_date: this.handleTransformTimestamp(item['updated_at']),
+              entry_date: item['updated_at'],
             }
           );
         });
@@ -307,7 +246,8 @@ export default {
           case 3:
             return '辞退';
           case 4:
-            return '他社内定';
+            // return '他社内定';
+            return '確認';
           default:
             break;
         }
@@ -319,6 +259,8 @@ export default {
             return '申請中';
           case 2:
             return '辞退';
+          case 3:
+            return '承認';
           default:
             break;
         }
@@ -331,19 +273,19 @@ export default {
           case 2:
             return 'オファー承認';
           case 3:
-            return '一次合格';
-          case 4:
-            return '二次合格';
-          case 5:
-            return '三次合格';
-          case 6:
-            return '四次合格';
-          case 7:
-            return '五次合格';
-          case 8:
             return '面接中止';
-          case 9:
+          case 4:
             return '面接辞退';
+          case 5:
+            return '一次合格';
+          case 6:
+            return '二次合格';
+          case 7:
+            return '三次合格';
+          case 8:
+            return '四次合格';
+          case 9:
+            return '五次合格';
           default:
             break;
         }
@@ -374,7 +316,8 @@ export default {
           case 3:
             return 'red-frame';
           case 4:
-            return 'grey-frame';
+            // return 'grey-frame';
+            return 'blue-frame';
           case 5:
           default:
             break;
@@ -387,6 +330,8 @@ export default {
             return 'grey-frame';
           case 2:
             return 'red-frame';
+          case 3:
+            return 'blue-frame';
           default:
             break;
         }
@@ -399,9 +344,9 @@ export default {
           case 2:
             return 'blue-frame';
           case 3:
-            return 'blue-frame';
+            return 'red-frame';
           case 4:
-            return 'blue-frame';
+            return 'red-frame';
           case 5:
             return 'blue-frame';
           case 6:
@@ -409,9 +354,9 @@ export default {
           case 7:
             return 'blue-frame';
           case 8:
-            return 'red-frame';
+            return 'blue-frame';
           case 9:
-            return 'red-frame';
+            return 'blue-frame';
           default:
             break;
         }
@@ -520,8 +465,10 @@ export default {
 }
 
 .hr-detail-list-status-item__status {
-  max-width: 25%;
-  min-width: 88px;
+  // max-width: 25%;
+  // min-width: 88px;
+  max-width: 35%;
+  min-width: 100px;
 }
 
 .hr-status-block {

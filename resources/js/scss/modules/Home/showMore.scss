@@ -1,0 +1,207 @@
+@import '@/scss/_variables.scss';
+@import '@/scss/modules/Job/job.scss';
+
+.show-more {
+  // border: 1px solid;
+  width: 100%;
+  min-height: 80vh;
+  padding-bottom: 5.5rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: stretch;
+}
+
+.show-more-container {
+  border: 1px solid #999999;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  // gap: 0.5rem;
+}
+
+.show-more-head {
+  // border: 1px solid;
+  width: 100%;
+  height: 48px;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.show-more-head__title {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  font-weight: 700;
+  color: $black;
+}
+
+.show-more-body {
+  // border: 1px solid red;
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+
+.show-more-body-wrap {
+  // border: 1px solid green;
+  width: 100%;
+  display: flex;
+  padding: 0.75rem 1rem 1.75rem 1rem;
+
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-end;
+  gap: 2rem;
+}
+
+.show-more-table-wrap {
+  // border: 1px solid;
+  width: 100%;
+  // height: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: stretch;
+}
+
+.show-more-table {
+  // border: 1px solid #999999;
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  min-height: 500px;
+}
+
+.show-more-pagination {
+  // border: 1px solid red;
+  width: 100%;
+  height: 20px;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+//
+
+.nav-item {
+  border: 1px solid #ccc;
+}
+
+.card-link {
+  color: #000;
+}
+
+.show-more {
+  color: #69609c !important;
+}
+
+.distribute-msg-frame {
+  background: #ffffff;
+  border: 1px solid #999;
+  margin-top: 1rem;
+  padding: 4rem 8rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.table-cell {
+  // border: 1px solid red;
+  width: 100%;
+  height: 40px;
+  // padding: 1.2rem 0.5rem ;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  position: relative;
+}
+
+.dot-unread-item {
+  border: 1px solid #ff0000;
+  background: #ff0000;
+  border-radius: 50%;
+  width: 8px;
+  height: 8px;
+  position: relative;
+  top: -1.2rem;
+  left: -0.3rem;
+}
+
+.dot-hidden {
+  border: 1px solid #ff0000;
+  background: #ff0000;
+  border-radius: 50%;
+  width: 8px;
+  height: 8px;
+  position: relative;
+  top: -1.2rem;
+  left: -0.3rem;
+
+  visibility: hidden !important;
+}
+
+.unread-all-head {
+  // border: 1px solid #000;
+  width: 100%;
+  display: flex;
+  justify-content: flex;
+  align-items: center;
+}
+
+.unread-all-tab {
+  position: relative;
+  padding: 0 1rem;
+  height: 0;
+
+  & span:nth-child(1) {
+    visibility: hidden;
+  }
+}
+
+::v-deep .nav-link {
+  border-top: 4px solid $white !important;
+}
+
+.unread-all-dot {
+  background: #ff0000;
+  border: 1px solid #ff0000;
+  border-radius: 50%;
+  width: 8px;
+  height: 8px;
+  position: absolute;
+  top: 0.25rem;
+  right: 0.15rem;
+  z-index: 1;
+  transform: translateY(4px);
+}
+
+::v-deep .text-link {
+  // border: 1px solid #ff0000;
+  color: $titleClassify;
+  &:hover {
+    text-decoration: underline;
+  }
+}
+.w-fit-content {
+  width: fit-content !important;
+  color: $titleClassify;
+  &:hover {
+    color: $titleClassify;
+  }
+}
+
+// ::v-deep .custom-b-tab {
+//   border: 1px solid red;
+// }
+// nav-tabs

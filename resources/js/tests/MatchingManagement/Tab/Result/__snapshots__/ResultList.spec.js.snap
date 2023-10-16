@@ -1,0 +1,116 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Test component MatchingManagement Tab Result Case 5: Check component render Table tab Result have data 1`] = `
+<table id="result-table-list" role="table" aria-busy="false" aria-colcount="9" class="table b-table table-hover">
+  <!---->
+  <!---->
+  <thead role="rowgroup" class="">
+    <!---->
+    <tr role="row" class="">
+      <th role="columnheader" scope="col" aria-colindex="1" aria-label="Selected" class="bg-header text-center" style="background-color: rgb(29, 38, 106); width: 50px; color: rgb(255, 255, 255); text-align: center;">
+        <div class="custom-control custom-checkbox"><input type="checkbox" class="custom-control-input" value="true" id="__BVID__233"><label class="custom-control-label" for="__BVID__233"></label></div>
+      </th>
+      <th role="columnheader" scope="col" tabindex="0" aria-colindex="2" aria-sort="none" class="position-relative bg-header text-center" style="width: 80px; background-color: rgb(29, 38, 106); color: rgb(255, 255, 255); text-align: center;">
+        <div>HEADER_ID</div><span class="sr-only"> (Click to sort ascending)</span>
+      </th>
+      <th role="columnheader" scope="col" tabindex="0" aria-colindex="3" aria-sort="none" class="position-relative bg-header" style="width: 114px; background-color: rgb(29, 38, 106); color: rgb(255, 255, 255); text-align: center;"><label class="mb-0">エントリー <br>
+          ID</label><span class="sr-only"> (Click to sort ascending)</span></th>
+      <th role="columnheader" scope="col" tabindex="0" aria-colindex="4" aria-sort="none" class="position-relative bg-header" style="width: 120px; background-color: rgb(29, 38, 106); color: rgb(255, 255, 255); text-align: center;">
+        <div>HEADER_UPDATING_DATE_ENTRY_MATCHING</div><span class="sr-only"> (Click to sort ascending)</span>
+      </th>
+      <th role="columnheader" scope="col" tabindex="0" aria-colindex="5" aria-sort="none" class="position-relative bg-header" style="background-color: rgb(29, 38, 106); width: 200px; color: rgb(255, 255, 255); text-align: center;">
+        <div>HEADER_FULL_NAME_ENTRY_MATCHING</div><span class="sr-only"> (Click to sort ascending)</span>
+      </th>
+      <th role="columnheader" scope="col" tabindex="0" aria-colindex="6" aria-sort="none" class="position-relative bg-header" style="width: 200px; background-color: rgb(29, 38, 106); color: rgb(255, 255, 255); text-align: center;">
+        <div>HEADER_JOB_LIST_ENTRY_MATCHING</div><span class="sr-only"> (Click to sort ascending)</span>
+      </th>
+      <th role="columnheader" scope="col" tabindex="0" aria-colindex="7" aria-sort="none" class="position-relative bg-header" style="width: 120px; background-color: rgb(29, 38, 106); color: rgb(255, 255, 255); text-align: center;"><label class="mb-0">選考 <br>
+          ステータス</label><span class="sr-only"> (Click to sort ascending)</span></th>
+      <th role="columnheader" scope="col" tabindex="0" aria-colindex="8" aria-sort="none" class="position-relative bg-header" style="width: 120px; background-color: rgb(29, 38, 106); color: rgb(255, 255, 255); text-align: center;">
+        <div>期限</div><span class="sr-only"> (Click to sort ascending)</span>
+      </th>
+      <th role="columnheader" scope="col" aria-colindex="9" class="bg-header" style="width: 104px; background-color: rgb(29, 38, 106); color: rgb(255, 255, 255); text-align: center;">
+        <div>HEADER_DETAIL_ENTRY_MATCHING</div>
+      </th>
+    </tr>
+  </thead>
+  <tbody role="rowgroup">
+    <!---->
+    <tr role="row" class="">
+      <td aria-colindex="1" role="cell" class="bg-header text-center">
+        <div class="custom-control custom-checkbox"><input id="checkbox-result" type="checkbox" class="custom-control-input" value="true"><label for="checkbox-result" class="custom-control-label"></label></div>
+      </td>
+      <td aria-colindex="2" role="cell" class="bg-header"><span></span></td>
+      <td aria-colindex="3" role="cell" class="bg-header text-center"><span>
+            1691053951
+          </span></td>
+      <td aria-colindex="4" role="cell" class="bg-header text-center">20230803</td>
+      <td aria-colindex="5" role="cell" class="bg-header">
+        <div class="w-100 justify-space-between flex-column"><a href="/hr/detail/undefined" class="w-100 justify-space-between flex-column text-dark" target="_self">
+            <div title="Dinh" class="one-line-paragraph" style="width: calc(200px - 1.5rem);">
+              Dinh
+            </div>
+            <div class="one-line-paragraph" style="width: calc(200px - 1.5rem);">
+
+            </div>
+          </a></div>
+      </td>
+      <td aria-colindex="6" role="cell" class="bg-header">
+        <div class="w-100 justify-space-between flex-column"><a href="/job-search/detail/undefined" class="w-100 justify-space-between flex-column text-dark" target="_self">
+            <div class="one-line-paragraph" style="width: calc(200px - 1.5rem);">
+              IT engineer
+            </div>
+          </a></div>
+      </td>
+      <td aria-colindex="7" role="cell" class="bg-header text-center">
+        <!----> <span class="btn-status btn-pending">
+            不合格
+          </span>
+        <!---->
+        <!---->
+      </td>
+      <td aria-colindex="8" role="cell" class="bg-header text-center"><span> - </span></td>
+      <td aria-colindex="9" role="cell" class="bg-header text-center"><button id="btn-go-detail" dusk="btn-go-detail-7" class="btn-go-detail"><i class="fas fa-eye icon-detail"></i></button></td>
+    </tr>
+    <tr role="row" class="">
+      <td aria-colindex="1" role="cell" class="bg-header text-center">
+        <div class="custom-control custom-checkbox"><input id="checkbox-result" type="checkbox" disabled="disabled" class="custom-control-input" value="true"><label for="checkbox-result" class="custom-control-label"></label></div>
+      </td>
+      <td aria-colindex="2" role="cell" class="bg-header"><span></span></td>
+      <td aria-colindex="3" role="cell" class="bg-header text-center"><span>
+            1691053991
+          </span></td>
+      <td aria-colindex="4" role="cell" class="bg-header text-center">20230703</td>
+      <td aria-colindex="5" role="cell" class="bg-header">
+        <div class="w-100 justify-space-between flex-column"><a href="/hr/detail/undefined" class="w-100 justify-space-between flex-column text-dark" target="_self">
+            <div title="Dinh 1" class="one-line-paragraph" style="width: calc(200px - 1.5rem);">
+              Dinh 1
+            </div>
+            <div class="one-line-paragraph" style="width: calc(200px - 1.5rem);">
+
+            </div>
+          </a></div>
+      </td>
+      <td aria-colindex="6" role="cell" class="bg-header">
+        <div class="w-100 justify-space-between flex-column"><a href="/job-search/detail/undefined" class="w-100 justify-space-between flex-column text-dark" target="_self">
+            <div class="one-line-paragraph" style="width: calc(200px - 1.5rem);">
+              IT engineer 1
+            </div>
+          </a></div>
+      </td>
+      <td aria-colindex="7" role="cell" class="bg-header text-center"><span class="btn-status btn-pending">
+            内定
+          </span>
+        <!---->
+        <!---->
+        <!---->
+      </td>
+      <td aria-colindex="8" role="cell" class="bg-header text-center"><span> - </span></td>
+      <td aria-colindex="9" role="cell" class="bg-header text-center"><button id="btn-go-detail" dusk="btn-go-detail-8" class="btn-go-detail"><i class="fas fa-eye icon-detail"></i></button></td>
+    </tr>
+    <!---->
+    <!---->
+  </tbody>
+  <!---->
+</table>
+`;

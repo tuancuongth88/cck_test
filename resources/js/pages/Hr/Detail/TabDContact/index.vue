@@ -1,38 +1,51 @@
 <template>
-  <div class="hr-content-tab">
+  <div class="hr-content-tab hr-detail-contact">
     <div class="hr-content-tab-wrap">
       <div class="hr-content-tab-item border-t border-l border-r">
         <div id=" " class="hr-content-tab-item__title">
-          <span>{{ $t('HR_LIST_FORM.TELEPHONE_NUMBER') }}</span>
+          <span
+            class="label-telephone-number"
+          >{{ $t('HR_LIST_FORM.TELEPHONE_NUMBER') }}
+          </span>
         </div>
 
         <div class="hr-content-tab__data">
           <div>
-            <span>{{ formData.telephone_number }}</span>
+            <span class="content-telephone-number">
+              {{ formData.telephone_number }}
+            </span>
           </div>
         </div>
       </div>
 
       <div class="hr-content-tab-item border-t border-l border-r">
         <div id=" " class="hr-content-tab-item__title">
-          <span>{{ $t('HR_LIST_FORM.MOBILE_PHONE_NUMBER') }}</span>
+          <span class="label-mobile-phone-number">{{
+            $t('HR_LIST_FORM.MOBILE_PHONE_NUMBER')
+          }}</span>
         </div>
 
         <div class="hr-content-tab__data">
           <div>
-            <span>{{ formData.mobile_phone_number }}</span>
+            <span class="content-mobile-phone-number">{{
+              formData.mobile_phone_number
+            }}</span>
           </div>
         </div>
       </div>
 
       <div class="hr-content-tab-item border-t border-l border-r">
         <div id=" " class="hr-content-tab-item__title">
-          <span>{{ $t('HR_LIST_FORM.MAIL_ADDRESS') }}</span>
+          <span class="label-mail-address">{{
+            $t('HR_LIST_FORM.MAIL_ADDRESS')
+          }}</span>
         </div>
 
         <div class="hr-content-tab__data">
           <div>
-            <span>{{ formData.mail_address }}</span>
+            <span class="content-mail-address">{{
+              formData.mail_address
+            }}</span>
           </div>
         </div>
       </div>
@@ -47,7 +60,7 @@
             padding-top: 1.5rem;
           "
         >
-          <span>{{ $t('HR_LIST_FORM.ADDRESS') }}</span>
+          <span class="label-address">{{ $t('HR_LIST_FORM.ADDRESS') }}</span>
         </div>
 
         <div class="hr-content-tab__data">
@@ -73,8 +86,12 @@
                   gap: 0.751rem;
                 "
               >
-                <span style="min-width: 28%">{{ $t('HR_LIST_FORM.CITY') }}</span><!-- City -->
-                <div>{{ formData.address_city }}</div>
+                <span style="min-width: 28%" class="label-address-city">{{
+                  $t('HR_LIST_FORM.CITY')
+                }}</span><!-- City -->
+                <div class="content-address-city">
+                  {{ formData.address_city }}
+                </div>
               </div>
               <div
                 class="w-100 d-flex"
@@ -85,10 +102,12 @@
                   gap: 0.751rem;
                 "
               >
-                <span style="min-width: 28%">{{
+                <span style="min-width: 28%" class="label-district">{{
                   $t('HR_LIST_FORM.DISTRICT')
                 }}</span><!-- district -->
-                <div>{{ formData.address_district }}</div>
+                <div class="content-district">
+                  {{ formData.address_district }}
+                </div>
               </div>
               <div
                 class="w-100 d-flex"
@@ -99,10 +118,12 @@
                   gap: 0.751rem;
                 "
               >
-                <span style="min-width: 28%">{{
+                <span style="min-width: 28%" class="label-address-number">{{
                   $t('HR_LIST_FORM.NUMBER')
                 }}</span><!-- Number -->
-                <div>{{ formData.address_number }}</div>
+                <div class="content-address-number">
+                  {{ formData.address_number }}
+                </div>
               </div>
               <div
                 class="w-100 d-flex"
@@ -113,10 +134,12 @@
                   gap: 0.751rem;
                 "
               >
-                <span style="min-width: 28%">{{
+                <span style="min-width: 28%" class="label-address-other">{{
                   $t('HR_LIST_FORM.ORTHER')
                 }}</span><!-- other -->
-                <div>{{ formData.address_other }}</div>
+                <div class="content-address-other">
+                  {{ formData.address_other }}
+                </div>
               </div>
             </div>
           </div>
@@ -133,7 +156,9 @@
             padding-top: 1.5rem;
           "
         >
-          <span>{{ $t('HR_LIST_FORM.HOMETOWN_ADDRESS') }}</span>
+          <span class="label-hometown-address">{{
+            $t('HR_LIST_FORM.HOMETOWN_ADDRESS')
+          }}</span>
         </div>
 
         <div class="hr-content-tab__data">
@@ -159,8 +184,12 @@
                   gap: 0.751rem;
                 "
               >
-                <span style="min-width: 28%">{{ $t('HR_LIST_FORM.CITY') }}</span><!-- City -->
-                <div>{{ formData.hometown_city }}</div>
+                <span style="min-width: 28%" class="label-hometown-city">{{
+                  $t('HR_LIST_FORM.CITY')
+                }}</span><!-- City -->
+                <div class="content-hometown-city">
+                  {{ formData.hometown_city }}
+                </div>
               </div>
               <div
                 class="w-100 d-flex"
@@ -171,10 +200,12 @@
                   gap: 0.751rem;
                 "
               >
-                <span style="min-width: 28%">{{
+                <span style="min-width: 28%" class="label-hometown-district">{{
                   $t('HR_LIST_FORM.DISTRICT')
                 }}</span><!-- district -->
-                <div>{{ formData.home_town_district }}</div>
+                <div class="content-hometown-district">
+                  {{ formData.home_town_district }}
+                </div>
               </div>
               <div
                 class="w-100 d-flex"
@@ -185,10 +216,12 @@
                   gap: 0.751rem;
                 "
               >
-                <span style="min-width: 28%">{{
+                <span style="min-width: 28%" class="label-hometown-number">{{
                   $t('HR_LIST_FORM.NUMBER')
                 }}</span><!-- Number -->
-                <div>{{ formData.home_town_number }}</div>
+                <div class="content-hometown-number">
+                  {{ formData.home_town_number }}
+                </div>
               </div>
               <div
                 class="w-100 d-flex"
@@ -199,10 +232,12 @@
                   gap: 0.751rem;
                 "
               >
-                <span style="min-width: 28%">{{
+                <span style="min-width: 28%" class="label-hometown-nother">{{
                   $t('HR_LIST_FORM.ORTHER')
                 }}</span><!-- other -->
-                <div>{{ formData.home_town_other }}</div>
+                <div class="content-hometown-nother">
+                  {{ formData.home_town_other }}
+                </div>
               </div>
             </div>
           </div>
@@ -213,7 +248,6 @@
 </template>
 
 <script>
-
 export default {
   name: 'TabDContactDetail',
   props: {
@@ -264,8 +298,8 @@ export default {
       }
 
       this.formData = {
-        telephone_number: data.telephone_number,
-        mobile_phone_number: data.mobile_phone_number,
+        telephone_number: data.telephone_number ?? '',
+        mobile_phone_number: data.mobile_phone_number ?? '',
         mail_address: data.mail_address,
 
         address_city: data.address_city,

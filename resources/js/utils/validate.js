@@ -14,7 +14,19 @@ export function validEmail(email) {
  * @returns Boolean
  */
 export function validPassword(password) {
-  const re = /^\S{8,16}$/;
+  // const re = /^\S{8,16}$/;
+  const re = /^(?=.*[a-z])(?=.*[A-Z]).{12,}$/;
+  return re.test(password);
+}
+
+export function validPasswordFormat(password) {
+  const re = /^(?=.*[A-Z])(?=.*\d).{12,}$/;
+  return re.test(password);
+}
+
+export function validPasswordLength(password) {
+  // const re = /^\S{8,16}$/;
+  const re = /^.{12}$/;
   return re.test(password);
 }
 

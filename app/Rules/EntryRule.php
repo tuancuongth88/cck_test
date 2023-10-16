@@ -33,6 +33,7 @@ class EntryRule implements Rule
             $company = $userLogin->company;
             $hrOrg = $userLogin->hrOrganization;
             $listIdForCompany =  Entry::query()->where(Entry::STATUS,'!=',ENTRY_STATUS_REQUESTING)
+                ->whereIn(Entry::DISPLAY,['on', 'stop'])
                 ->whereIn('id',$arrayListIdEntry);
             if ($userLogin->type == COMPANY)
                 $listIdForCompany= $listIdForCompany->whereHas('work',function ($q) use ($company){

@@ -25,7 +25,7 @@
         <hr>
         <div style="padding-left: 60px">
             <p>
-                {{ $data['company'] }}　様
+                {{ @$data['permission'] }}様
             </p>
             <p>
                 申請されたエントリーを審査するのタスクが停滞しています。<br>

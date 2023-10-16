@@ -265,10 +265,13 @@ class UserFavoriteController extends Controller
     {
         $favorite = UserFavorite::query()
             ->where(UserFavorite::RELATION_ID, $request->relation_id)
+            ->where(UserFavorite::USER_ID, auth()->id())
             ->where(UserFavorite::TYPE, $request->type)->first();
-
-        $this->authorize('delete', $favorite);
-        $this->repository->delete($favorite->id);
-        return $this->responseJson(200, null, trans('messages.mes.delete_success'));
+        if ($favorite){
+            $this->authorize('delete', $favorite);
+            $this->repository->delete($favorite->id);
+            return $this->responseJson(200, null, trans('messages.mes.delete_success'));
+        }
+        return $this->responseJsonError(404, trans('errors.id_not_found'), trans('errors.id_not_found'));
     }
 }

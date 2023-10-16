@@ -30,10 +30,11 @@ class ResetPasswordEmail extends Mailable
      */
     public function build()
     {
-        return $this->subject("Reset password")
+        $email = $this->to[0]['address'] ?: null;
+        return $this->subject(__('messages.mes.subject_forget_password'))
             ->view('email.reset-password')
             ->with([
-                'url' => URL::to('/').'/api/auth/password-reset?token='.$this->token
+                'url' => URL::to('/').'/api/auth/password-reset?email=' . $email . '&token='.$this->token
             ]);
     }
 }

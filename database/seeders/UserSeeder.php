@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\Company;
+use App\Models\HrOrganization;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -23,6 +25,12 @@ class UserSeeder extends Seeder
             $this->userArray(444444,'4okuridashi_hanoi@gmail.vn',COMPANY),
             $this->userArray(555555,'5okuridashi_hanoi@gmail.vn',HR)
         ]);
+        $userCompany = User::query()->where('type', COMPANY)->first();
+        $userHRO = User::query()->where('type', HR)->first();
+        $this->createUserInfo($userCompany->id,Company::class);
+        $this->createUserInfo($userHRO->id,HrOrganization::class);
+
+
     }
 
     private function userArray($loginId, $mail, $type): array
@@ -36,4 +44,11 @@ class UserSeeder extends Seeder
             'created_at' => now()
         ];
     }
+
+    private function createUserInfo($userID, $model){
+        $data = $model::factory()->create();
+        $data->user_id = $userID;
+        $data->save();
+    }
+
 }

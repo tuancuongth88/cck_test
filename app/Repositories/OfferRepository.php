@@ -34,7 +34,7 @@ class OfferRepository extends BaseRepository implements OfferRepositoryInterface
             if (Auth::user()->type == COMPANY) {
                 return $query->where('works.user_id', Auth::user()->id);
             }
-            return $query->where('display', 'on');
+            return $query->whereIn('display', ['on','stop']);
         });
 
     }
@@ -52,11 +52,17 @@ class OfferRepository extends BaseRepository implements OfferRepositoryInterface
 
     public function create(array $attributes)
     {
+        $user = Auth::user();
         $attributes[Offer::STATUS] = OFFER_STATUS_REQUESTING;
         $attributes[Offer::REQUEST_DATE] = Carbon::now()->format('Y-m-d');
+        $attributes[Offer::REMARKS] = isset($attributes[Offer::REMARKS])?$attributes[Offer::REMARKS]:'';
+        $checkOfferCreate = $this->checkOfferCreate($user,$attributes);
+        if ($checkOfferCreate['status']!='success'){
+            return  $checkOfferCreate;
+        }
         $offer = Offer::firstOrCreate($attributes);
-        RemindOfferJob::dispatch($offer->id, $offer->hr_id);
-        return $offer;
+        NotificationOfferJob::dispatch($user, $offer, OFFER_STATUS_REQUESTING, null);
+        return ResponseService::responseData(CODE_SUCCESS,'success','success',$offer);
     }
 
     /**
@@ -71,7 +77,10 @@ class OfferRepository extends BaseRepository implements OfferRepositoryInterface
         $items = $this->select("*", "$mainTbl.id", 'hrs.full_name', "$mainTbl.status")
             ->join('hrs', 'hrs.id', '=', "$mainTbl.hr_id")
             ->join('works', 'works.id', '=', "$mainTbl.work_id")
-            ->where('offers.display', 'on');
+            ->whereNull('hrs.deleted_at')
+            ->whereNull('works.deleted_at')
+            ->where("$mainTbl.status", "!=", OFFER_STATUS_CONFIRM)
+            ->whereIn('offers.display', ['on','stop']);
         if ($ids) {
             $items->whereIn("$mainTbl.id", $ids);
         }
@@ -133,7 +142,7 @@ class OfferRepository extends BaseRepository implements OfferRepositoryInterface
             $OfferId = $request->ids;
             $arrayListIdOffer = array_unique($OfferId);
             $updateStatus = Offer::query()->whereIn('id', $arrayListIdOffer)->update([
-                'display' => 'off',
+                'display' => 'delete',
             ]);
             return true;
         } catch (\Exception $exception) {
@@ -154,10 +163,14 @@ class OfferRepository extends BaseRepository implements OfferRepositoryInterface
         $item = $this->select("*", "$mainTbl.id", 'hrs.full_name', "$mainTbl.status")
             ->join('hrs', 'hrs.id', '=', "$mainTbl.hr_id")
             ->join('works', 'works.id', '=', "$mainTbl.work_id")
-            ->where('offers.display', 'on')
+            ->whereNull('hrs.deleted_at')
+            ->whereNull('works.deleted_at')
+            ->where("$mainTbl.status", "!=", OFFER_STATUS_CONFIRM)
+            ->whereIn('offers.display', ['on','stop'])
             ->where("$mainTbl.id", $id)
             ->first();
         if (!$item) return ResponseService::responseData(CODE_NO_ACCESS, 'error', trans('messages.data_does_not_exist'));
+        $weekdays = $item->updated_at->isoFormat('ddd');
         $updateItems = [
             'id' => $item->id,
             'offer_date' => date('Y-m-d', strtotime($item->request_date)),
@@ -169,7 +182,8 @@ class OfferRepository extends BaseRepository implements OfferRepositoryInterface
             'status' => $item->status,
             'status_name' => OFFER_STATUS_TEXTS[$item->status],
             'note' => $item->note,
-            'display' => $item->display
+            'display' => $item->display,
+            'updating_date_ja' => $item->updated_at->format('Y年m月d日').' (' . $weekdays . ') '
         ];
         return ResponseService::responseData(CODE_SUCCESS, 'success', 'success', $updateItems);
     }
@@ -194,14 +208,14 @@ class OfferRepository extends BaseRepository implements OfferRepositoryInterface
             $updateStatus = $offer->update([
                 'status' => $status,
                 'note' => $note,
-                'display' => $status == OFFER_STATUS_CONFIRM ? 'off' : 'on'
+                'display' => $status == OFFER_STATUS_CONFIRM ? 'off' : 'stop'
             ]);
             //tạo mới thông tin ở interview
-            if ($status == OFFER_STATUS_CONFIRM && in_array($authLogin->type, [HR, HR_MANAGER])) {
+            if ($status == OFFER_STATUS_CONFIRM && in_array($authLogin->type, [HR, HR_MANAGER, SUPER_ADMIN])) {
                 $createInterview = $this->createInterview($offer);
             }
             $sendNotiOffer = NotificationOfferJob::dispatch($authLogin, $offer, $status, $note);
-            return ResponseService::responseData(CODE_SUCCESS, 'success', trans('messages.mes.create_success'));
+            return ResponseService::responseData(CODE_SUCCESS, 'success', Common::getMessageModal('offer',$status));
         } catch (\Exception $exception) {
             Log::error('updateStatusOffer :' . $exception);
             return ResponseService::responseData(CODE_NO_ACCESS, 'error', trans('messages.data_does_not_exist'));
@@ -212,6 +226,9 @@ class OfferRepository extends BaseRepository implements OfferRepositoryInterface
         //check status
         if (in_array($offer->status, [OFFER_STATUS_DECLINE, OFFER_STATUS_CONFIRM])) {
             return ResponseService::responseData(CODE_NO_ACCESS, 'error', trans('messages.data_does_not_exist'));
+        }
+        if ($status == OFFER_STATUS_REQUESTING) {
+            return self::resp(CODE_NO_ACCESS, trans('api.offer.status.invalid'));
         }
         //check permission role HR
         if ($authLogin->type == HR && $offer->hr->user_id != $authLogin->id) {
@@ -244,7 +261,22 @@ class OfferRepository extends BaseRepository implements OfferRepositoryInterface
             "status_interview_adjustment" => INTERVIEW_STATUS_INTERVIEW_ADJUSTMENT_BEFORE_ADJUSTMENT,
             "remarks" => '',
             "display" => "on",
+            "step" => INTERVIEW_TABLE_STEP_INTERVIEW
         ]);
         return true;
+    }
+    private function checkOfferCreate($user,$attributes){
+        $hrId = $attributes['hr_id'];
+        $workId = $attributes['work_id'];
+
+        $getListOnGoingJob = Common::getGoingJobWork($user,[$workId]);
+        if (count($getListOnGoingJob) == 0) {
+            return ResponseService::responseData(CODE_SUCCESS, 'success', 'success');
+        }
+        $listHrinJob = array_unique(array_column($getListOnGoingJob[$workId],'hrsid'));
+        if (in_array($hrId,$listHrinJob)){
+            return ResponseService::responseData(CODE_NO_ACCESS,'error',trans('api.offer.check.list-hrs.create'));
+        }
+        return ResponseService::responseData(CODE_SUCCESS,'success','success');
     }
 }

@@ -62,8 +62,7 @@ class UserFavoriteRepository extends BaseRepository implements UserFavoriteRepos
                     $join->on('hrs.id', '=', 'user_favorites.relation_id')
                         ->where('user_favorites.user_id', $user->id)
                         ->where('user_favorites.type', FAVORITE_TYPE_HRS);
-                })
-                ->where(HR::STATUS, HRS_STATUS_PUBLIC);
+                });
         }
         $data = $data->orderBy('id', 'desc');
         $data = Common::pagination($request, $data);

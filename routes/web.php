@@ -18,5 +18,6 @@ use App\Http\Controllers\AutoTestController;
 // Route::view('/{any}', 'home')
 //     ->where('any', '.*');
 
-Route::get('/autotest',[AutoTestController::class, 'index']);
+Route::view('/', 'home');
+Route::view('/business', 'business');
 Route::view('/{any}', 'spa')->where('any', '.*');

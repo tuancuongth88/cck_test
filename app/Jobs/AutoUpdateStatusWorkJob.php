@@ -36,5 +36,10 @@ class AutoUpdateStatusWorkJob implements ShouldQueue
         Work::query()
             ->whereDate(Work::APPLICATION_PERIOD_TO, '<', $today)
             ->update([Work::STATUS => WORK_STATUS_OUT_OF_RECRUITMENT_PERIOD]);
+
+        //update status recruting
+        Work::query()->whereDate(Work::APPLICATION_PERIOD_FROM, '<=', $today)
+            ->where(Work::APPLICATION_PERIOD_TO, '>=', $today)
+            ->update([Work::STATUS => WORK_STATUS_RECRUITING]);
     }
 }

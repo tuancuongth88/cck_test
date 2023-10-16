@@ -25,7 +25,7 @@
         <hr>
         <div style="padding-left: 60px">
             <p>
-                {{ $data['company'] }}様
+                {{ @$data['permission'] }}様
             </p>
             <p>
                 {!! $data['content'] !!}
@@ -36,7 +36,7 @@
                 エントリーID
             </p>
             <p>
-                {{ $data['entry_code'] }}
+                {{ @$data['entry_code'] }}
             </p>
             <p>
                 <br>

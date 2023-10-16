@@ -5,6 +5,7 @@ namespace Tests;
 use Facebook\WebDriver\Chrome\ChromeOptions;
 use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
+use Laravel\Dusk\Browser;
 use Laravel\Dusk\TestCase as BaseTestCase;
 
 abstract class DuskTestCase extends BaseTestCase
@@ -52,7 +53,7 @@ abstract class DuskTestCase extends BaseTestCase
     }
 
     /**
-     * Determine whether the Dusk command has disabled headless mode.
+     * Deter mine whether the Dusk command has disabled headless mode.
      *
      * @return bool
      */
@@ -61,15 +62,40 @@ abstract class DuskTestCase extends BaseTestCase
         return isset($_SERVER['DUSK_HEADLESS_DISABLED']) ||
                isset($_ENV['DUSK_HEADLESS_DISABLED']);
     }
-    public function login(){
-        $this->browse(function ($browser) {
-            $browser->visit('/#/login')
-                ->typeSlowly('username', 'test@gmail.com')
-                ->type('password', '123456789')
-                ->press('.btn_submit')
-                ->waitFor('.navbar-app', 10)
-                ->assertPresent('.logo-navbar')->pause(1000);
+    public function login($type = SUPER_ADMIN){
+        $account['email'] = '1okuridashi_hanoi@gmail.vn';
+        $account['password'] = '123456789CCk';
+        switch ($type){
+            case SUPER_ADMIN:
+                $account['email'] = '1okuridashi_hanoi@gmail.vn';
+                break;
+            case COMPANY_MANAGER:
+                $account['email'] = '2okuridashi_hanoi@gmail.vn';
+                break;
+            case HR_MANAGER:
+                $account['email'] = '3okuridashi_hanoi@gmail.vn';
+                break;
+            case COMPANY:
+                $account['email'] = '4okuridashi_hanoi@gmail.vn';
+                break;
+            case HR:
+                $account['email'] = '5okuridashi_hanoi@gmail.vn';
+                break;
+
+        }
+        $this->browse(function (Browser $browser) use ($account) {
+            $browser->visit('/login')
+                ->type('@email', $account['email'])
+                ->type('@password', $account['password'])->releaseMouse()
+                ->press('.login-submit')->pause(2000);
         });
         sleep(2);
     }
+
+     public function  logout(){
+         $this->browse(function (Browser $browser)  {
+             $browser->scrollIntoView('.btn-logout')
+                 ->click('.btn-logout');
+         });
+     }
 }

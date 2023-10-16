@@ -6,6 +6,7 @@
           :class="
             status_organization_name ? null : 'collapsed  btn border-none'
           "
+          dusk="btn_organization_name"
           :aria-expanded="status_organization_name"
           aria-controls="collapse-1"
           @click="status_organization_name = !status_organization_name"
@@ -20,7 +21,6 @@
             :class="{ 'rotate-90deg': status_organization_name }"
           >
         </b-button>
-
         <b-collapse
           id="collapse-1"
           v-model="status_organization_name"
@@ -29,6 +29,7 @@
           <b-card>
             <b-form-select
               v-model="formData.hr_org_id"
+              dusk="hr_org_id"
               :options="organizationOptions"
               value-field="key"
               text-field="value"
@@ -36,10 +37,10 @@
           </b-card>
         </b-collapse>
       </div>
-
-      <div class="item-search-vs-condition">
+      <div id="dusk_gender" class="item-search-vs-condition">
         <b-button
           :class="status_gender_radio ? null : 'collapsed  btn border-none'"
+          dusk="btn_gender"
           :aria-expanded="status_gender_radio"
           aria-controls="collapse-1"
           @click="status_gender_radio = !status_gender_radio"
@@ -54,7 +55,6 @@
             :class="{ 'rotate-90deg': status_gender_radio }"
           >
         </b-button>
-
         <b-collapse id="collapse-1" v-model="status_gender_radio" class="w-100">
           <b-card>
             <b-form-checkbox-group
@@ -72,11 +72,12 @@
       <div class="item-search-vs-condition">
         <b-button
           :class="status_age ? null : 'collapsed  btn border-none'"
+          dusk="btn_age"
           :aria-expanded="status_age"
           aria-controls="collapse-1"
           @click="status_age = !status_age"
         >
-          <span :class="{ 'text-blue': formData.age_from && formData.age_to }">
+          <span :class="{ 'text-blue': formData.age_from || formData.age_to }">
             {{ $t('HR_REGISTER.AGE') }}
           </span>
 
@@ -99,12 +100,11 @@
               >
                 <b-form-select
                   v-model="formData.age_from"
+                  dusk="age_from"
                   :options="ageOptions"
                   class="pr-1"
-                  value-field="value"
-                  text-field="value"
                 />
-                <span>歳</span>
+                <span>{{ $t('AGE') }}</span>
               </div>
 
               <span class="px-1">~</span>
@@ -115,13 +115,12 @@
               >
                 <b-form-select
                   v-model="formData.age_to"
+                  dusk="age_to"
                   :options="ageOptions"
                   class="pr-1"
-                  value-field="value"
-                  text-field="value"
                 />
 
-                <span>歳</span>
+                <span>{{ $t('AGE') }}</span>
               </div>
             </div>
           </b-card>
@@ -133,6 +132,7 @@
           :class="
             status_final_education_date ? null : 'collapsed  btn border-none'
           "
+          dusk="btn_final_education_date"
           :aria-expanded="status_final_education_date"
           aria-controls="collapse-1"
           @click="status_final_education_date = !status_final_education_date"
@@ -140,9 +140,9 @@
           <span
             :class="{
               'text-blue':
-                formData.final_education_date_from_year &&
-                formData.final_education_date_from_month &&
-                formData.final_education_date_to_year &&
+                formData.final_education_date_from_year ||
+                formData.final_education_date_from_month ||
+                formData.final_education_date_to_year ||
                 formData.final_education_date_to_month,
             }"
           >
@@ -185,12 +185,11 @@
                 >
                   <b-form-select
                     v-model="formData.final_education_date_from_year"
-                    :options="finalEductionYear"
+                    dusk="final_education_date_from_year"
+                    :options="yearOptions"
                     class="pr-1"
-                    value-field="key"
-                    text-field="value"
                   />
-                  <span>年</span>
+                  <span>{{ $t('HR_LIST_FORM.YEAR') }}</span>
                 </div>
 
                 <div
@@ -199,12 +198,11 @@
                 >
                   <b-form-select
                     v-model="formData.final_education_date_from_month"
-                    :options="finalEductionMonth"
+                    dusk="final_education_date_from_month"
+                    :options="monthOptionList"
                     class="pr-1"
-                    value-field="key"
-                    text-field="value"
                   />
-                  <span>月</span>
+                  <span>{{ $t('JOB_SEARCH.MONTH') }}</span>
                 </div>
               </div>
 
@@ -218,12 +216,11 @@
                 >
                   <b-form-select
                     v-model="formData.final_education_date_to_year"
-                    :options="finalEductionYear"
+                    dusk="final_education_date_to_year"
+                    :options="yearOptions"
                     class="pr-1"
-                    value-field="key"
-                    text-field="value"
                   />
-                  <span>年</span>
+                  <span>{{ $t('HR_LIST_FORM.YEAR') }}</span>
                 </div>
 
                 <div
@@ -232,12 +229,11 @@
                 >
                   <b-form-select
                     v-model="formData.final_education_date_to_month"
-                    :options="finalEductionMonth"
+                    dusk="final_education_date_to_month"
+                    :options="monthOptionList"
                     class="pr-1"
-                    value-field="key"
-                    text-field="value"
                   />
-                  <span>月</span>
+                  <span>{{ $t('JOB_SEARCH.MONTH') }}</span>
                 </div>
               </div>
             </div>
@@ -250,8 +246,9 @@
           :class="
             status_final_educational_background_division_1
               ? null
-              : 'collapsed  btn border-none'
+              : 'collapsed btn border-none'
           "
+          dusk="btn_edu_class"
           :aria-expanded="status_final_educational_background_division_1"
           aria-controls="collapse-1"
           @click="
@@ -283,7 +280,9 @@
         >
           <b-card>
             <b-form-checkbox-group
+              id="dusk_edu_class"
               v-model="formData.edu_class"
+              dusk="edu_class"
               :options="finalEductionClassification"
               value-field="key"
               text-field="value"
@@ -293,13 +292,14 @@
         </b-collapse>
       </div>
 
-      <div class="item-search-vs-condition">
+      <div id="dusk_edu_degree" class="item-search-vs-condition">
         <b-button
           :class="
             status_final_educational_background_degree
               ? null
               : 'collapsed  btn border-none'
           "
+          dusk="btn_edu_degree"
           :aria-expanded="status_final_educational_background_degree"
           aria-controls="collapse-1"
           @click="
@@ -328,6 +328,7 @@
           <b-card>
             <b-form-checkbox-group
               v-model="formData.edu_degree"
+              dusk="edu_degree"
               :options="finalEductionDegree"
               value-field="key"
               text-field="value"
@@ -345,6 +346,7 @@
               ? null
               : 'collapsed  btn border-none'
           "
+          dusk="btn_edu_course"
           :aria-expanded="status_final_education_course_specify_btn"
           aria-controls="collapse-1"
           @click="
@@ -374,6 +376,7 @@
             <div class="w-100">
               <div
                 class="btn specify-btn"
+                dusk="btn_specify"
                 @click="handleOpenModalFinalEduCourse()"
               >
                 <span>＋ </span>
@@ -398,9 +401,10 @@
         </b-collapse>
       </div>
 
-      <div class="item-search-vs-condition">
+      <div id="dusk_work_forms" class="item-search-vs-condition">
         <b-button
           :class="status_work_form ? null : 'collapsed  btn border-none'"
+          dusk="btn_work_forms"
           :aria-expanded="status_work_form"
           aria-controls="collapse-1"
           @click="status_work_form = !status_work_form"
@@ -429,11 +433,12 @@
         </b-collapse>
       </div>
 
-      <div class="item-search-vs-condition">
+      <div id="dusk_work_part_time" class="item-search-vs-condition">
         <b-button
           :class="
             status_work_form_part_time ? null : 'collapsed  btn border-none'
           "
+          dusk="btn_work_part_time"
           :aria-expanded="status_work_form_part_time"
           aria-controls="collapse-1"
           @click="status_work_form_part_time = !status_work_form_part_time"
@@ -465,10 +470,10 @@
           </b-card>
         </b-collapse>
       </div>
-
-      <div class="item-search-vs-condition">
+      <div id="dusk_japan_levels" class="item-search-vs-condition">
         <b-button
           :class="status_japan_levels ? null : 'collapsed  btn border-none'"
+          dusk="btn_japan_levels"
           :aria-expanded="status_japan_levels"
           aria-controls="collapse-1"
           @click="status_japan_levels = !status_japan_levels"
@@ -502,6 +507,7 @@
           :class="
             status_choose_job_specify_btn ? null : 'collapsed  btn border-none'
           "
+          dusk="btn_main_job"
           :aria-expanded="status_choose_job_specify_btn"
           aria-controls="collapse-1"
           @click="
@@ -526,7 +532,11 @@
         >
           <b-card>
             <div class="w-100">
-              <div class="btn specify-btn" @click="handleOpenModalOccupation()">
+              <div
+                class="btn specify-btn"
+                dusk="btn_specify_job"
+                @click="handleOpenModalOccupation()"
+              >
                 <span>+</span>
                 <span class="font-weight-bold">{{
                   $t('HR_REGISTER.SPECIFY')
@@ -550,7 +560,12 @@
       </div>
 
       <div class="item-search-vs-condition">
-        <span class="w-100 d-flex justify-start align-center font-weight-bold">
+        <span
+          :class="{
+            'text-blue': formData.search,
+          }"
+          class="w-100 d-flex justify-start align-center font-weight-bold"
+        >
           <label for="free-word">{{ $t('SEARCH_JOB_LIST.FREE_WORD') }}</label>
         </span>
 
@@ -558,6 +573,7 @@
           <b-form-input
             id="free-word"
             v-model="formData.search"
+            dusk="input_search"
             class="cck-input"
             placeholder=""
             max-length="50"
@@ -566,12 +582,21 @@
           />
         </div>
 
-        <div class="btn btn-search-vs-conditions" @click="handleSearch">
+        <div
+          class="btn btn-search-vs-conditions btn_search--custom"
+          dusk="btn_search_with_conditions"
+          @click="handleSearch"
+        >
           <span>{{ $t('SEARCH_JOB_LIST.SEARCH_WITH_CONDITIONS') }}</span>
+          <img
+            :src="require('@/assets/images/login/chervon-right-white.png')"
+            alt="collapse"
+          >
         </div>
 
         <div
           class="btn btn-clear-settings"
+          dusk="btn_clear_settings"
           @click="handleClearAllHrFormSearch()"
         >
           <span>{{ $t('BUTTON.CLEAR_SETTINGS') }}</span>
@@ -597,12 +622,13 @@ import {
   renderAge,
   renderYearsEducationTiming,
 } from '@/const/hrOrganization.js';
-
+import EventBus from '@/utils/eventBus';
 import ModalMultipleSelect from '../../../components/Modal/ModalMultipleSelect.vue';
 import ModalMultipleSelectCourse from '../../../components/Modal/ModalMultipleSelectCourse.vue';
-import { getAllHrOrganization } from '@/api/hrOrganization.js';
+import { getOptionHrOrganization } from '@/api/modules/matching.js';
 import { getListMainjob, getListEduCourse } from '@/api/job';
 import { MakeToast } from '../../../utils/toastMessage';
+import { renderOptionRequire } from '@/utils/renderOptionRequire';
 
 export default {
   name: 'HrFormSearch',
@@ -658,7 +684,8 @@ export default {
       status_japan_levels: false,
       status_choose_job_specify_btn: false,
 
-      organizationOptions: [],
+      // organizationOptions: [],
+      organizationOptions: renderOptionRequire([]),
 
       genderOptions: genderOptions,
 
@@ -672,6 +699,35 @@ export default {
       workFormParttimeOptions: workFormParttimeOptions,
       jaLevelOption: jaLevelOption,
     };
+  },
+  computed: {
+    monthOptionList() {
+      const result = [
+        { value: null, text: '' },
+        { value: '01', text: '1' },
+        { value: '02', text: '2' },
+        { value: '03', text: '3' },
+        { value: '04', text: '4' },
+        { value: '05', text: '5' },
+        { value: '06', text: '6' },
+        { value: '07', text: '7' },
+        { value: '08', text: '8' },
+        { value: '09', text: '9' },
+        { value: '10', text: '10' },
+        { value: '11', text: '11' },
+        { value: '12', text: '21' },
+      ];
+      return result;
+    },
+    yearOptions() {
+      const result = [{ value: null, text: '' }];
+      const year_from = 1960;
+      const year_to = 2050;
+      for (let i = year_from; i <= year_to; i++) {
+        result.push(i);
+      }
+      return result;
+    },
   },
   watch: {
     // selected1(newValue, oldValue) {
@@ -688,12 +744,12 @@ export default {
     // },
   },
   created() {
-    this.getListHrOrganization();
+    this.getOptionHrOrganization();
 
-    this.getListMainJob();
+    this.getListMainjob();
     this.getListEduCourse();
 
-    this.$bus.on('dataModalMultiple', (data) => {
+    EventBus.$on('dataModalMultiple', (data) => {
       const listParentIds = Object.keys(data);
       const listSelected = [];
 
@@ -709,7 +765,7 @@ export default {
       this.modalDataSelected = listSelected;
     });
 
-    this.$bus.on('dataModalMultipleCourse', (data) => {
+    EventBus.$on('dataModalMultipleCourse', (data) => {
       const listParentIds = Object.keys(data);
 
       const listSelected = [];
@@ -728,24 +784,166 @@ export default {
 
       this.modalDataSelectedCourse = listSelected;
     });
+
+    this.handleSyncHrSearchData();
+    EventBus.$on('resetSearchParamsNull', () => {
+      this.handleSyncHrSearchData();
+    });
   },
   methods: {
-    async getListHrOrganization() {
+    handleSyncHrSearchData() {
+      const syncData = this.$store.getters.searchParams;
+      // console.log('syncData HrFormSearch===>', syncData);
+      if (syncData) {
+        this.modalDataSelectedCourse = syncData['middle_class'];
+        if (syncData['middle_class'].length > 0) {
+          this.status_final_education_course_specify_btn = true;
+        } else {
+          this.status_final_education_course_specify_btn = false;
+        }
+
+        this.modalDataSelected = syncData['main_job_ids'];
+        if (syncData['main_job_ids'].length > 0) {
+          this.status_choose_job_specify_btn = true;
+        } else {
+          this.status_choose_job_specify_btn = false;
+        }
+
+        this.formData.final_education_date_from_year = syncData['edu_date_from']
+          ? syncData['edu_date_from'].split('-')[0]
+          : '';
+        this.formData.final_education_date_from_month = syncData[
+          'edu_date_from'
+        ]
+          ? syncData['edu_date_from'].split('-')[1]
+          : '';
+        this.formData.final_education_date_to_year = syncData['edu_date_to']
+          ? syncData['edu_date_to'].split('-')[0]
+          : '';
+        this.formData.final_education_date_to_month = syncData['edu_date_to']
+          ? syncData['edu_date_to'].split('-')[1]
+          : '';
+
+        if (
+          this.formData.final_education_date_from_year ||
+          this.formData.final_education_date_from_month ||
+          this.formData.final_education_date_to_year ||
+          this.formData.final_education_date_to_month
+        ) {
+          this.status_final_education_date = true;
+        }
+
+        this.formData.hr_org_id = syncData['hr_org_id'];
+        if (this.formData.hr_org_id) {
+          this.status_organization_name = true;
+        } else {
+          this.status_organization_name = false;
+        }
+
+        this.formData.gender = syncData['gender'];
+        if (this.formData.gender.length > 0) {
+          this.status_gender_radio = true;
+        } else {
+          this.status_gender_radio = false;
+        }
+
+        this.formData.age_from = syncData['age_from'];
+        this.formData.age_to = syncData['age_to'];
+        if (this.formData.age_from && this.formData.age_to) {
+          this.status_age = true;
+        } else {
+          this.status_age = false;
+        }
+
+        this.formData.edu_degree = syncData['edu_degree'];
+        if (this.formData.edu_degree.length > 0) {
+          this.status_final_educational_background_degree = true;
+        } else {
+          this.status_final_educational_background_degree = false;
+        }
+
+        this.formData.edu_class = syncData['edu_class'];
+        if (this.formData.edu_class.length > 0) {
+          this.status_final_educational_background_division_1 = true;
+        } else {
+          this.status_final_educational_background_division_1 = false;
+        }
+
+        this.formData.work_forms = syncData['work_forms'];
+        if (this.formData.work_forms.length > 0) {
+          this.status_work_form = true;
+        } else {
+          this.status_work_form = false;
+        }
+
+        this.formData.work_hour = syncData['work_hour'] ? [1] : [];
+        if (this.formData.work_hour.length > 0) {
+          this.status_work_form_part_time = true;
+        } else {
+          this.status_work_form_part_time = false;
+        }
+
+        this.formData.japan_levels = syncData['japan_levels'];
+        if (this.formData.japan_levels.length > 0) {
+          this.status_japan_levels = true;
+        } else {
+          this.status_japan_levels = false;
+        }
+
+        this.formData.search = syncData['search'];
+        if (this.formData.search) {
+          this.status_search = true;
+        } else {
+          this.status_search = false;
+        }
+      } else {
+        Object.assign(this.formData, {
+          hr_org_id: '',
+          gender: [],
+          age_from: '',
+          age_to: '',
+          final_education_date_from_year: '',
+          final_education_date_from_month: '',
+          final_education_date_to_year: '',
+          final_education_date_to_month: '',
+          edu_class: [],
+          edu_degree: [],
+          final_education_course: [],
+          work_forms: [],
+          work_hour: [],
+          japan_levels: [],
+          main_job_career: [],
+          search: '',
+        });
+
+        this.status_organization_name = false;
+        this.status_gender_radio = false;
+        this.status_age = false;
+        this.status_final_education_date = false;
+        this.status_final_educational_background_division_1 = false;
+        this.status_final_educational_background_degree = false;
+        this.status_final_education_course_specify_btn = false;
+        this.status_work_form = false;
+        this.status_work_form_part_time = false;
+        this.status_japan_levels = false;
+        this.status_choose_job_specify_btn = false;
+      }
+    },
+
+    async getOptionHrOrganization() {
       const param = {
         per_page: -1,
       };
-      await getAllHrOrganization(param).then((response) => {
-        const { code } = response.data;
+      await getOptionHrOrganization(param).then((response) => {
+        const { code, data } = response.data;
         if (code === 200) {
-          const {
-            data: { result },
-          } = response.data;
-          this.organizationOptions = result.map((item) => {
-            return {
+          // this.formData.hr_org_id = null;
+          data.map((item) => {
+            this.organizationOptions.push({
               key: item.id,
-              value: item.corporate_name_ja,
+              value: item.corporate_name_en,
               // status: this.genderStatus(item.status),
-            };
+            });
           });
 
           // this.$store.dispatch('app/saveListUSer', listUser);
@@ -760,7 +958,7 @@ export default {
       });
     },
 
-    async getListMainJob() {
+    async getListMainjob() {
       try {
         const response = await getListMainjob();
         const { code, message } = response.data;
@@ -780,7 +978,7 @@ export default {
           });
         }
       } catch (error) {
-        console.log('error', error);
+        console.log(error);
       }
     },
 
@@ -804,7 +1002,7 @@ export default {
           });
         }
       } catch (error) {
-        console.log('error', error);
+        console.log(error);
       }
     },
 
@@ -812,58 +1010,83 @@ export default {
       return String(e).substring(0, 50);
     },
 
-    handleSearch() {
-      const formData = {
-        ...this.formData,
-        edu_date_from:
-          this.formData.final_education_date_from_year +
-          '-' +
-          this.formData.final_education_date_from_month,
-        edu_date_to:
-          this.formData.final_education_date_to_year +
-          '-' +
-          this.formData.final_education_date_to_month,
-      };
-      if (formData.edu_date_from === '-') {
-        formData.edu_date_from = '';
+    async handleSearch() {
+      const is_getSearchStore = this.$store.getters.searchParams;
+      if (is_getSearchStore) {
+        const finalFormData = {
+          ...this.formData,
+          main_job_ids: this.modalDataSelected,
+          middle_class: this.modalDataSelectedCourse,
+        };
+        await this.$store.dispatch(
+          'hrSearchQuery/setSearchParams',
+          finalFormData
+        );
+        this.$emit('handleSearch', finalFormData);
+      } else {
+        const formData = {
+          ...this.formData,
+          edu_date_from: this.handleMergeYearMonth(
+            this.formData.final_education_date_from_year,
+            this.formData.final_education_date_from_month
+          ),
+          // this.formData.final_education_date_from_year +
+          // '-' +
+          // this.formData.final_education_date_from_month,
+          edu_date_to: this.handleMergeYearMonth(
+            this.formData.final_education_date_to_year,
+            this.formData.final_education_date_to_month
+          ),
+          // this.formData.final_education_date_to_year +
+          // '-' +
+          // this.formData.final_education_date_to_month,
+        };
+        if (formData.edu_date_from === '-') {
+          formData.edu_date_from = null;
+        }
+
+        if (formData.edu_date_to === '-') {
+          formData.edu_date_to = null;
+        }
+
+        delete formData.final_education_date_to_month;
+        delete formData.final_education_date_to_year;
+        delete formData.final_education_date_from_year;
+        delete formData.final_education_date_from_month;
+        delete formData.final_education_course;
+
+        // const main_job_ids = this.modalDataSelected.flatMap(
+        //   (item) => item.childOptions
+        // );
+
+        // const middle_class = this.modalDataSelectedCourse.flatMap(
+        //   (item) => item.childOptions
+        // );
+
+        // console.log('main_job_ids--->', main_job_ids);
+        // console.log('middle_class--->', middle_class);
+        // const checkedWorkHour = 1; // check chọn 週28時間以下
+
+        const finalFormData = {
+          ...formData,
+          main_job_ids: this.modalDataSelected,
+          middle_class: this.modalDataSelectedCourse,
+          work_hour: formData.work_hour.length === 0 ? '' : true,
+        };
+
+        // console.log('finalFormData===>', finalFormData);
+        await this.$store.dispatch(
+          'hrSearchQuery/setSearchParams',
+          finalFormData
+        );
+        this.$emit('handleSearch', finalFormData);
       }
+    },
 
-      if (formData.edu_date_to === '-') {
-        formData.edu_date_to = '';
+    handleMergeYearMonth(year, month) {
+      if (year && month) {
+        return year + '-' + month;
       }
-
-      delete formData.final_education_date_to_month;
-      delete formData.final_education_date_to_year;
-      delete formData.final_education_date_from_year;
-      delete formData.final_education_date_from_month;
-      delete formData.final_education_course;
-
-      // console.log('handleSearch có formData', formData);
-      // console.log('this.modalDataSelected==>', this.modalDataSelected);
-      const main_job_ids = this.modalDataSelected.flatMap(
-        (item) => item.childOptions
-      );
-
-      const middle_class = this.modalDataSelectedCourse.flatMap(
-        (item) => item.childOptions
-      );
-
-      // console.log('main_job_ids--->', main_job_ids);
-      // console.log('middle_class--->', middle_class);
-      const checkedWorkHour = 1; // check chọn 週28時間以下
-
-      const finalFormData = {
-        ...formData,
-        main_job_ids,
-        middle_class,
-        work_hour:
-          formData.work_hour.length === 0
-            ? ''
-            : formData.work_hour.includes(checkedWorkHour),
-      };
-
-      console.log('handleSearch có finalFormData', finalFormData);
-      this.$emit('handleSearch', finalFormData);
     },
 
     handleClearAllHrFormSearch() {
@@ -889,16 +1112,16 @@ export default {
       this.modalDataSelected = [];
       this.modalDataSelectedCourse = [];
 
-      this.$bus.emit('handleClearSettingsModal');
-      this.$bus.emit('handleClearSettingsModalCourse');
+      EventBus.$emit('handleClearSettingsModal');
+      EventBus.$emit('handleClearSettingsModalCourse');
     },
 
     handleOpenModalFinalEduCourse() {
-      this.$bus.emit('showModalSelectCourse', true);
+      EventBus.$emit('showModalSelectCourse', true);
     },
 
     handleOpenModalOccupation() {
-      this.$bus.emit('showModalSelect', true);
+      EventBus.$emit('showModalSelect', true);
     },
 
     handleRemoveSelected(id) {
@@ -906,7 +1129,7 @@ export default {
         (item) => item.id !== Number(id)
       );
 
-      this.$bus.emit('removeSelected', Number(id));
+      EventBus.$emit('removeSelected', Number(id));
     },
 
     handleRemoveSelectedCourse(id) {
@@ -914,7 +1137,7 @@ export default {
         (item) => item.id !== Number(id)
       );
 
-      this.$bus.emit('removeSelectedCourse', Number(id));
+      EventBus.$emit('removeSelectedCourse', Number(id));
     },
   },
 };

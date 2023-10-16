@@ -24,7 +24,7 @@ trait CreateDuskTestApplication
 
         $app->make(Kernel::class)->bootstrap();
 
-        if ($app->env !== 'testing' || config('database.default') !== 'sqlite') {
+        if ($app->env !== 'testing' || config('database.default') !== 'mysql') {
 
             $output = new \Symfony\Component\Console\Output\ConsoleOutput();
             $output->writeln("");

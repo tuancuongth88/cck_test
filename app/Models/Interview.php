@@ -24,6 +24,7 @@ class Interview extends Model
     const INTERVIEW_ADJUSTMENT = 'status_interview_adjustment';
     const REMARKS = 'remarks';
     const DISPLAY = 'display';
+    const STEP = 'step';
 
     protected $table = 'interviews';
 
@@ -36,7 +37,8 @@ class Interview extends Model
         self::STATUS_SELECTION,
         self::INTERVIEW_ADJUSTMENT,
         self::REMARKS,
-        self::DISPLAY
+        self::DISPLAY,
+        self::STEP
     ];
 
     protected $dates = ['deleted_at'];

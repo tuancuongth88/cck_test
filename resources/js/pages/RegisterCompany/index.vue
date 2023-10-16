@@ -22,9 +22,14 @@
             <!-- 1. TITLE -->
             <div class="hr-registration-page__head">
               <div class="head-title">
-                <span>
+                <!-- <span>
                   {{ $t('COMPANY_REGISTER.TITLE_REGISTER_COMPANY_1') }}
-                </span>
+                </span> -->
+                <img
+                  :src="require('@/assets/images/login/bd-logo.png')"
+                  alt="bd-logo"
+                  class="bd-logo"
+                >
                 <span>
                   {{ $t('COMPANY_REGISTER.TITLE_REGISTER_COMPANY_2') }}
                 </span>
@@ -70,9 +75,9 @@
             </div>
 
             <template v-if="type_form === 'completed'">
-              <h4 class="text-center mt-5">送信しました。</h4>
+              <h4 class="text-center mt-5">{{ $t('SENT') }}</h4>
               <h4 class="text-center">
-                運営管理者の審査結果をお待ちください。
+                {{ $t('WAITING') }}
               </h4>
             </template>
             <!-- 3. FORM -->
@@ -86,7 +91,7 @@
                   v-if="type_form === 'create'"
                   class="row-item border-t border-l border-r"
                 >
-                  <div class="form-title">
+                  <div class="form-title d-flex justify-content-between">
                     <span>{{ $t('JOB_DETAIL.COMPANY_NAME') }}</span>
                     <Require />
                   </div>
@@ -99,6 +104,7 @@
                       :formatter="format50characters"
                       enabled
                       :class="error.company_name === false ? 'is-invalid' : ''"
+                      dusk="company_name"
                       @input="handleChangeForm($event, 'company_name')"
                     />
                     <b-form-invalid-feedback
@@ -123,12 +129,12 @@
                     {{ formData.company_name }}
                   </div>
                 </div>
-                <!-- 2 input 企業名（ﾌﾘｶﾞﾅ） company name (furigana) -->
+                <!-- 2 input 企業名（フリガナ） company name (furigana) -->
                 <div
                   v-if="type_form === 'create'"
                   class="row-item border-t border-l border-r"
                 >
-                  <div class="form-title">
+                  <div class="form-title d-flex justify-content-between">
                     <span>{{ $t('JOB_DETAIL.COMPANY_NAME_FURIGANA') }}</span><Require />
                   </div>
                   <div class="form-inputs border-l">
@@ -142,6 +148,7 @@
                       :class="
                         error.company_name_jp === false ? 'is-invalid' : ''
                       "
+                      dusk="company_name_jp"
                       @input="handleChangeForm($event, 'company_name_jp')"
                     />
                     <b-form-invalid-feedback
@@ -171,7 +178,7 @@
                   v-if="type_form === 'create'"
                   class="row-item border-t border-l border-r"
                 >
-                  <div class="form-title align-start">
+                  <div class="form-title align-start d-flex justify-content-between">
                     <span>{{ $t('COMPANY_REGISTER.FIELD') }}</span>
                     <Require />
                   </div>
@@ -187,6 +194,7 @@
                           :options="major_classification_options"
                           value-field="key"
                           text-field="value"
+                          dusk="major_classification"
                           :class="
                             error.major_classification === false
                               ? 'is-invalid'
@@ -212,25 +220,31 @@
                       <div style="width: 30%; min-width: 176px">
                         {{ $t('COMPANY_REGISTER.MIDDLE_CLASSIFICATION') }}
                       </div>
-                      <b-form-select
-                        v-model="formData.middle_classification"
-                        :options="middle_classification_options"
-                        value-field="key"
-                        text-field="value"
-                        :enabled="formData.major_classification"
-                        :disabled="!formData.major_classification"
-                        :class="
-                          error.middle_classification === false
-                            ? 'is-invalid'
-                            : ''
-                        "
-                      />
-                      <b-form-invalid-feedback
-                        id="middle_classification"
-                        :state="error.middle_classification"
-                      >
-                        {{ $t('VALIDATE.REQUIRED_SELECT') }}
-                      </b-form-invalid-feedback>
+                      <div class="d-flex flex-wrap w-100">
+                        <b-form-select
+                          v-model="formData.middle_classification"
+                          :options="middle_classification_options"
+                          value-field="key"
+                          text-field="value"
+                          dusk="middle_classification"
+                          :enabled="formData.major_classification"
+                          :disabled="!formData.major_classification"
+                          :class="
+                            error.middle_classification === false
+                              ? 'is-invalid'
+                              : ''
+                          "
+                          @change="
+                            [handleChangeForm($event, 'middle_classification')]
+                          "
+                        />
+                        <b-form-invalid-feedback
+                          id="middle_classification"
+                          :state="error.middle_classification"
+                        >
+                          {{ $t('VALIDATE.REQUIRED_SELECT') }}
+                        </b-form-invalid-feedback>
+                      </div>
                     </div>
                     <!--  -->
                   </div>
@@ -273,7 +287,7 @@
                   v-if="type_form === 'create'"
                   class="row-item border-t border-l border-r"
                 >
-                  <div class="form-title align-start">
+                  <div class="form-title align-start d-flex justify-content-between">
                     <span>{{ $t('COMPANY_REGISTER.ADDRESS') }}</span><Require />
                   </div>
                   <div class="form-inputs border-l" style="gap: 1rem">
@@ -296,6 +310,7 @@
                           :formatter="format7characters"
                           :placeholder="''"
                           class="w-100"
+                          dusk="post_code"
                           :class="error.post_code === false ? 'is-invalid' : ''"
                           @input="handleChangeForm($event, 'post_code')"
                         />
@@ -325,6 +340,7 @@
                           :formatter="format50characters"
                           :placeholder="''"
                           class="w-100"
+                          dusk="prefectures"
                           :class="
                             error.prefectures === false ? 'is-invalid' : ''
                           "
@@ -357,6 +373,7 @@
                           :formatter="format50characters"
                           :placeholder="''"
                           class="w-100"
+                          dusk="municipality"
                           :class="
                             error.municipality === false ? 'is-invalid' : ''
                           "
@@ -364,7 +381,7 @@
                         />
                         <b-form-invalid-feedback
                           id="municipality"
-                          :state="error.市町村区"
+                          :state="error.municipality"
                         >
                           {{ $t('VALIDATE.REQUIRED_TEXT') }}
                         </b-form-invalid-feedback>
@@ -389,6 +406,7 @@
                           :formatter="format50characters"
                           :placeholder="''"
                           class="w-100"
+                          dusk="number"
                           :class="error.number === false ? 'is-invalid' : ''"
                           @input="handleChangeForm($event, 'number')"
                         />
@@ -418,6 +436,7 @@
                           :formatter="format50characters"
                           :placeholder="''"
                           class="w-100"
+                          dusk="other"
                           @input="handleChangeForm($event, 'other')"
                         />
                       </div>
@@ -517,7 +536,7 @@
                   v-if="type_form === 'create'"
                   class="row-item border-t border-l border-r"
                 >
-                  <div class="form-title">
+                  <div class="form-title d-flex justify-content-between">
                     <span>{{ $t('COMPANY_REGISTER.TELEPHONE_NUMBER') }}</span>
                     <Require />
                   </div>
@@ -539,11 +558,31 @@
                           <div class="option-area-code">
                             <b-dropdown
                               id="telephone_number"
+                              dusk="telephone_number_option"
                               :text="display_area_code.telephone_number"
                               class="w-100 h-100"
                             >
+                              <!-- BLANK -->
+                              <b-dropdown-item
+                                @click="
+                                  pustAreaCode('telephone_number', '');
+                                  handleChangeFormOption(
+                                    $event,
+                                    'telephone_number_id'
+                                  );
+                                "
+                                @change="
+                                  handleChangeForm(
+                                    $event,
+                                    'telephone_number_id'
+                                  )
+                                "
+                              >
+                                <span style="height: 28px" />
+                              </b-dropdown-item>
                               <!-- VIE -->
                               <b-dropdown-item
+                                dusk="telephone_number_type_vn"
                                 @click="
                                   pustAreaCode('telephone_number', '+84');
                                   handleChangeFormOption(
@@ -567,6 +606,7 @@
                               </b-dropdown-item>
                               <!-- JA -->
                               <b-dropdown-item
+                                dusk="telephone_number_type_ja"
                                 @click="
                                   pustAreaCode('telephone_number', '+81');
                                   handleChangeFormOption(
@@ -630,6 +670,7 @@
                           "
                           :enabled="display_area_code.telephone_number !== ''"
                           :disabled="display_area_code.telephone_number === ''"
+                          dusk="telephone_number"
                           @input="handleChangeForm($event, 'telephone_number')"
                         />
                         <b-form-invalid-feedback
@@ -668,10 +709,10 @@
                   v-if="type_form === 'create'"
                   class="row-item border-t border-l border-r"
                 >
-                  <div class="form-title">
+                  <div class="form-title d-flex justify-content-between">
                     <span>{{ $t('COMPANY_REGISTER.EMAIL_ADDRESS_LOGIN_ID') }}
                       <br>
-                      (ログインID)
+                      {{ $t('HR_REGISTER.MAIL_ADDRESS2') }}
                     </span>
                     <Require />
                   </div>
@@ -685,6 +726,7 @@
                       :name="'mail_address'"
                       :formatter="format50characters"
                       enabled
+                      dusk="mail_address"
                       :class="error.mail_address === false ? 'is-invalid' : ''"
                       @input="handleChangeForm($event, 'mail_address')"
                     />
@@ -719,7 +761,7 @@
                   v-if="type_form === 'create'"
                   class="row-item border-t border-l border-r"
                 >
-                  <div class="form-title">
+                  <div class="form-title d-flex justify-content-between">
                     <span style="text-transform: capitalize">URL</span><Require />
                   </div>
                   <div class="form-inputs border-l">
@@ -733,6 +775,7 @@
                       :formatter="format50characters"
                       :placeholder="''"
                       enabled
+                      dusk="url"
                       :class="error.url === false ? 'is-invalid' : ''"
                       @input="handleChangeForm($event, 'url')"
                     />
@@ -763,7 +806,7 @@
                   v-if="type_form === 'create'"
                   class="row-item border-t border-l border-r"
                 >
-                  <div class="form-title align-start">
+                  <div class="form-title align-start d-flex justify-content-between">
                     <span>{{ $t('COMPANY_REGISTER.REPRESENTATIVE') }}</span><Require />
                   </div>
                   <div class="form-inputs border-l" style="gap: 1rem">
@@ -785,12 +828,13 @@
                           :formatter="format50characters"
                           :placeholder="''"
                           class="w-100"
+                          dusk="job_title"
                           :class="error.job_title === false ? 'is-invalid' : ''"
                           @input="handleChangeForm($event, 'job_title')"
                         />
                         <b-form-invalid-feedback
                           id="job_title"
-                          :state="error.市町村区"
+                          :state="error.job_title"
                         >
                           {{ $t('VALIDATE.REQUIRED_TEXT') }}
                         </b-form-invalid-feedback>
@@ -814,6 +858,7 @@
                           :formatter="format50characters"
                           :placeholder="''"
                           class="w-100"
+                          dusk="full_name"
                           :class="error.full_name === false ? 'is-invalid' : ''"
                           @input="handleChangeForm($event, 'full_name')"
                         />
@@ -850,6 +895,7 @@
                               ? 'is-invalid'
                               : ''
                           "
+                          dusk="full_name_furigana"
                           @input="
                             handleChangeForm($event, 'full_name_furigana')
                           "
@@ -929,7 +975,7 @@
                   v-if="type_form === 'create'"
                   class="row-item border-t border-l border-r"
                 >
-                  <div class="form-title">
+                  <div class="form-title d-flex justify-content-between">
                     <span>{{
                       $t('COMPANY_REGISTER.REPRESENTATIVE_CONTACT')
                     }}</span><Arbitrarily />
@@ -945,11 +991,31 @@
                           <div class="option-area-code">
                             <b-dropdown
                               id="representative_contact"
+                              dusk="representative_contact_option"
                               :text="display_area_code.representative_contact"
                               class="w-100 h-100"
                             >
+                              <!-- BLANK -->
+                              <b-dropdown-item
+                                @click="
+                                  pustAreaCode('representative_contact', '');
+                                  handleChangeFormOption(
+                                    $event,
+                                    'representative_contact_id'
+                                  );
+                                "
+                                @change="
+                                  handleChangeForm(
+                                    $event,
+                                    'representative_contact_id'
+                                  )
+                                "
+                              >
+                                <span style="height: 28px" />
+                              </b-dropdown-item>
                               <!-- VIE -->
                               <b-dropdown-item
+                                dusk="representative_contact_vn"
                                 @click="
                                   pustAreaCode('representative_contact', '+84');
                                   handleChangeFormOption(
@@ -973,6 +1039,7 @@
                               </b-dropdown-item>
                               <!-- JA -->
                               <b-dropdown-item
+                                dusk="representative_contact_ja"
                                 @click="
                                   pustAreaCode('representative_contact', '+81');
                                   handleChangeFormOption(
@@ -1028,10 +1095,9 @@
                         <b-form-input
                           v-model="formData.representative_contact"
                           aria-describedby="representative_contact"
-                          max-length="50"
                           type="number"
                           :name="'representative_contact'"
-                          :formatter="format50characters"
+                          :formatter="format15characters"
                           :placeholder="$t('COMPANY_REGISTER.PLACEHOLDER')"
                           :enabled="
                             display_area_code.representative_contact !== ''
@@ -1039,6 +1105,7 @@
                           :disabled="
                             display_area_code.representative_contact === ''
                           "
+                          dusk="representative_contact"
                           @input="
                             handleChangeForm($event, 'representative_contact')
                           "
@@ -1082,7 +1149,7 @@
                   v-if="type_form === 'create'"
                   class="row-item border-t border-l border-r border-b"
                 >
-                  <div class="form-title">
+                  <div class="form-title d-flex justify-content-between">
                     <span>{{ $t('COMPANY_REGISTER.ASSIGNEE_CONTACT') }}</span><Require />
                   </div>
                   <div class="form-inputs border-l">
@@ -1102,11 +1169,31 @@
                           <div class="option-area-code">
                             <b-dropdown
                               id="assignee_contact"
+                              dusk="assignee_contact_option"
                               :text="display_area_code.assignee_contact"
                               class="w-100 h-100"
                             >
+                              <!-- BLANK -->
+                              <b-dropdown-item
+                                @click="
+                                  pustAreaCode('assignee_contact', '');
+                                  handleChangeFormOption(
+                                    $event,
+                                    'assignee_contact_id'
+                                  );
+                                "
+                                @change="
+                                  handleChangeForm(
+                                    $event,
+                                    'assignee_contact_id'
+                                  )
+                                "
+                              >
+                                <span style="height: 28px" />
+                              </b-dropdown-item>
                               <!-- VIE -->
                               <b-dropdown-item
+                                dusk="assignee_contact_vn"
                                 @click="
                                   pustAreaCode('assignee_contact', '+84');
                                   handleChangeFormOption(
@@ -1130,6 +1217,7 @@
                               </b-dropdown-item>
                               <!-- JA -->
                               <b-dropdown-item
+                                dusk="assignee_contact_ja"
                                 @click="
                                   pustAreaCode('assignee_contact', '+81');
                                   handleChangeFormOption(
@@ -1186,6 +1274,7 @@
                           max-length="50"
                           type="number"
                           :name="'assignee_contact'"
+                          dusk="assignee_contact"
                           :formatter="format50characters"
                           :placeholder="$t('COMPANY_REGISTER.PLACEHOLDER')"
                           :class="
@@ -1234,9 +1323,20 @@
               class="hr-registration-page__btn"
             >
               <b-button
+                id="btn-back"
+                variant="secondary"
+                size="lg"
+                class="text-white"
+                @click="handleToggleConfirmLeavingModal"
+              >
+                {{ $t('RETURN') }}
+              </b-button>
+              <b-button
+                id="btn-next"
                 variant="warning"
                 size="lg"
                 class="text-white"
+                dusk="btn-next"
                 @click="registerCompanyCheckValidate"
               >
                 {{ $t('NEXT_BTN') }}
@@ -1252,8 +1352,88 @@
                 <div class="terms-vs-conditions-head">
                   <span>{{ $t('HR_REGISTER.TERMS_VS_CONDITIONS') }}</span>
                 </div>
-                <div class="terms-vs-conditions-content">
-                  <!-- <div>{{ Terms & Conditions }}</div> -->
+                <div
+                  id="myDIV"
+                  class="terms-vs-conditions-content"
+                  dusk="myDIV"
+                  @scroll="checkScroll"
+                >
+                  この利用規約（以下，「本規約」といいます。）は，シティコンピュータ株式会社（以下，「当社」といいます。）がこのウェブサイト上で提供するサービス（以下，「本サービス」といいます。）の利用条件を定めるものです。登録ユーザーの皆さま（以下，「ユーザー」といいます。）には，本規約に従って，本サービスをご利用いただきます。<br><br>
+                  第1条（適用）<br>
+                  １．本規約は，ユーザーと当社との間の本サービスの利用に関わる一切の関係に適用されるものとします。<br>
+                  ２．当社は本サービスに関し，本規約のほか，ご利用にあたってのルール等，各種の定め（以下，「個別規定」といいます。）をすることがあります。これら個別規定はその名称のいかんに関わらず，本規約の一部を構成するものとします。<br>
+                  ３．本規約の規定が個別規定の規定と矛盾する場合には，個別規定において特段の定めなき限り，個別規定の規定が優先されるものとします。<br>
+                  <br>
+                  第2条（利用登録）<br>
+                  １．本サービスにおいては，登録希望者が本規約に同意の上，当社の定める方法によって利用登録を申請し，当社がこれを承認することによって，利用登録が完了するものとします。<br>
+                  ２．当社は，利用登録の申請者に以下の事由があると判断した場合，利用登録の申請を承認しないことがあり，その理由については一切の開示義務を負わないものとします。<br>
+                  ⑴利用登録の申請に際して虚偽の事項を届け出た場合<br>
+                  ⑵本規約に違反したことがある者からの申請である場合<br>
+                  ⑶その他，当社が利用登録を相当でないと判断した場合<br>
+                  <br>
+                  第3条（ユーザーIDおよびパスワードの管理）<br>
+                  １．ユーザーは，自己の責任において，本サービスのユーザーIDおよびパスワードを適切に管理するものとします。<br>
+                  ２．ユーザーは，いかなる場合にも，ユーザーIDおよびパスワードを第三者に譲渡または貸与し，もしくは第三者と共用することはできません。当社は，ユーザーIDとパスワードの組み合わせが登録情報と一致してログインされた場合には，そのユーザーIDを登録しているユーザー自身による利用とみなします。<br>
+                  ３．ユーザーID及びパスワードが第三者によって使用されたことによって生じた損害は，当社に故意又は重大な過失がある場合を除き，当社は一切の責任を負わないものとします。<br><br>
+                  第4条（利用料金および支払方法）<br>
+                  １．ユーザーは，本サービスの有料部分の対価として，当社が別途定め，本ウェブサイトに表示する利用料金を，当社が指定する方法により支払うものとします。<br>
+                  ２．ユーザーが利用料金の支払を遅滞した場合には，ユーザーは年14．6％の割合による遅延損害金を支払うものとします。<br><br>
+                  第5条（禁止事項）<br>
+                  ユーザーは，本サービスの利用にあたり，以下の行為をしてはなりません。<br>
+                  ⑴法令または公序良俗に違反する行為 ⑵犯罪行為に関連する行為<br>
+                  ⑶本サービスの内容等，本サービスに含まれる著作権，商標権ほか知的財産権を侵害する行為<br>
+                  ⑷当社，ほかのユーザー，またはその他第三者のサーバーまたはネットワークの機能を破壊したり，妨害したりする行為<br>
+                  ⑸本サービスによって得られた情報を商業的に利用する行為<br>
+                  ⑹当社のサービスの運営を妨害するおそれのある行為<br>
+                  ⑺不正アクセスをし，またはこれを試みる行為<br>
+                  ⑻他のユーザーに関する個人情報等を収集または蓄積する行為<br>
+                  ⑼不正な目的を持って本サービスを利用する行為<br>
+                  ⑽本サービスの他のユーザーまたはその他の第三者に不利益，損害，不快感を与える行為<br>
+                  ⑾他のユーザーに成りすます行為<br>
+                  ⑿当社が許諾しない本サービス上での宣伝，広告，勧誘，または営業行為<br>
+                  ⒀面識のない異性との出会いを目的とした行為<br>
+                  ⒁当社のサービスに関連して，反社会的勢力に対して直接または間接に利益を供与する行為<br>
+                  ⒂その他，当社が不適切と判断する行為<br><br>
+                  第6条（本サービスの提供の停止等）<br>
+                  １．当社は，以下のいずれかの事由があると判断した場合，ユーザーに事前に通知することなく本サービスの全部または一部の提供を停止または中断することができるものとします。<br>
+                  ⑴本サービスにかかるコンピュータシステムの保守点検または更新を行う場合<br>
+                  ⑵地震，落雷，火災，停電または天災などの不可抗力により，本サービスの提供が困難となった場合<br>
+                  ⑶コンピュータまたは通信回線等が事故により停止した場合<br>
+                  ⑷その他，当社が本サービスの提供が困難と判断した場合<br>
+                  ２．当社は，本サービスの提供の停止または中断により，ユーザーまたは第三者が被ったいかなる不利益または損害についても，一切の責任を負わないものとします。<br><br>
+                  第7条（利用制限および登録抹消）<br>
+                  １．当社は，ユーザーが以下のいずれかに該当する場合には，事前の通知なく，ユーザーに対して，本サービスの全部もしくは一部の利用を制限し，またはユーザーとしての登録を抹消することができるものとします。<br>
+                  ⑴本規約のいずれかの条項に違反した場合<br>
+                  ⑵登録事項に虚偽の事実があることが判明した場合<br>
+                  ⑶料金等の支払債務の不履行があった場合<br>
+                  ⑷当社からの連絡に対し，一定期間返答がない場合<br>
+                  ⑸本サービスについて，最終の利用から一定期間利用がない場合<br>
+                  ⑹その他，当社が本サービスの利用を適当でないと判断した場合<br>
+                  ２．当社は，本条に基づき当社が行った行為によりユーザーに生じた損害について，一切の責任を負いません。<br><br>
+                  第8条（退会）<br>
+                  ユーザーは，当社の定める退会手続により，本サービスから退会できるものとします。<br><br>
+                  第9条（保証の否認および免責事項）<br>
+                  １．当社は，本サービスに事実上または法律上の瑕疵（安全性，信頼性，正確性，完全性，有効性，特定の目的への適合性，セキュリティなどに関する欠陥，エラーやバグ，権利侵害などを含みます。）がないことを明示的にも黙示的にも保証しておりません。<br>
+                  ２．当社は，本サービスに起因してユーザーに生じたあらゆる損害について、当社の故意又は重過失による場合を除き、一切の責任を負いません。ただし，本サービスに関する当社とユーザーとの間の契約（本規約を含みます。）が消費者契約法に定める消費者契約となる場合，この免責規定は適用されません。<br>
+                  ３．前項ただし書に定める場合であっても，当社は，当社の過失（重過失を除きます。）による債務不履行または不法行為によりユーザーに生じた損害のうち特別な事情から生じた損害（当社またはユーザーが損害発生につき予見し，または予見し得た場合を含みます。）について一切の責任を負いません。また，当社の過失（重過失を除きます。）による債務不履行または不法行為によりユーザーに生じた損害の賠償は，ユーザーから当該損害が発生した月に受領した利用料の額を上限とします。<br>
+                  ４．当社は，本サービスに関して，ユーザーと他のユーザーまたは第三者との間において生じた取引，連絡または紛争等について一切責任を負いません。<br><br>
+                  第10条（サービス内容の変更等）<br>
+                  当社は，ユーザーへの事前の告知をもって、本サービスの内容を変更、追加または廃止することがあり、ユーザーはこれを承諾するものとします。<br><br>
+                  第11条（利用規約の変更）<br>
+                  １．当社は以下の場合には、ユーザーの個別の同意を要せず、本規約を変更することができるものとします。<br>
+                  ⑴本規約の変更がユーザーの一般の利益に適合するとき。<br>
+                  ⑵本規約の変更が本サービス利用契約の目的に反せず、かつ、変更の必要性、変更後の内容の相当性その他の変更に係る事情に照らして合理的なものであるとき。<br>
+                  ２．当社はユーザーに対し、前項による本規約の変更にあたり、事前に、本規約を変更する旨及び変更後の本規約の内容並びにその効力発生時期を通知します。<br><br>
+                  第12条（個人情報の取扱い）<br>
+                  当社は，本サービスの利用によって取得する個人情報については，当社「プライバシーポリシー」に従い適切に取り扱うものとします。<br><br>
+                  第13条（通知または連絡）<br>
+                  ユーザーと当社との間の通知または連絡は，当社の定める方法によって行うものとします。当社は,ユーザーから,当社が別途定める方式に従った変更届け出がない限り,現在登録されている連絡先が有効なものとみなして当該連絡先へ通知または連絡を行い,これらは,発信時にユーザーへ到達したものとみなします。<br><br>
+                  第14条（権利義務の譲渡の禁止）<br>
+                  ユーザーは，当社の書面による事前の承諾なく，利用契約上の地位または本規約に基づく権利もしくは義務を第三者に譲渡し，または担保に供することはできません。<br><br>
+                  第15条（準拠法・裁判管轄）<br>
+                  本規約の解釈にあたっては、日本法を準拠法とします。<br>
+                  本サービスに関して紛争が生じた場合には，当社の本店所在地を管轄する裁判所を専属的合意管轄とします。<br><br>
+                  以上<br>
                 </div>
               </div>
             </div>
@@ -1266,9 +1446,11 @@
               <b-form-checkbox
                 id="checkbox-1"
                 v-model="status_agree_with_terms_conditions"
+                dusk="checkbox-ok"
                 name="checkbox-1"
                 :value="true"
                 :unchecked-value="false"
+                :disabled="!isCheckboxEnabled"
               />
               <span>{{ $t('HR_REGISTER.AGREE_WITH_TERMS_CONDITIONS') }}</span>
             </div>
@@ -1286,7 +1468,8 @@
                 {{ $t('BUTTON.BTN_BACK_REGISTER') }}
               </b-button>
               <b-button
-                :disable="status_agree_with_terms_conditions === true"
+                dusk="btn-register"
+                :disabled="!status_agree_with_terms_conditions"
                 variant="warning"
                 class="text-white"
                 size="lg"
@@ -1300,6 +1483,7 @@
               variant=""
               size="lg"
               class="text-white mt-5 btn-custome"
+              dusk="go_to_login"
               @click="goToLogin"
             >
               <span>{{ $t('GO_TO_LOGIN_SCREEN') }}</span>
@@ -1308,6 +1492,43 @@
         </div>
       </div>
     </div>
+    <b-modal
+      ref="confirm modal"
+      v-model="statusModalConfirmLeaving"
+      hide-footer
+      :no-fade="false"
+      no-close-on-backdrop
+      centered
+      size="lg"
+    >
+      <template #modal-title>
+        <div class="modal-title">
+          <span>{{ $t('TITLE_QUESTION1') }}</span>
+        </div>
+      </template>
+      <template #default>
+        <div class="modal-body-confirm">
+          <div class="w-100 d-flex justify-end align-center" style="gap: 10px">
+            <button
+              id="btn-go-to-back-home-"
+              dusk="btn_continue_create"
+              class="btn btn_cancel--custom btn-modal-confirm"
+              @click="handleToggleConfirmLeavingModal"
+            >
+              {{ $t('BUTTON.CANCEL') }}
+            </button>
+            <button
+              id="leaving-create-hr"
+              class="btn btn_modal_accept--custom btn-modal-confirm"
+              dusk="btn_accept_leaving"
+              @click="handleConfirmStilConfirmLeaving"
+            >
+              {{ $t('OK') }}
+            </button>
+          </div>
+        </div>
+      </template>
+    </b-modal>
   </b-overlay>
 </template>
 
@@ -1316,7 +1537,7 @@ import Require from '@/components/Require/Require.vue';
 import { MakeToast } from '@/utils/toastMessage';
 import { validEmail } from '@/utils/validate';
 import { companyRegister } from '@/api/company.js';
-import { getListEduCourse } from '@/api/job';
+import { getListMainjob } from '@/api/job';
 import Arbitrarily from '@/components/Arbitrarily/Arbitrarily.vue';
 
 export default {
@@ -1330,6 +1551,9 @@ export default {
     return {
       type_form: 'create',
       status_agree_with_terms_conditions: false,
+      isCheckboxEnabled: false,
+      statusModalConfirmLeaving: false,
+
       overlay: {
         show: false,
         variant: 'light',
@@ -1353,8 +1577,8 @@ export default {
       formData: {
         company_name: '',
         company_name_jp: '',
-        major_classification: '',
-        middle_classification: '',
+        major_classification: null, // !
+        middle_classification: null, // !
 
         post_code: '',
         prefectures: '',
@@ -1376,8 +1600,25 @@ export default {
         is_create: 0,
       },
 
-      major_classification_options: [],
-      middle_classification_options: [],
+      selected: null,
+
+      major_classification_options: [
+        {
+          key: null,
+          type: null,
+          value: this.$t('VALIDATE.REQUIRED_SELECT'),
+          disabled: true,
+        },
+      ],
+
+      middle_classification_options: [
+        {
+          key: null,
+          type: null,
+          value: this.$t('VALIDATE.REQUIRED_SELECT'),
+          disabled: true,
+        },
+      ],
 
       error: {
         company_name: true,
@@ -1410,14 +1651,41 @@ export default {
     // },
   },
 
+  // mounted() {
+  //   this.myagree = this.$refs.myagree;
+  //   this.mybutton = this.$refs.mybutton;
+  // },
+
   created() {
-    this.getListEduCourse();
+    this.getListMainjob();
   },
 
   methods: {
-    format7characters(e) {
-      return String(e).substring(0, 7);
+    checkScroll() {
+      var elmnt = document.getElementById('myDIV');
+      // var x = elmnt.scrollLeft;
+      var y = elmnt.scrollTop;
+      // document.getElementById('demo').innerHTML =
+      //   'Horizontally: ' + x + 'px<br>Vertically: ' + y + 'px';
+
+      if (y > 2200) {
+        this.isCheckboxEnabled = true;
+      }
     },
+
+    format7characters(e) {
+      const inputValue = String(e).substring(0, 7); // Giới hạn 7 ký tự
+
+      // Loại bỏ các ký tự tiếng Nhật từ giá trị nhập vào
+      const filteredValue = inputValue.replace(/[ぁ-んァ-ン一-龯。]/g, '');
+
+      return filteredValue;
+    },
+
+    format15characters(e) {
+      return String(e).substring(0, 15);
+    },
+
     format50characters(e) {
       return String(e).substring(0, 50);
     },
@@ -1476,11 +1744,20 @@ export default {
       if (this.formData.company_name_jp === '') {
         this.error.company_name_jp = false;
       }
-      if (this.formData.major_classification === '') {
+      if (
+        this.formData.major_classification === '' ||
+        this.formData.major_classification === null
+      ) {
         this.error.major_classification = false;
         this.error.middle_classification = true;
-      } else if (this.formData.major_classification !== '') {
-        if (this.formData.middle_classification === '') {
+      } else if (
+        this.formData.major_classification !== '' ||
+        this.formData.major_classification !== null
+      ) {
+        if (
+          this.formData.middle_classification === '' ||
+          this.formData.middle_classification === null
+        ) {
           this.error.middle_classification = false;
         } else {
           this.error.middle_classification = true;
@@ -1810,10 +2087,10 @@ export default {
       this.type_form = 'create';
     },
 
-    async getListEduCourse() {
+    async getListMainjob() {
       let arr_list_main_job = [];
       try {
-        const response = await getListEduCourse();
+        const response = await getListMainjob();
         const { code, data, message } = response.data;
         if (code === 200) {
           arr_list_main_job = data;
@@ -1825,35 +2102,43 @@ export default {
           });
         }
       } catch (erorr) {
-        console.log('erorr', erorr);
+        console.log(erorr);
       }
-      this.major_classification_options = arr_list_main_job.map((element) => {
-        return {
+      arr_list_main_job.map((element) => {
+        this.major_classification_options.push({
           key: element.id,
           type: element.type,
           value: element.name_ja,
           job_info: element.job_info,
-        };
+        });
       });
     },
 
     handleChangeMajor() {
-      this.middle_classification_options = [];
       if (this.formData.major_classification) {
+        this.middle_classification_options = [
+          {
+            key: null,
+            type: null,
+            value: this.$t('VALIDATE.REQUIRED_SELECT'),
+            disabled: true,
+            selected: true,
+          },
+        ];
+
         const findItem = this.major_classification_options.find(
           (item) => item.key === this.formData.major_classification
         );
 
         if (findItem) {
-          this.middle_classification_options = findItem.job_info.map(
-            (element) => {
-              return {
-                key: element.id,
-                type: element.job_type_id,
-                value: element.name_ja,
-              };
-            }
-          );
+          this.formData.middle_classification = null;
+          findItem.job_info.forEach((item) => {
+            this.middle_classification_options.push({
+              key: item.id,
+              type: item.job_type_id,
+              value: item.name_ja,
+            });
+          });
         }
       }
     },
@@ -1878,9 +2163,7 @@ export default {
       const resCheckEmail = this.checkEmail();
 
       if (resCheckvalidate) {
-        if (resCheckEmail) {
-          console.log('pass validEmail');
-        } else {
+        if (!resCheckEmail) {
           MakeToast({
             variant: 'warning',
             title: 'warning',
@@ -1961,9 +2244,15 @@ export default {
       try {
         if (this.status_agree_with_terms_conditions) {
           const response = await companyRegister(previewFormData);
-          const { code } = response.data;
+          const { code, message } = response.data;
           if (code === 200) {
             this.type_form = 'completed';
+          } else {
+            MakeToast({
+              variant: 'warning',
+              title: 'warning',
+              content: message,
+            });
           }
         }
       } catch (error) {
@@ -1987,6 +2276,16 @@ export default {
         return findItem.value;
       }
     },
+    handleConfirmStilConfirmLeaving() {
+      this.$router.push({ path: `/login` }, (onAbort) => {});
+    },
+    handleToggleConfirmLeavingModal() {
+      if (this.statusModalConfirmLeaving === true) {
+        this.statusModalConfirmLeaving = false;
+      } else {
+        this.statusModalConfirmLeaving = true;
+      }
+    },
   },
 };
 </script>
@@ -2001,5 +2300,15 @@ export default {
     background-color: #6c757d !important;
     color: white !important;
   }
+}
+
+.bd-logo {
+  width: 250px;
+  margin-bottom: 2rem;
+}
+
+#btn-back {
+  background: #a5a5a5 !important;
+  color: #fff !important;
 }
 </style>

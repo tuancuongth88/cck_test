@@ -1,0 +1,83 @@
+<?php
+
+namespace App\Jobs;
+
+use App\Models\User;
+use App\Notifications\RemindAccountNotification;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
+
+class RemindAccountJob extends RemindJob
+{
+
+    protected $type;
+    protected $model;
+    protected $id;
+
+    /**
+     * Create a new job instance.
+     *
+     * @return void
+     */
+    public function __construct($type, $model, $id = null)
+    {
+        $this->type = $type;
+        $this->model = $model;
+        $this->id = $id;
+    }
+
+    /**
+     * Execute the job.
+     *
+     * @return void
+     */
+    public function handle()
+    {
+        try {
+            $subject = '';
+            if ($this->id){
+                $object = $this->model::query()->find($this->id);
+                if ($this->type == COMPANY_MANAGER){
+                    $subject  = trans('messages.account_subject_examination_email_company');
+                }else{
+                    $subject = trans('messages.account_subject_examination_email_hro');
+                }
+            }else{
+                $object = $this->model::query()
+                    ->where('status', EXAMINATION_PENDING)
+                    ->whereDate('updated_at', '<=', Carbon::now()->subDay(5))
+                    ->first();
+                if ($this->type == COMPANY_MANAGER){
+                    $subject  = trans('messages.account_subject_not_update_status_email_company');
+                }else{
+                    $subject = trans('messages.account_subject_not_update_status_email_hro');
+                }
+            }
+            if ($object) {
+                $users = User::query()->whereIn('type', [SUPER_ADMIN, $this->type])->get();
+                foreach ($users as $user){
+                    $data['permission'] = User::getPermissionName($user);
+                    $data['type'] = $user->type;
+                    $data['email'] = $user->mail_address;
+                    $data['date'] = Carbon::now()->format('Y/m/d');
+                    $data['content'] = $this->getView($data, $this->getPartView());
+                    $data['contentHTML'] = $this->getView($data, $this->getPartView());
+                    $data['subject'] = $subject;
+                    $data['viewEmail'] = $this->type == COMPANY_MANAGER ? 'email.account-examination.company': 'email.account-examination.hr';
+                    $this->send($user, $data, $this->getPartView(), $data['subject'], $data['viewEmail']);
+                }
+            }
+        }catch (\Exception $exception){
+            Log::error($exception);
+        }
+    }
+
+    public function getPartView(){
+        if ($this->type == COMPANY_MANAGER){
+            return trans('messages.account-examination.company');
+        }else{
+            return trans('messages.account-examination.hr');
+        }
+    }
+}

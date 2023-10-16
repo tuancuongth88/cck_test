@@ -37,7 +37,7 @@
         <h5 class="mt-4 font-weight-medium">
           エントリー求人情報 Entry job information
         </h5>
-        <b-table bordered :items="items" :fields="fields" />
+        <b-table bordered :items="items" :fields="fields" no-local-sorting />
       </div>
       <div class="distribute-msg-frame__inputs-datas px-5">
         <h5 class="mt-4 font-weight-medium">エントリー人材 Entry HR</h5>
@@ -136,27 +136,6 @@ export default {
   methods: {
     goToBackHomeMsgs() {
       this.$router.push('/home');
-    },
-
-    goTodeliveryMessage() {
-      // if (this.characters_title.length > 0 && this.characters_content.length > 0) {
-      //   MakeToast({
-      //     variant: 'success',
-      //     title: this.$t('SUCCESS'),
-      //     content: this.$t('DISTRIBUTE_MSG_SEND_SUCCESS'),
-      //   });
-      // } else if (this.characters_title.length <= 0 && this.characters_content.length <= 0) {
-      //   MakeToast({
-      //     variant: 'danger',
-      //     title: this.$t('DANGER'),
-      //     content: this.$t('DISTRIBUTE_MSG_BLANK'),
-      //   });
-      // }
-      // this.$router.push('/home/detail');
-    },
-
-    handleSubmitDistribute() {
-      console.log('handleSubmitDistribute');
     },
   },
 };

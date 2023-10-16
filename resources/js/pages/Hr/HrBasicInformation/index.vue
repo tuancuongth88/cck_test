@@ -12,26 +12,32 @@
 
       <div class="hr-basic-information-general">
         <div class="infor-first">
-          <span>{{ formData['full_name'] }}</span>
-          <span>{{ formData['full_name_ja'] }}</span>
-          <span>{{ `(ID : ${hrIndentify})` }}</span>
+          <span class="info-full-name">{{ formData['full_name'] }}</span>
+          <span class="info-full-name-ja">{{ formData['full_name_ja'] }}</span>
+          <span class="info-id">{{ `(ID : ${hrIndentify})` }}</span>
         </div>
 
-        <!-- <div class="infor-company">
+        <div class="infor-company mb-4">
           <span>{{ company_name_en }}</span>
           <span>{{ company_name_jp }}</span>
-        </div> -->
+        </div>
 
-        <div v-if="type === 'detail'" class="information-favorire-btns">
-          <div id="favorite" @click="handleAddedToFavorites()">
+        <div v-if="type === 'detail'">
+          <div
+            v-if="checkRoleFavourite"
+            id="favorite"
+            class="information-favorire-btns"
+            @click="handleAddedToFavorites()"
+          >
             <FavoriteBtn v-if="favorite_added" />
-            <FavoriteRemoved v-if="!favorite_added" />
+            <FavoriteBtnRemoved v-if="!favorite_added" />
           </div>
 
           <div
             v-if="checkRoleOffer"
             id="offer"
-            class="btn"
+            class="btn information-detail-btns"
+            :class="{ 'disable-offer': cv_status !== 1 }"
             @click="handleToggleModalSelectJobsToOffer()"
           >
             <span>オファーする</span>
@@ -41,53 +47,86 @@
         <div class="information-general-btns">
           <div
             :class="`btn ${
-              cv_status === 1 ? 'public-active' : 'public-deactive'
+              cv_status === 1
+                ? 'public-active'
+                : `${cv_status === 3 ? 'disable-btn-offer' : 'public-deactive'}`
             }`"
-            @click="handlePublicCV()"
           >
-            <span>公開</span>
+            <span>{{ $t('HR_LIST.STATUS_PUBLIC') }}</span>
           </div>
 
           <div
             :class="`btn ${
-              cv_status === 2 ? 'private-active' : 'private-deactive'
+              cv_status === 2
+                ? 'private-active'
+                : `${
+                  cv_status === 3 ? 'disable-btn-offer' : 'private-deactive'
+                }`
             }`"
-            @click="handlePrivateCV()"
           >
-            <span>非公開</span>
+            <span>{{ $t('HR_LIST.STATUS_PRIVATE') }}</span>
+          </div>
+
+          <div
+            :class="`btn ${cv_status === 3 ? 'offer-active' : 'offer-disable'}`"
+          >
+            <span>{{ $t('HR_LIST.STATUS_OFFICIAL_OFFER_CONFIRM') }}</span>
           </div>
         </div>
 
         <div class="information-general-select-file">
           <div class="d-flex flex-row align-items-center">
-            <span
-              style="line-height: 21px; font-size: 14px"
-              class="mr-2"
-            >履歴書</span>
+            <span style="line-height: 21px; font-size: 14px" class="mr-2">{{
+              $t('RESUME')
+            }}</span>
           </div>
 
           <div class="d-flex flex-row align-items-center">
             <b-link
               :href="getLinkFile(formData.file_c_v?.file_path)"
               target="_blank"
+              class="file-content"
             >
               {{ formData.file_c_v?.file_name }}
             </b-link>
           </div>
 
           <div class="d-flex flex-row align-items-center mt-3">
-            <span
-              style="line-height: 21px; font-size: 14px"
-              class="mr-2"
-            >職務経歴書</span>
+            <span style="line-height: 21px; font-size: 14px" class="mr-2">{{
+              $t('CV')
+            }}</span>
           </div>
 
           <div class="d-flex flex-row align-items-center">
             <b-link
               :href="getLinkFile(formData.file_job?.file_path)"
               target="_blank"
+              class="file-content"
             >
               {{ formData.file_job?.file_name }}
+            </b-link>
+          </div>
+
+          <div
+            v-if="file_others.length > 0"
+            class="d-flex flex-row align-items-center mt-3"
+          >
+            <span style="line-height: 21px; font-size: 14px" class="mr-2">{{
+              $t('OTHER_DOCUMENT')
+            }}</span>
+          </div>
+
+          <div
+            v-for="(item, index) in file_others"
+            :key="`file-other-${index}`"
+            class="d-flex flex-row align-items-center"
+          >
+            <b-link
+              :href="getLinkFile(item.file_path)"
+              target="_blank"
+              class="file-content"
+            >
+              {{ item.name }}
             </b-link>
           </div>
         </div>
@@ -111,14 +150,15 @@
         :hr-full-name="formData.full_name"
         :hr-full-name-jp="formData.full_name_ja"
         @clicked-something="handleClickInParent"
+        @close-modal="handleCloseModal"
       />
     </b-modal>
   </div>
 </template>
 
 <script>
-import FavoriteBtn from '@/components/Favorite';
-import FavoriteRemoved from '@/components/FavoriteRemoved';
+import FavoriteBtn from '@/components/FavoriteBtn/index.vue';
+import FavoriteBtnRemoved from '@/components/FavoriteBtnRemoved';
 import SelectJobsToOffer from '@/pages/Hr/HrBasicInformation/SelectJobsToOffer.vue';
 
 import { getListCompany } from '@/api/modules/company';
@@ -133,7 +173,7 @@ export default {
   name: 'HrBasicInformation',
   components: {
     FavoriteBtn,
-    FavoriteRemoved,
+    FavoriteBtnRemoved,
     SelectJobsToOffer,
   },
   props: {
@@ -158,6 +198,14 @@ export default {
         return 0;
       },
     },
+
+    // setOpen: {
+    //   type: Boolean,
+    //   require: false,
+    //   default: function() {
+    //     return false;
+    //   },
+    // },
   },
   data() {
     return {
@@ -184,7 +232,10 @@ export default {
 
       jd_file_name: '選択されていません',
 
+      file_others: [],
+
       role_offer: [1, 2, 4],
+      role_favourite: [4],
     };
   },
   computed: {
@@ -192,6 +243,14 @@ export default {
       const profile = this.$store.getters.profile;
       const ROLE = profile.type || 0;
       return this.role_offer.includes(ROLE);
+    },
+    checkRoleFavourite() {
+      const profile = this.$store.getters.profile;
+      const ROLE = profile.type || 0;
+      return this.role_favourite.includes(ROLE);
+    },
+    setOpen() {
+      return this.$store.getters.setOpen;
     },
   },
   watch: {
@@ -205,10 +264,18 @@ export default {
       deep: true,
     },
   },
+
   created() {
-    this.handleGetListCompany();
+    // this.handleGetListCompany();
+    // Lấy set trong store
+    if (this.setOpen) {
+      this.statusModalSelectJobsToOffer = this.setOpen;
+    }
   },
   methods: {
+    handleCloseModal() {
+      this.statusModalSelectJobsToOffer = false;
+    },
     getLinkFile(path) {
       const link = `${process.env.MIX_LARAVEL_TEST_URL}${path}`;
       return link;
@@ -216,6 +283,13 @@ export default {
     handleUpdatDataDetail(data) {
       this.cv_status = data.status;
       this.favorite_added = data.is_favorite === 1;
+
+      this.company_name_en = data.hr_org.corporate_name_en;
+      this.company_name_jp = data.hr_org.corporate_name_ja;
+
+      if (data.file_others) {
+        this.file_others = JSON.parse(data.file_others);
+      }
     },
     handleClickInParent: function(data) {
       this.statusModalSelectJobsToOffer = data;
@@ -258,7 +332,7 @@ export default {
         return;
       }
       try {
-        const query = `?relation_id=${this.formData.id}&type=1`;
+        const query = `relation_id=${this.formData.id}&type=1`;
         const res = await destroyFavorite(query);
         const { code, message } = res.data;
         if (code === 200) {
@@ -275,15 +349,10 @@ export default {
       }
     },
     handleToggleModalSelectJobsToOffer() {
+      if (this.cv_status !== 1) {
+        return;
+      }
       this.statusModalSelectJobsToOffer = !this.statusModalSelectJobsToOffer;
-    },
-    handlePublicCV() {
-      // this.cv_status = 1;
-      console.log('handle public cv status');
-    },
-    handlePrivateCV() {
-      // this.cv_status = 2;
-      console.log('handle private cv status');
     },
     async handleGetListCompany() {
       try {
@@ -357,6 +426,16 @@ export default {
 @import '@/scss/_variables.scss';
 @import '@/scss/modules/common/common.scss';
 
+.file-content {
+  max-width: 100%;
+  word-break: break-word;
+}
+
+.disable-offer {
+  background-color: #999 !important;
+  border-color: #999 !important;
+}
+
 .hr-basic-information {
   width: 25%;
   display: flex;
@@ -368,6 +447,7 @@ export default {
 
 .hr-basic-information-wrap {
   width: 100%;
+  margin-left: 2px;
   display: flex;
   border-radius: 3px;
   background: #ffffff;
@@ -408,7 +488,7 @@ export default {
   align-items: center;
   flex-direction: column;
   justify-content: center;
-
+  overflow-wrap: anywhere;
   & span:nth-child(1) {
     font-size: 24px;
     line-height: 36px;
@@ -435,7 +515,7 @@ export default {
   align-items: center;
   flex-direction: column;
   justify-content: center;
-
+  overflow-wrap: anywhere;
   & span {
     font-size: 14px;
     line-height: 21px;
@@ -451,19 +531,20 @@ export default {
   align-items: center;
   flex-direction: column;
   justify-content: center;
+}
 
-  & > div:nth-child(2) {
-    gap: 2px;
-    width: 100%;
-    height: 38px;
-    color: $white;
-    display: flex;
-    min-width: 152px;
-    background: #f9be00;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid #f9be00;
-  }
+.information-detail-btns {
+  gap: 2px;
+  width: 100%;
+  height: 38px;
+  color: $white;
+  display: flex;
+  min-width: 152px;
+  background: #f9be00;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #f9be00;
+  margin-top: 1rem;
 }
 
 .favorite-btn {
@@ -528,6 +609,27 @@ export default {
       font-weight: 400;
       line-height: 30px;
     }
+  }
+
+  .disable-btn-offer {
+    border-radius: 10px;
+    border: 1px solid #999;
+    background: #fff;
+    color: #999;
+  }
+
+  .offer-active {
+    border-radius: 10px;
+    border: 1px solid #999;
+    background: #666;
+    color: #ffffff;
+  }
+
+  .offer-disable {
+    border-radius: 10px;
+    border: 1px solid #d7d7d7;
+    background: #fff;
+    color: #d7d7d7;
   }
 }
 

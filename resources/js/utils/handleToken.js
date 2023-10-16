@@ -14,6 +14,14 @@ export function getToken() {
   return '';
 }
 
+export function getUserInfo(){
+  const USERINFO = Cookies.get('user_info');
+  if (USERINFO){
+    return JSON.parse(USERINFO);
+  }
+  return null;
+}
+
 /**
  * Function get Exp Token in Cookies
  * @returns Exp Token

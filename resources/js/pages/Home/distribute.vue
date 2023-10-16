@@ -5,11 +5,9 @@
         $t('BUTTON_RETURN')
       }}</b-button>
 
-      <b-button
-        variant="warning"
-        class="text-white"
-        @click="handleSubmitDistribute"
-      >{{ $t('BUTTON.DISTRIBUTE') }}</b-button>
+      <b-button variant="warning" class="text-white">{{
+        $t('BUTTON.DISTRIBUTE')
+      }}</b-button>
     </div>
 
     <!-- Phần nhập liệu -->
@@ -17,8 +15,11 @@
       <div class="distribute-msg-frame__title-input">
         <!-- title -->
         <div class="title-input-title">
-          <label for="edit-title">{{ $t('HOME_MANAGEMENT.TITLE') }}</label>
-          <b-badge class="badge-required mx-2" variant="light">必須</b-badge>
+          <label class="mr-2" for="edit-title">{{ $t('HOME_MANAGEMENT.TITLE') }}</label>
+          <!-- <b-badge class="badge-required mx-2" variant="light">{{
+            $t('REQUIRED')
+          }}</b-badge> -->
+          <Require />
         </div>
         <div>
           <b-form-input id="edit-title" type="text" max-lenght="50" />
@@ -30,10 +31,13 @@
         <!-- title -->
         <div class="distribute-msg-frame__title-input">
           <div class="title-input-title">
-            <label for="upload-msg-picture" class="distribute-title">
+            <label for="upload-msg-picture" class="distribute-title mr-2">
               {{ $t('HOME_MANAGEMENT.TEXT') }}
             </label>
-            <b-badge class="badge-required mx-2" variant="light">必須</b-badge>
+            <!-- <b-badge class="badge-required mx-2" variant="light">{{
+              $t('REQUIRED')
+            }}</b-badge> -->
+            <Require />
           </div>
         </div>
         <!-- area -->
@@ -87,9 +91,13 @@
 </template>
 
 <script>
+import Require from '@/components/Require/Require.vue';
+
 export default {
   name: 'Distribute',
-  components: {},
+  components: {
+    Require,
+  },
 
   data() {
     return {
@@ -133,27 +141,6 @@ export default {
   methods: {
     goToBackHomeMsgs() {
       this.$router.push('/home');
-    },
-
-    goTodeliveryMessage() {
-      // if (this.characters_title.length > 0 && this.characters_content.length > 0) {
-      //   MakeToast({
-      //     variant: 'success',
-      //     title: this.$t('SUCCESS'),
-      //     content: this.$t('DISTRIBUTE_MSG_SEND_SUCCESS'),
-      //   });
-      // } else if (this.characters_title.length <= 0 && this.characters_content.length <= 0) {
-      //   MakeToast({
-      //     variant: 'danger',
-      //     title: this.$t('DANGER'),
-      //     content: this.$t('DISTRIBUTE_MSG_BLANK'),
-      //   });
-      // }
-      // this.$router.push('/home/detail');
-    },
-
-    handleSubmitDistribute() {
-      console.log('handleSubmitDistribute');
     },
   },
 };

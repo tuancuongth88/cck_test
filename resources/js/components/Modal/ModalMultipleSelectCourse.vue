@@ -18,7 +18,7 @@
 
     <div class="content-modal">
       <div class="w-100 content-modal-options">
-        <div class="collapse-parents">
+        <div id="dusk_parent_option" class="collapse-parents">
           <div
             v-for="(item, index) in options"
             :key="index"
@@ -33,19 +33,28 @@
           >
             <span>{{ item.name_ja }}</span>
 
-            <img :src="require('@/assets/images/login/chervon-right-white.png')" alt="collapse" style="height: 18px; width: 8px">
+            <img
+              :src="require('@/assets/images/login/chervon-right-white.png')"
+              alt="collapse"
+              style="height: 18px; width: 8px"
+            >
           </div>
         </div>
 
-        <div class="content-collapse-options">
-          <div class="head-collapse-parents-title" :class="{ 'd-none': !parentSelected.id }">
+        <div id="dusk_children_option" class="content-collapse-options">
+          <div
+            class="head-collapse-parents-title"
+            :class="{ 'd-none': !parentSelected.id }"
+          >
             <b-form-checkbox
               id="checkbox-2"
               v-mode="parentCheck[`${parentSelected.id}`]"
               :checked="parentCheck[`${parentSelected.id}`]"
               @change="handleSelectAllChild"
             >
-              <span>{{ parentSelected.name_ja ? parentSelected.name_ja : '' }}</span>
+              <span>{{
+                parentSelected.name_ja ? parentSelected.name_ja : ''
+              }}</span>
             </b-form-checkbox>
           </div>
 
@@ -64,11 +73,18 @@
       </div>
 
       <div class="select-job-btns">
-        <div class="btn btn-reflect-the-content" @click="handleReflectContent()">
+        <div
+          class="btn btn-reflect-the-content"
+          dusk="btn_reflect"
+          @click="handleReflectContent()"
+        >
           <span>{{ $t('SEARCH_JOB_LIST.REFLECT_CONTENT') }}</span>
         </div>
 
-        <div class="btn btn-clear-settings" @click="handleClearSettingsModalCourse()">
+        <div
+          class="btn btn-clear-settings"
+          @click="handleClearSettingsModalCourse()"
+        >
           <span>{{ $t('SEARCH_JOB_LIST.CLEAR_SETTINGS') }}</span>
         </div>
       </div>
@@ -77,6 +93,7 @@
 </template>
 
 <script>
+import EventBus from '@/utils/eventBus';
 export default {
   name: 'ModalMultipleSelectCourse',
   components: {},
@@ -113,11 +130,11 @@ export default {
       },
     },
     show() {
-      this.$bus.emit('modalSpecifyCourseShowStatusChanged', this.show);
+      EventBus.$emit('modalSpecifyCourseShowStatusChanged', this.show);
     },
   },
   created() {
-    this.$bus.on('removeSelectedCourse', (id) => {
+    EventBus.$on('removeSelectedCourse', (id) => {
       delete this.childrentSelected[id];
       delete this.parentCheck[id];
 
@@ -125,18 +142,18 @@ export default {
       this.childOptions = [];
     });
 
-    this.$bus.on('showModalSelectCourse', (status) => {
+    EventBus.$on('showModalSelectCourse', (status) => {
       this.show = status;
     });
 
-    this.$bus.on('handleClearSettingsModalCourse', () => {
+    EventBus.$on('handleClearSettingsModalCourse', () => {
       this.handleClearSettingsModalCourse();
     });
   },
   destroyed() {
-    this.$bus.off('removeSelectedCourse');
-    this.$bus.off('showModalSelectCourse');
-    this.$bus.off('handleClearSettingsModalCourse');
+    // EventBus.$off('removeSelectedCourse');
+    // EventBus.$off('showModalSelectCourse');
+    // EventBus.$off('handleClearSettingsModalCourse');
   },
   methods: {
     handleCloseModal() {
@@ -147,17 +164,21 @@ export default {
 
       const childList = [];
 
-      item.childOptions.length > 0 && item.childOptions.map((item) => {
-        childList.push({
-          text: item.name_ja,
-          value: item.id,
+      item.childOptions.length > 0 &&
+        item.childOptions.map((item) => {
+          childList.push({
+            text: item.name_ja,
+            value: item.id,
+          });
         });
-      });
 
       this.childOptions = childList;
     },
     changeChildCheckbox() {
-      if (this.parentSelected.childOptions.length === this.childrentSelected[this.parentSelected.id].length) {
+      if (
+        this.parentSelected.childOptions.length ===
+        this.childrentSelected[this.parentSelected.id].length
+      ) {
         this.parentCheck = {
           ...this.parentCheck,
           [`${this.parentSelected.id}`]: true,
@@ -180,9 +201,10 @@ export default {
       if (checked) {
         const childChecked = [];
 
-        this.parentSelected.childOptions.length > 0 && this.parentSelected.childOptions.map((item) => {
-          childChecked.push(item.id);
-        });
+        this.parentSelected.childOptions.length > 0 &&
+          this.parentSelected.childOptions.map((item) => {
+            childChecked.push(item.id);
+          });
 
         this.childrentSelected = {
           ...this.childrentSelected,
@@ -200,18 +222,19 @@ export default {
 
       let newListChildrentSelected = {};
 
-      listSelectedKeys.length > 0 && listSelectedKeys.map((id) => {
-        if (this.childrentSelected[id].length > 0) {
-          newListChildrentSelected = {
-            ...newListChildrentSelected,
-            [id]: this.childrentSelected[id],
-          };
-        }
-      });
+      listSelectedKeys.length > 0 &&
+        listSelectedKeys.map((id) => {
+          if (this.childrentSelected[id].length > 0) {
+            newListChildrentSelected = {
+              ...newListChildrentSelected,
+              [id]: this.childrentSelected[id],
+            };
+          }
+        });
 
       this.childrentSelected = newListChildrentSelected;
 
-      this.$bus.emit('dataModalMultipleCourse', this.childrentSelected);
+      EventBus.$emit('dataModalMultipleCourse', this.childrentSelected);
 
       this.show = false;
     },
@@ -222,14 +245,13 @@ export default {
       this.childrentSelected = {};
       this.childOptions = [];
 
-      this.$bus.emit('dataModalMultipleCourse', this.childrentSelected);
+      EventBus.$emit('dataModalMultipleCourse', this.childrentSelected);
     },
   },
 };
 </script>
 
 <style lang="scss" scoped>
-
 @import '@/scss/_variables.scss';
 
 ::v-deep .modal-content {

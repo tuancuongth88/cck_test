@@ -46,25 +46,46 @@ class RemindResultJob extends RemindJob
 
     private function sendNotify($result){
         try {
-            $user = $result->hr->user;
-            $users = User::query()->whereIn(User::TYPE, [SUPER_ADMIN, HR_MANAGER])->orWhere('id', $user->id)->get();
+
+            $users = User::query()->where(function ($query) use ($result) {
+                $query->whereIn('type', [SUPER_ADMIN, COMPANY_MANAGER, HR_MANAGER])
+                    ->orWhereHas('hrOrganization', function ($q) use ($result) {
+                        $q->where('id', $result->hr->hr_organization_id);
+                    })
+                    ->orWhereHas('company', function ($q) use ($result) {
+                        $q->where('id', $result->work->company->id);
+                    });
+            })->get();
+
             foreach ($users as $user) {
-                $data['title']  =trans('messages.mes.official_offer_has_expired');
+                $data['permission'] = User::getPermissionName($user);
+                $data['type_noti'] = NOTI_TYPE_REMIND_RESULT;
+                $data['type'] = $user->type;
+//                $data['title']  =trans('messages.mes.official_offer_has_expired');
                 $data['email']  = @$user->mail_address;
                 $data['job']    = @$result->work->title;
-                $data['company']= @$result->work->company->company_name_jp;
+                $data['company']= @$result->work->company->company_name;
                 $data['full_name']= @$result->hr->full_name;
                 $data['full_name_ja']= @$result->hr->full_name_ja;
+                $data['full_name'] = @$result->hr->full_name;
                 $data['date']= Carbon::now()->format('Y/m/d');
-                $data['content'] = self::getContent(19);
+//                $data['content'] = self::getContent(19);
                 $data['entry_code'] = $result->code;
-                $data['status'] = RESULT_STATUS_LIST [$result->status_selection];
+                $data['status_text'] = RESULT_STATUS_LIST [$result->status_selection];
+                $data['status'] = $result->status_selection;
                 $data['interview_date'] = @$result->interview->interview_date;
                 $data['interview_or_group_interview'] = @$result->interview->type == INTERVIEW_TYPE_GROUP ? '集団面接' :'個別面接';
-                $partViewWeb = 'messages.remind.format_e';
-                $subjectEmail = trans('messages.mes.official_offer_has_expired');
-                $viewEmail = 'email.remind.format_e';
-                $this->send($user, $data, $partViewWeb, $subjectEmail, $viewEmail);
+//                $partViewWeb = 'messages.remind.format_e';
+//                $subjectEmail = trans('messages.mes.official_offer_has_expired');
+//                $viewEmail = 'email.remind.format_e';
+                $data['job_id'] = @$result->work_id;
+                $data['company_id'] = @$result->work->company->id;
+                $data['hrs_id'] = @$result->hr_id;
+                $data['time'] = $result->time;
+                $data['hire_date'] = $result->hire_date;
+                $data['decline_date'] = $result->decline_date;
+                $data['note'] = $result->note;
+                $this->send($user, $data);
             }
         }catch (\Exception $e){
             Log::error($e);

@@ -96,7 +96,6 @@ export default {
     },
 
     goToBackHomeMsgs() {
-      //   console.log('goToBackHomeMsgs');
       //   if (
       //     this.characters_title.length > 0 ||
       //     this.characters_content.length > 0
@@ -114,7 +113,6 @@ export default {
 
     goTodeliveryMessage() {
       // if (this.characters_title.length > 0 && this.characters_content.length > 0) {
-      //   console.log('goTodeliveryMessage >0 ');
       //   MakeToast({
       //     variant: 'success',
       //     title: this.$t('SUCCESS'),
@@ -128,10 +126,6 @@ export default {
       //   });
       // }
       this.$router.push('/distribute-msg-detail');
-    },
-
-    handleImportDistributeImg() {
-      console.log('handleImportDistributeImg');
     },
   },
 };

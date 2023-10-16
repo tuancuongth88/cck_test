@@ -1,3 +1,4 @@
+@import './variables';
 .display-menu-right > a {
   padding: 0;
 
@@ -261,7 +262,7 @@
   }
 }
 .btn-search-vs-conditions {
-  background: #5eb236;
+  background: $btn-search;
   border-radius: 10px;
   padding: 0.5rem 2.5rem;
   margin-top: 1.75rem;
@@ -344,4 +345,190 @@
     border-top: 4px solid #69609C !important;
     border-radius: 0 !important;
   }
+}
+
+// .btn:focus{
+//   box-shadow: none;
+// }
+.btn_save--custom {
+  background-color: $btn-save;
+  border-color: $btn-save;
+  color: white;
+
+  &:hover {
+    opacity: 0.6;
+    background-color: $btn-save;
+    border-color: $btn-save;
+    color: white;
+  }
+
+  &:focus {
+    opacity: 0.9;
+    background-color: $btn-save;
+    border-color: $btn-save;
+    color: white;
+    box-shadow: none !important;
+  }
+
+  &:active {
+    opacity: 0.9;
+    background-color: $btn-save !important;
+    border-color: $btn-save !important;
+    color: white !important;
+    box-shadow: none !important;
+  }
+
+}
+
+.btn_import--custom,
+.btn_export--custom {
+  background-color: $btn-import;
+  border-color: $btn-import;
+  color: white;
+
+  &:hover {
+    opacity: 0.6;
+    background-color: $btn-import;
+    border-color: $btn-import;
+    color: white;
+    box-shadow: none !important;
+  }
+
+  &:active,  
+  &:focus {
+    opacity: 0.9;
+    background-color: $btn-import;
+    border-color: $btn-import;
+    color: white;
+    box-shadow: none !important;
+  }
+
+}
+
+.btn_del_mul--custom {
+  color: #343a40;
+  border: 1px solid #1d266a;
+   background-color: unset;
+  &:hover {
+    opacity: 0.6;
+    background-color: $btn-delete-hover;
+    border-color: $btn-delete-hover;
+    color: white;
+    box-shadow: none !important;
+  }
+
+  &:active,&:focus  {
+    opacity: 0.9;
+    background-color: $btn-delete-hover;
+    border-color: $btn-delete-hover;
+    color: white;
+    box-shadow: none !important;
+  }
+
+}
+
+.btn_back--custom {
+  background-color: $btn-back;
+  border-color: $btn-back;
+  color: white;
+
+  &:hover {
+    opacity: 0.6;
+    background-color: $btn-back;
+    border-color: $btn-back;
+    color: white;
+    box-shadow: none !important;
+  }
+
+  &:active,  &:focus  {
+    opacity: 0.9;
+    background-color: $btn-back;
+    border-color: $btn-back;
+    color: white;
+    box-shadow: none !important;
+  }
+
+}
+
+.btn_search--custom {
+  background-color: $btn-search;
+  border-color: $btn-search;
+  color: white;
+
+  &:hover {
+    opacity: 0.6;
+    background-color: $btn-search;
+    border-color: $btn-search;
+    color: white;
+    box-shadow: none !important;
+  }
+
+  &:active, &:focus  {
+    opacity: 0.9;
+    background-color: $btn-search;
+    border-color: $btn-search;
+    color: white;
+    box-shadow: none !important;
+  }
+
+}
+
+.btn_cancel--custom {
+  background-color: $btn-cancel;
+  border-color: $btn-cancel;
+  color: white;
+
+  &:hover {
+    opacity: 0.6;
+    background-color: $btn-cancel;
+    border-color: $btn-cancel;
+    color: white;
+    box-shadow: none !important;
+  }
+
+  &:active,  &:focus {
+    opacity: 0.9;
+    background-color: $btn-cancel;
+    border-color: $btn-cancel;
+    color: white;
+    box-shadow: none !important;
+  }
+
+}
+
+.btn_modal_accept--custom {
+  background-color: $btn-accept-modal;
+  border-color: $btn-accept-modal;
+  color: white;
+
+  &:hover {
+    opacity: 0.6;
+    background-color: $btn-accept-modal;
+    border-color: $btn-accept-modal;
+    color: white;
+    box-shadow: none !important;
+  }
+
+  &:active,  &:focus {
+    opacity: 0.9;
+    background-color: $btn-accept-modal;
+    border-color: $btn-accept-modal;
+    color: white;
+    box-shadow: none !important;
+  }
+
+}
+
+.btn-modal-confirm {
+  min-width: 104px !important;
+  height: 40px;
+}
+
+.icon-hover{
+  &:hover{
+    opacity: 0.6;
+  }
+}
+.content-modal{
+  overflow-wrap: anywhere;
 }

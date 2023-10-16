@@ -59,6 +59,7 @@ const actions = {
     commit('SET_PERMISSON', []);
 
     localStorage.setItem('currentRoutes', '');
+    localStorage.removeItem('revertRouter');
 
     resetRouter();
   },

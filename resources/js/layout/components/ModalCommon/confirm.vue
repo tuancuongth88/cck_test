@@ -7,6 +7,7 @@
     static
     no-fade
     centered
+    :modal-key="refs"
   >
     <template #modal-header>
       <button type="button" class="close" @click="closeModal">
@@ -19,8 +20,21 @@
         <b-button variant="secondary" class="mx-1" @click="closeModal()">
           {{ $t('MODAL_BUTTON_CANCEL') }}
         </b-button>
-        <b-button variant="primary" class="mx-1" @click="handleSubmit">
-          {{ $t('MODAL_BUTTON_CONFIRM') }}
+        <b-button
+          variant="primary"
+          class="mx-1"
+          dusk="btn_confirm"
+          @click="handleSubmit"
+        >
+          {{
+            type === 'entry'
+              ? $t('MODAL_BUTTON_CONFIRM_ENTRY')
+              : type === 'offer'
+                ? $t('MODAL_BUTTON_CONFIRM_OFFER')
+                : type === 'result'
+                  ? $t('MODAL_BUTTON_CONFIRM_RESULT')
+                  : $t('MODAL_BUTTON_CONFIRM')
+          }}
         </b-button>
       </div>
     </div>
@@ -28,6 +42,8 @@
 </template>
 
 <script>
+import EventBus from '@/utils/eventBus';
+
 export default {
   name: 'ModalConfirm',
   components: {},
@@ -48,6 +64,12 @@ export default {
       default: 'sm',
       required: false,
     },
+
+    type: {
+      type: String,
+      default: '',
+      required: false,
+    },
   },
 
   data() {
@@ -57,13 +79,17 @@ export default {
   computed: {},
 
   created() {
-    this.$bus.on('open-modal', (param) => {
+    EventBus.$on('open-modal', (param) => {
       if (Object.keys(this.$refs)[0] === param) {
-        this.$refs[param].show();
+        if (!this.$refs[param]) {
+          return 0;
+        } else {
+          this.$refs[param].show();
+        }
       }
     });
 
-    this.$bus.on('close-modal', () => {
+    EventBus.$on('close-modal', () => {
       this.$refs[this.refs].hide();
       this.$emit('reset-modal');
     });
@@ -71,7 +97,6 @@ export default {
 
   methods: {
     closeModal() {
-      console.log('nơi đây');
       this.$refs[this.refs].hide();
     },
     handleSubmit() {

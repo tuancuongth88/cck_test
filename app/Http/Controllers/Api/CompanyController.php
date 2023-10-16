@@ -110,6 +110,45 @@ class CompanyController extends Controller
 
     /**
      * @OA\Get(
+     *   path="/api/company-option",
+     *   tags={"Company"},
+     *   summary="Select option company",
+     *   operationId="company_list_all",
+     *   @OA\Response(
+     *     response=200,
+     *     description="Send request success",
+     *     @OA\MediaType(
+     *      mediaType="application/json",
+     *      example={"code":200,
+     *     "data":{
+     *           "company_name": "City Computer Co., Ltd.",
+     *           "company_name_jp": "シティコンピュータ株式会社",
+     *           "id": 1
+     *     }},
+     *     )
+     *   ),
+     *   @OA\Response(
+     *     response=401,
+     *     description="Login false",
+     *     @OA\MediaType(
+     *      mediaType="application/json",
+     *      example={"code":401,"message":"Username or password invalid"}
+     *     )
+     *   ),
+     *   security={{"auth": {}}},
+     * )
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function listAll(Request $request)
+    {
+        $data = $this->repository->getAllName();
+        return $this->responseJson(CODE_SUCCESS, BaseResource::collection($data));
+    }
+
+    /**
+     * @OA\Get(
      *   path="/api/company/{id}",
      *   tags={"Company"},
      *   summary="Detail Company",
@@ -169,9 +208,10 @@ class CompanyController extends Controller
     {
         try {
             $company = $this->repository->find($id);
+            $this->authorize('show', $company);
             return $this->responseJson(CODE_SUCCESS, new BaseResource($company));
         } catch (\Exception $e) {
-            return $this->responseJsonEx($e);
+            return $this->responseJsonError($e->getCode(), $e->getMessage());
         }
     }
 
@@ -438,13 +478,15 @@ class CompanyController extends Controller
     public function update(CompanyRequest $request, $id){
         try {
             $request->except(['status', 'mail_address']);
+            $item = $this->repository->find($id);
+            $this->authorize('update', $item);
             $data = $this->repository->update($request->toArray(), $id);
             if (!$data){
                 return $this->responseJsonError(Response::HTTP_NO_CONTENT, trans('messages.data_does_not_exist'), trans('messages.data_does_not_exist'));
             }
             return $this->responseJson(CODE_SUCCESS, $data);
         }catch (\Exception $e){
-            return $this->responseJsonEx($e);
+            return $this->responseJsonError($e->getCode(), $e->getMessage());
         }
     }
 

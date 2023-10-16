@@ -1,6 +1,3 @@
-<!-- BTN Forget password -> Password reset - send email -->
-<!-- /reset-password -->
-<!-- /reset-password-send-email -->
 <template>
   <b-overlay
     :show="overlay.show"
@@ -13,91 +10,158 @@
     <template #overlay>
       <div class="text-center">
         <b-icon icon="arrow-clockwise" font-scale="3" animation="spin" />
-        <p style="margin-top: 10px">{{ $t("PLEASE_WAIT") }}</p>
+        <!-- <p style="margin-top: 10px">{{ $t('PLEASE_WAIT') }}</p> -->
       </div>
     </template>
-    <!--  -->
     <div class="login-page">
       <div
         class="login-bg"
-        :style="{ 'background-image': 'url(@/assets/images/login/login-bg.png)' }"
+        :style="{
+          'background-image': 'url(@/assets/images/login/login-bg.png)',
+        }"
       >
-        <img
-          class="login-bg__img"
-          :src="require('@/assets/images/login/login-bg.png')"
-          alt="avata"
-        >
-        <div class="login-form">
-          <div class="login-title" style="color: #1D266A">
+        <div class="login-form d-flex flex-column justify-content-between">
+          <div class="login-title" style="color: #1d266a">
             <span>{{ $t('RESET_PASSWORD_TITLE') }}</span>
           </div>
+          <!-- <div class="login-descriptions">
+            <h6>{{ $t('CHANGE_PASSWORD_DESCRIPTION_2') }}</h6>
+          </div> -->
+          <template v-if="step === 1">
+            <div class="login-input-container mt-5">
+              <div class="login-input-wrraper">
+                <!-- Field 1: New password -->
+                <div class="login-input">
+                  <img
+                    :src="require('@/assets/images/login/key-password.png')"
+                    alt="new_password"
+                    style="transform: translateY(4px)"
+                  >
+                  <b-form-input
+                    id="new_password"
+                    v-model="password.current_password"
+                    :formatter="format12characters"
+                    :placeholder="$t('NEW_PASSWORD')"
+                    :type="status_show_currently_pass ? 'text' : 'password'"
+                    :class="
+                      error.current_password === false ? 'is-invalid' : ''
+                    "
+                    @input="handleChangeForm($event, 'current_password')"
+                  />
+                  <div @click="handleShowPass('password')">
+                    <EyeHideIcon v-if="!status_show_currently_pass" />
+                    <EyeShowIcon v-if="status_show_currently_pass" />
+                  </div>
+                  <b-form-invalid-feedback
+                    class="error-text"
+                    :state="error.current_password"
+                  >
+                    {{ error.current_password_content }}
+                  </b-form-invalid-feedback>
+                </div>
 
-          <div class="login-descriptions">
-            <span>{{ $t('RESET_PASS_DESCRIPTION_1') }}</span>
-            <span>{{ $t('RESET_PASS_DESCRIPTION_2') }}</span>
-            <span>{{ $t('RESET_PASS_DESCRIPTION_3') }}</span>
-          </div>
-
-          <!-- <div>formData: {{ formData }}</div> -->
-          <!-- <div>resetPassComfirm: {{ resetPassComfirm }}</div> -->
-          <!-- <div>currentPasswordConfirm: {{ password.currentPasswordConfirm }}</div> -->
-
-          <div class="login-input-container" style="margin-top: 2.5rem">
-            <!-- 1 メールアドレス Mail address -->
-            <div class="login-input-wrraper">
-              <div class="login-input">
-                <img
-                  :src="require('@/assets/images/login/mail.png')"
-                  alt="password"
-                  style="transform: translateY(6px);"
-                >
-
-                <b-form-input
-                  v-model="formData.mail_address"
-                  :placeholder="$t('MAIL_ADDRESS')"
-                  type="text"
-                  :class="error.mail_address === false ? 'is-invalid' : ''"
-                  @input="handleChangeForm($event, 'mail_address'), saveEmail()"
-                  @keyup.enter="goToSendEmail"
-                  @keyup.alt.enter="goToSendEmail"
-                />
+                <!-- Field 2: New password confirm -->
+                <div class="login-input-wrraper mt-4">
+                  <div class="login-input">
+                    <img
+                      :src="require('@/assets/images/login/key-password.png')"
+                      alt="new_password_confirm"
+                    >
+                    <b-form-input
+                      id="new_password_comfirm"
+                      v-model="password.current_password_confirm"
+                      :placeholder="$t('NEW_PASSWORD_CONFIRM')"
+                      :formatter="format12characters"
+                      :type="
+                        status_show_currently_pass_confirm ? 'text' : 'password'
+                      "
+                      :class="
+                        !error.current_password_confirm || !error.pass_match
+                          ? 'is-invalid'
+                          : ''
+                      "
+                      @input="
+                        handleChangeForm($event, 'current_password-confirm')
+                      "
+                    />
+                    <div @click="handleShowPass('password-confirm')">
+                      <EyeHideIcon v-if="!status_show_currently_pass_confirm" />
+                      <EyeShowIcon v-if="status_show_currently_pass_confirm" />
+                    </div>
+                  </div>
+                  <b-form-invalid-feedback
+                    class="error-text"
+                    :state="error.current_password_confirm"
+                  >
+                    {{ error.current_password_confirm_content }}
+                  </b-form-invalid-feedback>
+                  <b-form-invalid-feedback
+                    class="error-text"
+                    :state="error.pass_match"
+                  >
+                    {{ error.pass_match_content }}
+                  </b-form-invalid-feedback>
+                </div>
               </div>
-
-              <b-form-invalid-feedback class="error-text" :state="error.mail_address">
-                {{ error.email_address_text }}
-              </b-form-invalid-feedback>
             </div>
-          <!--  -->
-          </div>
+          </template>
+          <template v-if="step === 2">
+            <div class="login-input-container mt-5">
+              <div class="login-descriptions login-noti">
+                <span>
+                  {{ $t('NEW_PASSWORD_RESET_COMPLETED') }}
+                </span>
+              </div>
+            </div>
+          </template>
           <div class="login-submit-btns">
-            <div class="login-submit btn-send-mail btn" @click="goToSendEmail()">
-              <span>{{ $t('SEND_MAIL') }}</span>
+            <div
+              v-if="step === 1"
+              id="btn-set-newpass"
+              class="login-submit btn"
+              @click="handleSetNewPassword()"
+            >
+              <span>{{ $t('TO_SET') }}</span>
             </div>
-            <div class="login-submit btn" @click="backToLogin()">
+            <div
+              v-if="step === 2"
+              class="login-submit btn"
+              @click="backToLogin()"
+            >
               <span>{{ $t('GO_TO_LOGIN_SCREEN') }}</span>
             </div>
+            <!-- <div class="text-noti">
+              <span>{{ error.pass_match_content }}</span>
+            </div> -->
           </div>
-
-        <!--  -->
         </div>
       </div>
     </div>
-    <!--  -->
-
   </b-overlay>
 </template>
 
 <script>
 // IMPORT API
+// import { login } from '@/api/auth';
 import { MakeToast } from '@/utils/toastMessage';
-// import { validPassAz19 } from '@/utils/validate';
-import { validEmail } from '@/utils/validate';
-import { email, resetPassComfirm } from '@/pages/PassWords/ResetPassWord/dataResetPass.js';
-import { ResetPassSendEmailPost } from '@/api/password';
+// import { validPassOnlyRequireAz09 } from '@/utils/validate';
+import {
+  // validPassword,
+  // validPasswordLength,
+  validPasswordFormat,
+} from '@/utils/validate';
+// import { parseToken } from '@/utils/handleToken';
+// import { handleRole } from '@/utils/handleRole';
+import img_bg from '@/assets/images/login/login-bg.png';
+import EyeHideIcon from '@/components/EyeHide';
+import EyeShowIcon from '@/components/EyeShow';
+import { ResetPassConfirmPut } from '@/api/password';
 
 export default {
-  name: 'ResetPassWordSendEmail',
+  name: 'ResetPassWord',
   components: {
+    EyeHideIcon,
+    EyeShowIcon,
   },
   data() {
     return {
@@ -110,44 +174,103 @@ export default {
         backgroundColor: 'transparent !important',
         bgColor: 'transparent !important',
       },
-      statusShowCurrentlyPass: false,
-      statusShowCurrentlyPassConfirm: false,
+      status_show_currently_pass: false,
+      status_show_currently_pass_confirm: false,
       isProcess: false,
+      pass_match: true,
 
-      formData: email,
-      resetPassComfirm: resetPassComfirm,
-
-      error: {
-        mail_address: true,
-        email_address_text: '',
+      password: {
+        token: '',
+        mail_address: '',
+        current_password: '',
+        current_password_confirm: '',
       },
 
-      //
+      error: {
+        current_password: true,
+        current_password_content: '',
+        current_password_confirm: true,
+        current_password_confirm_content: '',
+        pass_match: true,
+        pass_match_content: '',
+      },
+      img_bg: img_bg,
+      step: 1,
     };
   },
 
+  created() {
+    this.getTokenFormURLbyEmail();
+    // this.getEmailFormLocal();
+    this.getEmailFormURLbyEmail();
+  },
+
   methods: {
-    format12characters(e) {
-      return String(e).substring(0, 12);
+    handleShowPass(typeInput) {
+      if (typeInput === 'password') {
+        if (this.status_show_currently_pass === true) {
+          this.status_show_currently_pass = false;
+        } else {
+          this.status_show_currently_pass = true;
+        }
+      }
+      if (typeInput === 'password-confirm') {
+        if (this.status_show_currently_pass_confirm === true) {
+          this.status_show_currently_pass_confirm = false;
+        } else {
+          this.status_show_currently_pass_confirm = true;
+        }
+      }
     },
 
-    saveEmail() {
-      this.resetPassComfirm.mail_address = this.formData.mail_address;
-      localStorage.setItem('email_reset_pass', `${this.formData.mail_address}`);
+    getTokenFormURLbyEmail() {
+      const TOKEN = this.$route?.query.token;
+      this.password.token = TOKEN;
+    },
+    getEmailFormURLbyEmail() {
+      const email_reset_pass = this.$route?.query.email;
+      this.password.mail_address = email_reset_pass;
+    },
+
+    format12characters(e) {
+      const inputValue = String(e).substring(0, 12); // Giới hạn 12 ký tự
+
+      // Loại bỏ các ký tự tiếng Nhật từ giá trị nhập vào
+      const filteredValue = inputValue.replace(/[ぁ-んァ-ン一-龯。]/g, '');
+
+      return filteredValue;
     },
 
     handleChangeForm(event, field) {
-      console.log('handleChangeForm');
       const newValue = event;
       switch (field) {
-        case 'mail_address':
-          this.checkvalidate();
-          this.error.mail_address = true;
+        case 'current_password':
+          this.error.current_password = true;
           if (newValue) {
-            this.error.mail_address = true;
-            this.resetPassComfirm.mail_address = this;
+            this.error.current_password = true;
           } else {
-            this.error.mail_address = false;
+            this.error.current_password = false;
+            this.error.current_password_content = this.$t(
+              'PLEASE_ENTER_NEW_PASSWORD'
+            );
+          }
+          break;
+
+        case 'current_password-confirm':
+          this.error.current_password_confirm = true;
+          this.error.pass_match = true;
+          if (newValue) {
+            this.error.current_password_confirm = true;
+            this.error.pass_match = true;
+          } else {
+            this.error.current_password_confirm = false;
+
+            this.error.current_password_confirm_content = this.$t(
+              'PLEASE_ENTER_NEW_PASSWORD_CONFIRMATION'
+            );
+
+            this.error.pass_match = false;
+            this.error.pass_match_content = '';
           }
           break;
         default:
@@ -155,71 +278,431 @@ export default {
       }
     },
 
-    checkvalidate() {
-      if (this.formData.mail_address === '') {
-        console.log('mail_address empty');
-        this.error.mail_address = false;
-        this.error.email_address_text = this.$t('PLEASE_ENTER_YOUR_EMAIL_ADDRESS');
+    checkValidate1() {
+      const current_password = this.password.current_password;
+      // Kiểm tra rỗng
+      if (current_password === '') {
+        this.error.current_password = false;
+
+        this.error.current_password_content = this.$t(
+          'PLEASE_ENTER_NEW_PASSWORD'
+        );
+        this.error.pass_match = true;
+        this.error.pass_match_content = '';
+        return false;
+      }
+
+      // Check length
+      if (current_password.length !== 12) {
+        this.error.current_password = false;
+        this.error.current_password_content = this.$t(
+          'CHANGE_PASSWORD_DESCRIPTION_FORMAT'
+        );
+        this.error.pass_match = true;
+        this.error.pass_match_content = '';
+        return false;
       } else {
-        // Nếu có giá trị thì -> Regex
-        if (validEmail(this.formData.mail_address)) {
-          console.log('mail_address regex');
-          this.error.mail_address = true;
-          this.error.email_address_text = '';
+        if (validPasswordFormat(current_password)) {
+          this.error.current_password = true;
+          this.error.current_password_content = '';
           return true;
         } else {
-          console.log('mail_address fail regex');
-          this.error.mail_address = false;
-          this.error.email_address_text = this.$t('PLEASE_ENTER_THE_CORRECT_EMAIL_ADDRESS_FORMAT');
+          this.error.current_password = false;
+          this.error.current_password_content = this.$t(
+            'CHANGE_PASSWORD_DESCRIPTION_FORMAT'
+          );
+          this.error.pass_match = true;
+          this.error.pass_match_content = '';
           return false;
         }
       }
 
-      //
-    },
-    // Call API Send email
-    async goToSendEmail() {
-      this.checkvalidate();
-      const DATA_EMAL = {
-        mail_address: this.formData.mail_address,
-      };
-      if (this.checkvalidate()) {
-        this.saveEmail();
+      // Check validate bắt buộc mật khẩu phải có ít nhất 1 số và 1 chữ cái (không phân biệt chữ hoa chữ thường)
+      // if (validPasswordFormat(current_password)) {
+      //   this.error.current_password = true;
+      //   this.error.current_password_content = '';
+      //   return true;
+      // } else {
+      //   this.error.current_password = false;
+      //   this.error.current_password_content =
+      //     '正しいパスワード形式を入力してください。';
+      //   this.error.pass_match = true;
+      //   this.error.pass_match_content = '';
+      //   return false;
+      // }
 
-        try {
-          this.overlay.show = true;
-          const response = await ResetPassSendEmailPost(DATA_EMAL);
-          const resCode = response.code;
-          const resDataCode = response.data.code;
-          const resMessage = response.message;
-          const resDataMessage = response.data.message;
-          const resDataData = response.data.data;
-          if (resCode === 200 || resDataCode === 200) {
-            // console.log('response 200');
-            this.overlay.show = false;
-            this.$router.push({ path: `/reset-password-sent-email` }, (onAbort) => {});
-          } else {
-            this.overlay.show = false;
-            MakeToast({
-              variant: 'warning',
-              title: this.$t('warning'),
-              content: resMessage || resDataMessage || resDataData,
-            });
-          }
-        } catch (error) {
-          console.log(error);
+      // if (current_password !== '' && current_password_confirm !== '') {
+      //   this.error.current_password_confirm = true;
+      //   this.error.current_password = true;
+      //   // Sau Đã nhập -> Kiểm tra trùng
+      //   this.error.pass_match = true;
+      //   this.error.pass_match_content = '';
+      //   // Cả khi trùng pass kiểm tra độ dài
+      //   if (current_password.length > 12) {
+      //     this.error.current_password = false;
+      //     this.error.current_password_content = this.$t(
+      //       'PLEASE_ENTER_LESS_THAN_TWELVE_CHARACTERS'
+      //     );
+      //     this.error.pass_match = true;
+      //     this.error.pass_match_content = '';
+      //   }
+      //   if (current_password_confirm.length > 12) {
+      //     this.error.current_password_confirm = false;
+      //     this.error.current_password_confirm_content = this.$t(
+      //       'PLEASE_ENTER_LESS_THAN_TWELVE_CHARACTERS'
+      //     );
+      //     this.error.pass_match = true;
+      //     this.error.pass_match_content = '';
+      //   }
+      //   //
+
+      //   if (String(current_password) === String(current_password_confirm)) {
+      //     this.error.pass_match = true;
+      //     this.error.pass_match_content = '';
+      //     // Check Regex
+      //     const regexCurrentPassword = validPassOnlyRequireAz09(
+      //       this.password.current_password
+      //     );
+      //     const regexCurrentPasswordConfirm = validPassOnlyRequireAz09(
+      //       this.password.current_password_confirm
+      //     );
+      //     if (!regexCurrentPasswordConfirm) {
+      //       this.error.current_password = false;
+      //       this.error.current_password_content = this.$t(
+      //         'VALIDATE_PASS_INPUT'
+      //       );
+      //       this.error.pass_match = true;
+      //       this.error.pass_match_content = '';
+      //     }
+      //     if (!regexCurrentPassword) {
+      //       this.error.current_password_confirm = false;
+      //       this.error.current_password_confirm_content = this.$t(
+      //         'VALIDATE_PASS_INPUT'
+      //       );
+      //       this.error.pass_match = true;
+      //       this.error.pass_match_content = '';
+      //     }
+      //     if (regexCurrentPassword && regexCurrentPasswordConfirm) {
+      //       return true;
+      //     }
+      //   } else {
+      //     this.error.pass_match = false;
+      //     this.error.pass_match_content = this.$t('PASSWORD_NOT_MATCH');
+      //     return false;
+      //   }
+      // }
+    },
+
+    checkValidate2() {
+      const current_password_confirm = this.password.current_password_confirm;
+      // Kiểm tra rỗng
+      if (current_password_confirm === '') {
+        this.error.current_password_confirm = false;
+
+        this.error.current_password_confirm_content = this.$t(
+          'PLEASE_ENTER_NEW_PASSWORD_CONFIRMATION'
+        );
+        this.error.pass_match = true;
+        this.error.pass_match_content = '';
+        return false;
+      }
+
+      // Check length
+      if (current_password_confirm.length !== 12) {
+        this.error.current_password_confirm = false;
+        this.error.current_password_confirm_content = this.$t(
+          'CHANGE_PASSWORD_DESCRIPTION_FORMAT'
+        );
+        this.error.pass_match = true;
+        this.error.pass_match_content = '';
+        return false;
+      } else {
+        if (validPasswordFormat(current_password_confirm)) {
+          this.error.current_password_confirm = true;
+          this.error.current_password_confirm_content = '';
+          return true;
+        } else {
+          this.error.current_password_confirm = false;
+          this.error.current_password_confirm_content = this.$t(
+            'CHANGE_PASSWORD_DESCRIPTION_FORMAT'
+          );
+          this.error.pass_match = true;
+          this.error.pass_match_content = '';
+          return false;
         }
       }
 
-    //
+      // if (validPasswordFormat(current_password_confirm)) {
+      //   this.error.current_password_confirm = true;
+      //   this.error.current_password_confirm_content = '';
+      //   return true;
+      // } else {
+      //   this.error.current_password_confirm = false;
+      //   this.error.current_password_confirm_content =
+      //     '正しいパスワード形式を入力してください。';
+      //   this.error.pass_match = true;
+      //   this.error.pass_match_content = '';
+      //   return false;
+      // }
+
+      // if (current_password !== '' && current_password_confirm !== '') {
+      //   this.error.current_password_confirm = true;
+      //   this.error.current_password = true;
+      //   // Sau Đã nhập -> Kiểm tra trùng
+      //   this.error.pass_match = true;
+      //   this.error.pass_match_content = '';
+      //   // Cả khi trùng pass kiểm tra độ dài
+      //   if (current_password.length > 12) {
+      //     this.error.current_password = false;
+      //     this.error.current_password_content = this.$t(
+      //       'PLEASE_ENTER_LESS_THAN_TWELVE_CHARACTERS'
+      //     );
+      //     this.error.pass_match = true;
+      //     this.error.pass_match_content = '';
+      //   }
+      //   if (current_password_confirm.length > 12) {
+      //     this.error.current_password_confirm = false;
+      //     this.error.current_password_confirm_content = this.$t(
+      //       'PLEASE_ENTER_LESS_THAN_TWELVE_CHARACTERS'
+      //     );
+      //     this.error.pass_match = true;
+      //     this.error.pass_match_content = '';
+      //   }
+      //   //
+
+      //   if (String(current_password) === String(current_password_confirm)) {
+      //     this.error.pass_match = true;
+      //     this.error.pass_match_content = '';
+      //     // Check Regex
+      //     const regexCurrentPassword = validPassOnlyRequireAz09(
+      //       this.password.current_password
+      //     );
+      //     const regexCurrentPasswordConfirm = validPassOnlyRequireAz09(
+      //       this.password.current_password_confirm
+      //     );
+      //     if (!regexCurrentPasswordConfirm) {
+      //       this.error.current_password = false;
+      //       this.error.current_password_content = this.$t(
+      //         'VALIDATE_PASS_INPUT'
+      //       );
+      //       this.error.pass_match = true;
+      //       this.error.pass_match_content = '';
+      //     }
+      //     if (!regexCurrentPassword) {
+      //       this.error.current_password_confirm = false;
+      //       this.error.current_password_confirm_content = this.$t(
+      //         'VALIDATE_PASS_INPUT'
+      //       );
+      //       this.error.pass_match = true;
+      //       this.error.pass_match_content = '';
+      //     }
+      //     if (regexCurrentPassword && regexCurrentPasswordConfirm) {
+      //       return true;
+      //     }
+      //   } else {
+      //     this.error.pass_match = false;
+      //     this.error.pass_match_content = this.$t('PASSWORD_NOT_MATCH');
+      //     return false;
+      //   }
+      // }
+    },
+
+    // checkValidatePasswordRequired(type) {
+    //   if (type === 'current_password') {
+    //     if (this.password.current_password === '') {
+    //       this.error.current_password = false;
+    //       this.error.current_password_content =
+    //         '新しいパスワードを入力してください。';
+    //     } else {
+    //       if (validPasswordLength(this.password.current_password)) {
+    //         this.error.current_password = true;
+    //         this.error.current_password_content = '';
+    //         return true;
+    //       } else {
+    //         this.error.current_password = false;
+    //         this.error.current_password_content =
+    //           'パスワードは12桁の半角数字で入力してください。';
+    //         return false;
+    //       }
+    //     }
+    //   } else {
+    //     if (this.password.current_password_confirm === '') {
+    //       this.error.current_password_confirm = false;
+    //       this.error.current_password_confirm_content =
+    //         '新しいパスワード（確認）を入力してください。';
+    //     } else {
+    //       if (validPasswordLength(this.password.current_password_confirm)) {
+    //         this.error.current_password_confirm = true;
+    //         this.error.current_password_confirm = '';
+    //         return true;
+    //       } else {
+    //         this.error.current_password_confirm = false;
+    //         this.error.current_password_confirm_content =
+    //           'パスワードは12桁の半角数字で入力してください。';
+    //         return false;
+    //       }
+    //     }
+    //   }
+    // },
+
+    // checkValidatePasswordLength(type) {
+    //   if (type === 'current_password') {
+    //     if (this.password.current_password === '') {
+    //       this.error.current_password = false;
+    //       this.error.current_password_content =
+    //         '新しいパスワードを入力してください。';
+    //     } else {
+    //       if (validPasswordLength(this.password.current_password)) {
+    //         this.error.current_password = true;
+    //         this.error.current_password_content = '';
+    //         return true;
+    //       } else {
+    //         this.error.current_password = false;
+    //         this.error.current_password_content =
+    //           'パスワードは12桁の半角数字で入力してください。';
+    //         return false;
+    //       }
+    //     }
+    //   } else {
+    //     if (this.password.current_password_confirm === '') {
+    //       this.error.current_password_confirm = false;
+    //       this.error.current_password_confirm_content =
+    //         '新しいパスワード（確認）を入力してください。';
+    //     } else {
+    //       if (validPasswordLength(this.password.current_password_confirm)) {
+    //         this.error.current_password_confirm = true;
+    //         this.error.current_password_confirm = '';
+    //         return true;
+    //       } else {
+    //         this.error.current_password_confirm = false;
+    //         this.error.current_password_confirm_content =
+    //           'パスワードは12桁の半角数字で入力してください。';
+    //         return false;
+    //       }
+    //     }
+    //   }
+    // },
+
+    // checkValidatePasswordFormat(type) {
+    //   if (type === 'current_password') {
+    //     if (this.password.current_password === '') {
+    //       this.error.current_password = false;
+    //       this.error.current_password_content =
+    //         '新しいパスワードを入力してください。';
+    //     } else {
+    //       if (validPassword(this.password.current_password)) {
+    //         this.error.current_password = true;
+    //         this.error.current_password_content = '';
+    //         return true;
+    //       } else {
+    //         this.error.current_password = false;
+    //         this.error.current_password_content = this.$t(
+    //           'PLEASE_ENTER_THE_CORRECT_PASSWORD_FORMAT'
+    //         );
+    //         return false;
+    //       }
+    //     }
+    //   } else {
+    //     if (this.password.current_password_confirm === '') {
+    //       this.error.current_password_confirm = false;
+    //       this.error.current_password_confirm_content =
+    //         '新しいパスワード（確認）を入力してください。';
+    //     } else {
+    //       if (validPassword(this.password.current_password_confirm)) {
+    //         this.error.current_password_confirm = true;
+    //         this.error.current_password_confirm_content = '';
+    //         return true;
+    //       } else {
+    //         this.error.current_password_confirm = false;
+    //         this.error.current_password_confirm_content = this.$t(
+    //           'PLEASE_ENTER_THE_CORRECT_PASSWORD_FORMAT'
+    //         );
+    //         return false;
+    //       }
+    //     }
+    //   }
+    // },
+
+    // checkValidatePasswordConfirm() {
+    //   if (this.password.current_password_confirm === '') {
+    //     this.error.current_password_confirm = false;
+    //     this.error.current_password_confirm_content =
+    //       '新しいパスワード（確認）を入力してください。';
+    //   } else {
+    //     if (validPassword(this.password.current_password_confirm)) {
+    //       this.error.current_password_confirm = true;
+    //       this.error.current_password_confirm_content = '';
+    //       // Check match
+    //       return this.checkMatchPassword();
+    //       // return true;
+    //     } else {
+    //       this.error.current_password_confirm = false;
+    //       this.error.current_password_confirm_content = this.$t(
+    //         'PLEASE_ENTER_THE_CORRECT_PASSWORD_FORMAT'
+    //       );
+    //       return false;
+    //     }
+    //   }
+    // },
+
+    checkMatchPassword() {
+      const current_password = this.password.current_password;
+      const current_password_confirm = this.password.current_password_confirm;
+      if (String(current_password) === String(current_password_confirm)) {
+        this.error.pass_match = true;
+        this.error.pass_match_content = '';
+        return true;
+      } else {
+        this.error.pass_match = false;
+        this.error.pass_match_content = this.$t('PASSWORD_NOT_MATCH');
+        return false;
+      }
+    },
+
+    // GOI API SET mật khẩu mới
+    async handleSetNewPassword() {
+      this.checkValidate1();
+      this.checkValidate2();
+      // this.checkValidatePasswordRequired('current_password');
+      // this.checkValidatePasswordRequired('current_password_confirm');
+      // this.checkValidatePasswordFormat('current_password');
+      // this.checkValidatePasswordFormat('current_password_confirm');
+      // this.checkValidatePasswordConfirm();
+
+      if (this.checkValidate1() && this.checkValidate2()) {
+        this.checkMatchPassword();
+        if (this.checkMatchPassword()) {
+          const DATA_CONFIRM_PASS = {
+            token: this.password.token,
+            mail_address: this.password.mail_address,
+            new_password: this.password.current_password,
+            new_password_confirm: this.password.current_password_confirm,
+          };
+          try {
+            this.overlay.show = true;
+            const response = await ResetPassConfirmPut(DATA_CONFIRM_PASS);
+            const { code, message } = response.data;
+            if (code === 200) {
+              this.overlay.show = false;
+              this.step = 2;
+            } else {
+              this.overlay.show = false;
+              MakeToast({
+                variant: 'warning',
+                title: this.$t('warning'),
+                content: message,
+              });
+            }
+          } catch (error) {
+            console.log(error);
+          }
+        }
+      }
     },
 
     backToLogin() {
-      console.log('backToLogin');
-      this.formData.mail_address = '';
       this.$router.push('/login');
     },
-    //
   },
 };
 </script>
@@ -227,5 +710,4 @@ export default {
 <style lang="scss" scoped>
 @import '@/scss/_variables.scss';
 @import '@/pages/Login/Login.scss';
-@import '@/scss/modules/common/common.scss';
 </style>

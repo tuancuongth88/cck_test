@@ -7,7 +7,7 @@ return [
     'mes.create_error' => 'エラーの作成',
     'mes.update_success' => '更新の成功',
     'mes.update_error' => '更新エラー',
-    'email_not_exist' => 'メールが存在しません',
+    'email_not_exist' => 'このメールアドレスは存在しません',
     'wrong_username_or_password' => '間違ったユーザー名またはパスワード',
     'data_does_not_exist' => 'データが存在しません。',
     'center_code_is_exit' => 'センターコードは終了です。',
@@ -22,10 +22,13 @@ return [
     'mes.permission' => 'You can not access this page.',
     'email_existed' => 'Email already exists in the system, please choose another email.',
     'mes.reset_password' => 'メールアドレスにパスワード再設定URLを送信しました。',
-    'mes.subject_mail_confirm_account_hr' => '【海外人材マッチングシステム】申請が承認されました',
-    'mes.subject_mail_confirm_account_company' => '【海外人材マッチングシステム】申請が承認されました',
+    'mes.subject_mail_confirm_account_hr' => '【Bluee Direct】申請が承認されました',
+    'mes.subject_mail_confirm_account_company' => '【Bluee Direct】申請が承認されました',
     'status_invalid' => 'Invalid status value',
-    'account_subject_examination_email' => 'Account examination msg :type',
+    'account_subject_examination_email_hro' => '人材団体新規アカウント申請のお知らせ',
+    'account_subject_examination_email_company' => '企業新規アカウント申請のお知らせ',
+    'account_subject_not_update_status_email_hro' => 'リマインドのお知らせ ',
+    'account_subject_not_update_status_email_company' => 'リマインドのお知らせ ',
     'account_type_hr' => ' (人材団体)',
     'account_type_company' => ' (企業 )',
     'mes.subject_entry_stagnant_status' => 'リマインドのお知らせ',
@@ -34,4 +37,17 @@ return [
     'mes.import_success' => 'Import Hr success',
     'mes.invalid_photo' => 'Invalid photo. Please check again',
     'mes.official_offer_has_expired' => '内定承諾が期限切れになりました',
+    'mes.not.action.permission' => 'You do not have permission to perform this function',
+    'mes.subject_forget_password' => 'パスワードの再設定',
+
+    //mess modal
+    'mes.modal.entry.confirm' => '承認しました。',
+    'mes.modal.entry.decline' => 'キャンセルしました。',
+    'mes.modal.entry.reject' => ' 却下しました',
+    'mes.modal.offer.decline' => '辞退しました。',
+    'mes.modal.offer.confirm' => '承諾しました。',
+    'mes.modal.interview.sent' => '送信しました。',
+    'mes.modal.interview.submit.calendar' => '送信しました。',
+
+
 ];

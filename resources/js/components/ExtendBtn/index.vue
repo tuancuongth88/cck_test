@@ -2,7 +2,8 @@
   <div class="btn entry-hr-select-btn">
     <div>
       <span style="font-weight: bold;">+</span>
-      <span style="font-weight: bold;">人材を選ぶ</span>
+      <!-- <span style="font-weight: bold;">人材を選ぶ</span> -->
+      <span style="font-weight: bold;">{{ $t('JOB_ENTRY.MODAL_ENTRY_TITME') }}</span>
     </div>
   </div>
 </template>

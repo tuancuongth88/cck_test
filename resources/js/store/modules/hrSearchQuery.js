@@ -1,7 +1,7 @@
 import Cookies from 'js-cookie';
 
 const state = {
-  searchParams: {},
+  searchParams: null,
 };
 
 const mutations = {

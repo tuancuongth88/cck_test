@@ -19,91 +19,125 @@
         </p>
       </div>
     </template>
-    <!--  -->
-    <div v-if="role_admin || role_company_management" class="company-edit">
 
-      <!-- <div>formData {{ formData }}</div> -->
-      <!-- <div>display_area_code {{ display_area_code }}</div> -->
-      <!-- <button style="position: fixed; background: gray; opacity: 0.2;" class="btn" @click="changeStatus">Change</button> -->
+    <div v-if="role_admin || role_company_management" class="company-edit">
       <div class="company-edit-wrap">
         <!-- 1 Change Status -->
-        <div class="company-change-status ">
+        <div class="company-change-status">
           <div class="company-change-status-wrap">
             <div class="company-change-status-infor">
               <!-- 1 Name, Name jp -->
               <div class="w-100 d-flex flex-column justify-center align-center">
-                <div class="infor-name"><span>{{ formData.company_name }}</span></div>
-                <div class="infor-name"><span>{{ formData.company_name_jp }}</span></div>
+                <div class="infor-name">
+                  <span>{{ formData.company_name }}</span>
+                </div>
+                <div class="infor-name">
+                  <span>{{ formData.company_name_jp }}</span>
+                </div>
               </div>
-              <!-- 2 ID company 000123 -->
-              <div class="w-100 d-flex justify-center align-center">
+              <!-- 2 ID company  -->
+              <div
+                id="id-company"
+                class="w-100 d-flex justify-center align-center"
+              >
                 <span>(ID : {{ id_company }})</span>
               </div>
             </div>
-            <!--  -->
+
             <div class="company-change-status-options">
-              <div v-if="type_form === 'detail'">
+              <div v-if="type_form === 'detail' || checkCompanyRole">
                 <div :id="status_color" class="status-cell">
                   <span>{{ showStatusCompany(formData.status) }}</span>
                 </div>
               </div>
 
-              <div v-if="type_form === 'edit'">
+              <div v-if="type_form === 'edit' && !checkCompanyRole">
                 <div v-if="optionsStatusConpany.length <= 0">
                   <div :id="status_color" class="status-cell">
                     <span>{{ showStatusCompany(formData.status) }}</span>
                   </div>
                 </div>
-                <b-dropdown
-                  v-if="optionsStatusConpany.length > 0"
-                  id="change-status-company"
-                  :text="statusConpanyLabel"
-                  class="dropdown-custom"
-                  variant="light"
-                >
-                  <b-dropdown-item
-                    v-for="(item, index) in optionsStatusConpany"
-                    :key="index"
-                    :value="item.value"
-                    @click="handelChangeStatusCompany(item)"
-                  >{{ item.label }}</b-dropdown-item>
-                </b-dropdown>
+                <b-form-select
+                  v-model="statusSelect"
+                  :options="companyStatusOptions"
+                  value-field="value"
+                  text-field="text"
+                  class="mb-3 dropdown-custom"
+                  style="width: 100%"
+                  dusk="change_status"
+                  :disabled="companyStatusOptions.length === 1"
+                  @change="changeStatusCompany"
+                />
               </div>
-              <!--  -->
             </div>
           </div>
-
-          <!--  -->
         </div>
         <!-- 2 Tab Form -->
-        <div class="company-edit-content  ">
+        <div class="company-edit-content">
           <div class="company-edit-content__head">
             <div class="list-company-head__title">
               <div class="line" />
-              <div v-if="type_form === 'detail'"><span>{{ $t('TITLE.COMPANY_DETAIL') }}</span></div>
-              <div v-if="type_form === 'edit'"><span>{{ $t('TITLE.COMPANY_DETAIL') }}</span></div>
+              <div v-if="type_form === 'detail'">
+                <span id="title-company-detail">{{
+                  $t('TITLE.COMPANY_DETAIL')
+                }}</span>
+              </div>
+              <div v-if="type_form === 'edit'">
+                <span id="title-company-detail">{{
+                  $t('TITLE.COMPANY_DETAIL')
+                }}</span>
+              </div>
             </div>
             <!-- 一覧に戻る Back to list /  編集 Edit -->
             <div v-if="type_form === 'detail'" class="list-company-head__btns">
-              <div @click="backCompanyList"><BtnBack :text="$t('BUTTON.BACK_TO_LIST')" /></div>
-              <div @click="goToEditCompany"><BtnConfirm :text="$t('BUTTON.EDIT')" /></div>
+              <b-button
+                id="btn-back-to-list "
+                dusk="btn-back"
+                class="btn_back--custom"
+                @click="backCompanyList"
+              >
+                {{ $t('BUTTON.BACK_TO_LIST') }}
+              </b-button>
+              <b-button
+                id="btn-edit "
+                dusk="btn-edit"
+                class="btn_save--custom"
+                @click="goToEditCompany"
+              >
+                {{ $t('BUTTON.EDIT') }}
+              </b-button>
             </div>
-            <!-- キャンセル cancel /  保存 save -->
             <div v-if="type_form === 'edit'" class="list-company-head__btns">
-              <div @click="cancelEditCompany"><BtnBack :text="$t('BUTTON.CANCEL')" /></div>
-              <div @click="handleUpdateCompany"><BtnConfirm :text="$t('BUTTON.SAVE')" /></div>
+              <b-button
+                id="btn-cancel "
+                dusk="btn-cancel"
+                class="btn_back--custom"
+                @click="cancelEditCompany"
+              >
+                {{ $t('BUTTON.CANCEL') }}
+              </b-button>
+              <b-button
+                id="btn-save"
+                dusk="btn-save"
+                class="btn_save--custom"
+                @click="handleUpdateCompany"
+              >
+                {{ $t('BUTTON.SAVE') }}
+              </b-button>
             </div>
           </div>
 
           <!-- <b-form-input v-model="formData.full_name_furigana" /> -->
-          <!--  -->
           <div class="company-edit-content__tabs">
             <div class="company-edit-content-tabs-wrap">
-
               <div class="company-tab-content-child">
                 <b-tabs v-model="tabIndex" fill>
-                  <b-tab :title="$t('TAB.BASIC_INFORMATION')" :title-link-class="linkClass(0)">
+                  <b-tab
+                    :title="$t('TAB.BASIC_INFORMATION')"
+                    :title-link-class="linkClass(0)"
+                  >
                     <CompanyBasicInfo
+                      id="company-basic-info"
                       :form-data-company="formData"
                       :display-area-code="display_area_code"
                       :error-company="error"
@@ -117,8 +151,12 @@
                   </b-tab>
                   <!--  -->
                   <!-- 詳細情報 detail information -->
-                  <b-tab :title="$t('TAB.DETAIL_INFORMATION')" :title-link-class="linkClass(1)">
+                  <b-tab
+                    :title="$t('TAB.DETAIL_INFORMATION')"
+                    :title-link-class="linkClass(1)"
+                  >
                     <CompanyDetailInfo
+                      id="company-detail-info"
                       :form-data-company="formData"
                       :error-company="error"
                       @change-status="changeStatus"
@@ -132,11 +170,9 @@
                   <!--  -->
                 </b-tabs>
               </div>
-
             </div>
           </div>
         </div>
-        <!--  -->
       </div>
       <!-- Modal updateAllData -->
       <!-- @reset-modal="resetModal"
@@ -149,60 +185,46 @@
         title=""
       >
         <div class="modal-body-content">
-          <!--  -->
-          <div class="w-100 modal-content-title-del-hr d-flex justify-center align-center">
-            <div class="d-flex" style="padding-top: 30px;">
-              <span>
-                {{ $t('COMPANY.REALLY') }}
-                {{ statusConpanyLabel }}
-                {{ $t('COMPANY.DO_YOU_WANT_TO_CHANGE_TO') }}
-              </span>
-            </div>
+          <div
+            class="w-100 d-flex justify-center align-center modal-content-title-del-hr"
+            style="padding-top: 30px"
+          >
+            <span>{{ $t('COMPANY.REALLY') }}{{ statusConpanyLabel
+            }}{{ $t('COMPANY.DO_YOU_WANT_TO_CHANGE_TO') }}</span>
           </div>
+
           <div class="hr-list-btns">
-            <div id="delete-all-item-hr" class="btn" @click="closeModalUpdateCompany">
-              <span>キャンセル</span>
+            <div
+              id="delete-all-item-hr"
+              class="btn"
+              @click="closeModalUpdateCompany"
+            >
+              <span>{{ $t('CANCEL') }}</span>
             </div>
-            <!-- Cancel -->
+
             <div id="import-csv" class="btn accept" @click="updateAllData">
-              <span>OK</span>
+              <span>{{ $t('OK') }}</span>
             </div>
-            <!-- delete -->
           </div>
         </div>
       </b-modal>
-
-      <div>
-      <!--  -->
-      </div>
-
-    </div></b-overlay>
-
+    </div>
+  </b-overlay>
 </template>
 
 <script>
 import { MakeToast } from '@/utils/toastMessage';
-// import { obj2Path } from '@/utils/obj2Path';
 import { validEmail } from '@/utils/validate';
 import CompanyBasicInfo from './CompanyBasicInfo';
 import CompanyDetailInfo from './CompanyDetailInfo';
-import BtnBack from '@/components/Button/BtnBack.vue';
-import BtnConfirm from '@/components/Button/BtnConfirm.vue';
-// import ModalConfirm from '@/layout/components/ModalCommon/confirm.vue';
-//
 import { detailCompany } from '@/api/company.js';
 import { updateCompany } from '@/api/company.js';
 import { updateStatus } from '@/api/user.js';
 import { getListMainjob } from '@/api/job';
 
-// const urlAPI = {
-//   urlGetLisUser: '/user',
-//   urlDeleAll: 'user/ ',
-// };
 export default {
   name: 'CompanyDetail',
   components: {
-    BtnBack, BtnConfirm,
     CompanyBasicInfo,
     CompanyDetailInfo,
     // ModalConfirm,
@@ -232,7 +254,15 @@ export default {
       modalConfirmUpdateStatus: false,
 
       major_classification_options: [],
-      middle_classification_options: [],
+      middle_classification_options: [
+        {
+          key: null,
+          type: null,
+          value: this.$t('VALIDATE.REQUIRED_SELECT'),
+          disabled: true,
+          selected: true,
+        },
+      ],
       formData: {
         company_name: '',
         company_name_jp: '',
@@ -313,28 +343,110 @@ export default {
         assignee_contact: true,
       },
       optionsStatusConpany: [
-        { value: 1, label: this.$t('HR_STATUS.EXAMINATION_PENDING'), translate: 'examination pending' },
-        { value: 2, label: this.$t('HR_STATUS.CONFIRM'), translatel: 'confirm' },
+        {
+          value: 1,
+          label: this.$t('HR_STATUS.EXAMINATION_PENDING'),
+          translate: 'examination pending',
+        },
+        {
+          value: 2,
+          label: this.$t('HR_STATUS.CONFIRM'),
+          translatel: 'confirm',
+        },
         { value: 3, label: this.$t('HR_STATUS.REJECT'), translatel: 'decline' },
-        { value: 4, label: this.$t('HR_STATUS.STOP_USING'), translatebel: 'reject' },
+        {
+          value: 4,
+          label: this.$t('HR_STATUS.STOP_USING'),
+          translatebel: 'reject',
+        },
       ],
+      statusSelect: null,
+      idStatusSelect: null,
       idStatusCompany: null,
       status_color: '',
       statusConpanyLabelBefore: '',
       statusConpanyLabel: '',
       itemStatusCompanyselectedBefore: '',
       itemStatusCompanyselected: '',
+
+      error_toast_message: '',
       //
     };
   },
 
   computed: {
-  // listUser() {
-  //   return this.$store.getters.listUser;
-  // },
-  // currChange() {
-  //   return this.queryData.page;
-  // },
+    checkCompanyRole() {
+      const PROFILE = this.$store.getters.profile;
+      return PROFILE.type === 4;
+    },
+    companyStatusOptions() {
+      let OPTIONS = [];
+      switch (this.idStatusSelect) {
+        case 1:
+          OPTIONS = [
+            {
+              value: 1,
+              text: this.$t('HR_STATUS.EXAMINATION_PENDING'),
+              // translate: 'examination pending',
+            },
+            {
+              value: 2,
+              text: this.$t('HR_STATUS.CONFIRM'),
+              // translatel: 'confirm',
+            },
+            {
+              value: 3,
+              text: this.$t('HR_STATUS.REJECT'),
+              // translatel: 'decline',
+            },
+          ];
+          break;
+
+        case 2:
+          OPTIONS = [
+            {
+              value: 2,
+              text: this.$t('HR_STATUS.CONFIRM'),
+              // translatel: 'confirm',
+            },
+            {
+              value: 4,
+              text: this.$t('HR_STATUS.STOP_USING'),
+              // translatebel: 'reject',
+            },
+          ];
+          break;
+        case 3:
+          OPTIONS = [
+            {
+              value: 3,
+              text: this.$t('HR_STATUS.REJECT'),
+              // translatel: 'decline',
+            },
+          ];
+          break;
+        case 4:
+          OPTIONS = [
+            {
+              value: 4,
+              text: this.$t('HR_STATUS.STOP_USING'),
+              // translatebel: 'reject',
+            },
+          ];
+          break;
+
+        default:
+          break;
+      }
+
+      return OPTIONS;
+    },
+    // listUser() {
+    //   return this.$store.getters.listUser;
+    // },
+    // currChange() {
+    //   return this.queryData.page;
+    // },
   },
 
   created() {
@@ -400,7 +512,6 @@ export default {
       switch (type_select) {
         case 'telephone_number':
           if (type_option) {
-            // console.log('pustAreaCode telephone_number', type_select, 'type_option:', type_option);
             this.display_area_code.telephone_number = String(type_option);
             this.formData.telephone_number_put_api = String(type_option);
           } else {
@@ -438,26 +549,25 @@ export default {
           break;
       }
     },
-    selectRenderText(type_select, id_select, option_select){
+    selectRenderText(type_select, id_select, option_select) {
       switch (type_select) {
         // 1 major classification
         case 'major_classification_id':
           if (id_select) {
             let text = '';
-            option_select.map(item => {
+            option_select.map((item) => {
               if (item.id === id_select) {
                 text = item.name_ja;
               }
             });
-            // console.log('major_classification_id text: ', text);
             this.formData.major_classification_text = text;
           }
           break;
-          // 2 middle classification
+        // 2 middle classification
         case 'middle_classification_id':
           if (id_select) {
             let text = '';
-            option_select.map(item => {
+            option_select.map((item) => {
               if (item.id === id_select) {
                 text = item.name_ja;
               }
@@ -465,7 +575,7 @@ export default {
             this.formData.middle_classification_text = text;
           }
           break;
-          //
+        //
         default:
           break;
       }
@@ -473,14 +583,11 @@ export default {
     phonePutApi(areaCode, string_phone, type) {
       // this.$emit('phone-put-api', areaCode, string_phone);
       if (areaCode || string_phone) {
-        console.log('phonePutApi: ', areaCode, string_phone, type);
         const phone_convert = `${areaCode} ${string_phone}`;
         return phone_convert;
       }
       if (type === 'representative_contact') {
-        console.log('phonePutApi representative_contact: ');
         if (string_phone === '') {
-          console.log('phonePutApi: ', areaCode, string_phone, type);
           const phone_convert = ``;
           return phone_convert;
         }
@@ -488,7 +595,6 @@ export default {
     },
 
     handleChangeForm(event, field) {
-      // console.log('handleChangeForm(event, field)', event, field);
       const newValue = event;
       switch (field) {
         case 'company_name':
@@ -521,9 +627,13 @@ export default {
         case 'middle_classification_id':
           this.error.middle_classification_id = true;
           if (newValue) {
-            this.error.middle_classification_id = true;
+            if (this.findItemCount > 0) {
+              this.error.middle_classification_id = true;
+            }
           } else {
-            this.error.middle_classification_id = false;
+            if (this.findItemCount > 0) {
+              this.error.middle_classification_id = false;
+            }
           }
           break;
         // 4.1
@@ -622,15 +732,7 @@ export default {
             this.error.full_name_furigana = false;
           }
           break;
-        // 9
-        // case 'representative_contact_id':
-        //   this.error.representative_contact_id = true;
-        //   if (newValue) {
-        //     this.error.representative_contact_id = true;
-        //   } else {
-        //     this.error.representative_contact_id = false;
-        //   }
-        //   break;
+
         // 9 input
         case 'representative_contact':
           this.error.representative_contact = true;
@@ -641,12 +743,11 @@ export default {
               this.formData.representative_contact
             );
           } else {
-            console.log('representative_contact none newValue');
             // this.error.representative_contact = false;
             this.display_area_code.representative_contact = '';
           }
           break;
-          // 10
+        // 10
         case 'assignee_contact_id':
           this.error.assignee_contact_id = true;
           if (newValue) {
@@ -709,7 +810,8 @@ export default {
       //   this.error.other = false;
       // }
 
-      if (this.display_area_code.telephone_number === '') { // option khác
+      if (this.display_area_code.telephone_number === '') {
+        // option khác
         this.error.telephone_number_id = false;
         this.error.telephone_number = true;
       } else if (this.display_area_code.telephone_number !== '') {
@@ -738,7 +840,6 @@ export default {
       }
       // 9
       // if (this.display_area_code.representative_contact === '') { // option khác
-      //   // console.log('display_area_code.representative_contact === rong');
       //   this.error.representative_contact_id = false;
       //   this.error.representative_contact = true;
       // } else if (this.display_area_code.representative_contact !== '') {
@@ -749,8 +850,8 @@ export default {
       //   }
       // }
       // 10
-      if (this.display_area_code.assignee_contact === '') { // option khác
-        // console.log('display_area_code.assignee_contact === rong');
+      if (this.display_area_code.assignee_contact === '') {
+        // option khác
         this.error.assignee_contact_id = false;
         this.error.assignee_contact = true;
       } else if (this.display_area_code.assignee_contact !== '') {
@@ -766,7 +867,6 @@ export default {
         this.formData.company_name_jp !== '' &&
         this.formData.major_classification_id !== null &&
         this.formData.middle_classification_id !== null &&
-
         this.formData.post_code !== '' &&
         this.formData.prefectures !== '' &&
         this.formData.municipality !== '' &&
@@ -774,19 +874,15 @@ export default {
         // this.formData.other !== '' &&
         this.display_area_code.telephone_number && // option khác
         this.formData.telephone_number &&
-
         this.formData.mail_address &&
-
         this.formData.url !== '' &&
         this.formData.job_title !== '' &&
         this.formData.full_name !== '' &&
-
         // this.display_area_code.representative_contact && // option khác
         // this.formData.representative_contact &&
 
         this.display_area_code.assignee_contact && // option khác
         this.formData.assignee_contact
-
       ) {
         return true;
       }
@@ -834,7 +930,12 @@ export default {
       }
     },
     backCompanyList() {
-      this.$router.push({ path: `/company/list` }, (onAbort) => {});
+      const PROFILE = this.$store.getters.profile;
+      if (PROFILE.type === 4) {
+        this.$router.push({ name: 'Home' }, (onAbort) => {});
+      } else {
+        this.$router.push({ path: `/company/list` }, (onAbort) => {});
+      }
     },
     goToEditCompany() {
       this.$router.push({ path: `/company/edit/${this.id_company}` });
@@ -846,7 +947,7 @@ export default {
       if (this.formData) {
         this.idStatusCompany = this.formData.status;
         this.statusConpanyLabel = '';
-        this.optionsStatusConpany.map(item => {
+        this.optionsStatusConpany.map((item) => {
           if (this.formData.status === item.value) {
             this.statusConpanyLabelBefore = item.label;
             this.itemStatusCompanyselectedBefore = item.value;
@@ -856,48 +957,101 @@ export default {
       }
     },
 
-    handelChangeStatusCompany(item) {
-      if (item) {
-        this.statusConpanyLabel = item.label;
-        this.itemStatusCompanyselected = item.value;
-        this.idStatusCompany = item.value; // ! Gửi lên
+    // handelChangeStatusCompany(item) {
+    //   console.log('item khi chọn selectbox====>', item);
+    //   if (item) {
+    //     this.statusConpanyLabel = item.label;
+    //     this.itemStatusCompanyselected = item.value;
+    //     this.idStatusCompany = item.value; // ! Gửi lên
+    //     this.hasChangeStatus = true;
+    //   }
+    // },
+
+    changeStatusCompany() {
+      const findSelected = this.companyStatusOptions.find(
+        (item) => item.value === this.statusSelect
+      );
+      if (findSelected) {
+        this.statusConpanyLabel = findSelected.text;
+      }
+      if (this.statusSelect === this.idStatusSelect) {
+        this.hasChangeStatus = false;
+      } else {
         this.hasChangeStatus = true;
       }
     },
 
     changeUIStatusCompany(IditemSelect) {
       // 1 status company = 1
-      if (Number(this.formData.status) === 1){
+      if (Number(this.formData.status) === 1) {
         this.optionsStatusConpany = [
-          { value: 2, label: this.$t('HR_STATUS.CONFIRM'), translatel: 'confirm' },
-          { value: 3, label: this.$t('HR_STATUS.REJECT'), translatel: 'decline' },
+          {
+            value: 1,
+            label: this.$t('HR_STATUS.EXAMINATION_PENDING'),
+            translate: 'examination pending',
+          },
+          {
+            value: 2,
+            label: this.$t('HR_STATUS.CONFIRM'),
+            translatel: 'confirm',
+          },
+          {
+            value: 3,
+            label: this.$t('HR_STATUS.REJECT'),
+            translatel: 'decline',
+          },
         ];
         if (IditemSelect) {
           // UI: Chọn đổi status 2 -> còn 3
-          if (IditemSelect === 2) {
-            this.optionsStatusConpany = [{ value: 3, label: this.$t('HR_STATUS.REJECT'), translatel: 'decline' }];
-          }
-          // UI: Chọn 3 đổi status 3 -> option rỗng
-          if (IditemSelect === 3) {
-            this.optionsStatusConpany = [];
-          }
+          // if (IditemSelect === 2) {
+          //   this.optionsStatusConpany = [{ value: 3, label: this.$t('HR_STATUS.REJECT'), translatel: 'decline' }];
+          // }
+          // // UI: Chọn 3 đổi status 3 -> option rỗng
+          // if (IditemSelect === 3) {
+          //   this.optionsStatusConpany = [];
+          // }
         }
       }
       // 2 status company = 2 còn 4
-      if (Number(this.formData.status) === 2){
+      if (Number(this.formData.status) === 2) {
         this.optionsStatusConpany = [
-          { value: 4, label: this.$t('HR_STATUS.STOP_USING'), translatebel: 'reject' },
+          {
+            value: 2,
+            label: this.$t('HR_STATUS.CONFIRM'),
+            translatel: 'confirm',
+          },
+          {
+            value: 4,
+            label: this.$t('HR_STATUS.STOP_USING'),
+            translatebel: 'reject',
+          },
         ];
         if (IditemSelect) {
           // UI: Chọn đổi status 4 -> option rỗng
-          if (IditemSelect === 4) {
-            this.optionsStatusConpany = [];
-          }
+          // if (IditemSelect === 4) {
+          //   this.optionsStatusConpany = [];
+          // }
         }
       }
-      // 3 status company = 3/4
-      if (Number(this.formData.status) === 3 || Number(this.formData.status) === 4){
-        this.optionsStatusConpany = [];
+      // 3 status company = 3
+      if (Number(this.formData.status) === 3) {
+        this.optionsStatusConpany = [
+          {
+            value: 3,
+            label: this.$t('HR_STATUS.REJECT'),
+            translatel: 'decline',
+          },
+        ];
+      }
+
+      if (Number(this.formData.status) === 4) {
+        this.optionsStatusConpany = [
+          {
+            value: 4,
+            label: this.$t('HR_STATUS.STOP_USING'),
+            translatebel: 'reject',
+          },
+        ];
       }
       //
     },
@@ -917,7 +1071,7 @@ export default {
         const { data, code } = response.data;
 
         if (code === 200) {
-          data.map(item => {
+          data.map((item) => {
             if (this.formData.major_classification_id === item.id) {
               this.formData.major_classification_text = item.name_ja;
             }
@@ -935,14 +1089,14 @@ export default {
           this.middle_classification_options = [];
           this.middle_classification_options = middle_option;
 
-          middle_option.map(item => {
+          middle_option.map((item) => {
             if (this.formData.middle_classification_id === item.id) {
               this.formData.middle_classification_text = item.name_ja;
             }
           });
         }
-      } catch (erorr) {
-        console.log('erorr', erorr);
+      } catch (error) {
+        console.log(error);
       }
     },
 
@@ -950,7 +1104,8 @@ export default {
       this.closeModalUpdateCompany();
       const PARAMS = {
         company_id: this.id_company,
-        status: this.idStatusCompany, // Nhận ID status mới theo select
+        // status: this.idStatusCompany, // Nhận ID status mới theo select
+        status: this.statusSelect,
       };
 
       try {
@@ -961,20 +1116,21 @@ export default {
           this.overlay.show = false;
           await this.getCompanyDetail(); // Lấy lại số status mới nhất
           this.changeUIStatusCompany(this.itemStatusCompanyselected);
-          MakeToast({
-            variant: 'success',
-            title: 'SUCCESS',
-            content: message || '',
-          });
+          // MakeToast({
+          //   variant: 'success',
+          //   title: 'SUCCESS',
+          //   content: message || '',
+          // });
         } else {
           this.overlay.show = false;
           this.statusConpanyLabel = this.statusConpanyLabelBefore;
           this.itemStatusCompanyselected = this.itemStatusCompanyselectedBefore;
-          MakeToast({
-            variant: 'warning',
-            title: 'WARNING',
-            content: message || '',
-          });
+          // MakeToast({
+          //   variant: 'danger',
+          //   title: this.$t('DANGER'),
+          //   content: message || '',
+          // });
+          this.error_toast_message = message;
         }
       } catch (error) {
         this.overlay.show = false;
@@ -993,6 +1149,8 @@ export default {
           this.convertDataCompanyDetail(data);
           this.showStatusConpanyLabelInit();
           this.changeUIStatusCompany(data.status);
+          this.statusSelect = data.status;
+          this.idStatusSelect = data.status;
           this.itemStatusCompanyselected = data.status;
           //
         } else {
@@ -1036,16 +1194,19 @@ export default {
       this.formData.company_name_jp = dataCompany.company_name_jp;
       // 3
       this.formData.major_classification_id = dataCompany.major_classification;
-      this.formData.major_classification_text =
-      this.selectRenderText(
-        'major_classification_id', dataCompany.major_classification,
-        this.major_classification_options);
+      this.formData.major_classification_text = this.selectRenderText(
+        'major_classification_id',
+        dataCompany.major_classification,
+        this.major_classification_options
+      );
 
-      this.formData.middle_classification_id = dataCompany.middle_classification;
-      this.formData.middle_classification_text =
-      this.selectRenderText(
-        'middle_classification_id', dataCompany.middle_classification,
-        this.middle_classification_options);
+      this.formData.middle_classification_id =
+        dataCompany.middle_classification;
+      this.formData.middle_classification_text = this.selectRenderText(
+        'middle_classification_id',
+        dataCompany.middle_classification,
+        this.middle_classification_options
+      );
       // 4
       this.formData.post_code = dataCompany.post_code;
       this.formData.prefectures = dataCompany.prefectures;
@@ -1053,9 +1214,12 @@ export default {
       this.formData.number = dataCompany.number;
       this.formData.other = dataCompany.other;
       // 5
-      this.display_area_code.telephone_number =
-      this.convertAreaCode(dataCompany.telephone_number);
-      this.formData.telephone_number = this.convertPhone(dataCompany.telephone_number);
+      this.display_area_code.telephone_number = this.convertAreaCode(
+        dataCompany.telephone_number
+      );
+      this.formData.telephone_number = this.convertPhone(
+        dataCompany.telephone_number
+      );
       //
       this.formData.mail_address = dataCompany.mail_address;
       this.formData.url = dataCompany.url;
@@ -1064,12 +1228,18 @@ export default {
       this.formData.full_name = dataCompany.full_name;
       this.formData.full_name_furigana = dataCompany.full_name_furigana;
       //
-      this.display_area_code.representative_contact =
-      this.convertAreaCode(dataCompany.representative_contact);
-      this.formData.representative_contact = this.convertPhone(dataCompany.representative_contact);
-      this.display_area_code.assignee_contact =
-      this.convertAreaCode(dataCompany.assignee_contact);
-      this.formData.assignee_contact = this.convertPhone(dataCompany.assignee_contact);
+      this.display_area_code.representative_contact = this.convertAreaCode(
+        dataCompany.representative_contact
+      );
+      this.formData.representative_contact = this.convertPhone(
+        dataCompany.representative_contact
+      );
+      this.display_area_code.assignee_contact = this.convertAreaCode(
+        dataCompany.assignee_contact
+      );
+      this.formData.assignee_contact = this.convertPhone(
+        dataCompany.assignee_contact
+      );
       // 2 企業情報 Company information
       this.formData.establishment_year = dataCompany.establishment_year;
       this.formData.startup_year = dataCompany.startup_year;
@@ -1096,13 +1266,8 @@ export default {
       this.checkEmail();
       const resCheckValidate = this.checkValidate();
       const resCheckEmail = this.checkEmail();
-      if (
-        resCheckValidate
-      ) {
-        // console.log('pass checkValidate');
-        if (resCheckEmail) {
-          // console.log('pass validEmail');
-        } else {
+      if (resCheckValidate) {
+        if (!resCheckEmail) {
           this.hasChangeStatus = false;
           MakeToast({
             variant: 'warning',
@@ -1117,11 +1282,9 @@ export default {
           content: this.$t('HR_REGISTER.PLEASE_ENTER_ALL_REQUIRED_INFORMATION'),
         });
       }
+      console.log('đi vào đây đúng không', this.formData);
 
-      if (
-        resCheckValidate &&
-        resCheckEmail
-      ) {
+      if (resCheckValidate && resCheckEmail) {
         const BODY = {
           company_name: this.formData.company_name,
           company_name_jp: this.formData.company_name_jp,
@@ -1132,18 +1295,26 @@ export default {
           municipality: this.formData.municipality,
           number: this.formData.number,
           other: this.formData.other,
-          telephone_number: this.phonePutApi(this.display_area_code.telephone_number, this.formData.telephone_number),
+          telephone_number: this.phonePutApi(
+            this.display_area_code.telephone_number,
+            this.formData.telephone_number
+          ),
           mail_address: this.formData.mail_address,
           url: this.formData.url,
           job_title: this.formData.job_title,
           full_name: this.formData.full_name,
           full_name_furigana: this.formData.full_name_furigana,
-          representative_contact: this.phonePutApi(
-            this.display_area_code.representative_contact,
-            this.formData.representative_contact,
-            'representative_contact'
+          representative_contact: this.formData.representative_contact
+            ? this.phonePutApi(
+              this.display_area_code.representative_contact,
+              this.formData.representative_contact,
+              'representative_contact'
+            )
+            : '',
+          assignee_contact: this.phonePutApi(
+            this.display_area_code.assignee_contact,
+            this.formData.assignee_contact
           ),
-          assignee_contact: this.phonePutApi(this.display_area_code.assignee_contact, this.formData.assignee_contact),
           // 2 企業情報 Company information
           establishment_year: this.formData.establishment_year,
           startup_year: this.formData.startup_year,
@@ -1157,6 +1328,7 @@ export default {
           // status: this.idStatusCompany, // Cũng thay dc status
           is_create: 1,
         };
+
         try {
           this.overlay.show = true;
           const response = await updateCompany(this.id_company, BODY);
@@ -1165,29 +1337,43 @@ export default {
             this.overlay.show = false;
             // this.updateStatusCompany(); //
             this.closeModalUpdateCompany();
-            MakeToast({
-              variant: 'success',
-              title: this.$t('SUCCESS'),
-              content: '更新の成功',
-            });
+            if (this.error_toast_message) {
+              MakeToast({
+                variant: 'danger',
+                title: this.$t('DANGER'),
+                content: this.error_toast_message,
+              });
+            } else {
+              MakeToast({
+                variant: 'success',
+                title: this.$t('SUCCESS'),
+                content: message || this.$t('HR_ORG_COMPANY_UPDATE_SUCCESS'),
+              });
+            }
             this.$router.push({ path: `/company/detail/${this.id_company}` });
             //
           } else {
             this.overlay.show = false;
             MakeToast({
-              variant: 'warning',
-              title: this.$t('WARNING'),
+              variant: 'danger',
+              title: this.$t('DANGER'),
               content: message || 'アップデートに失敗しました',
             });
+            MakeToast({
+              variant: 'danger',
+              title: this.$t('DANGER'),
+              content: this.error_toast_message,
+            });
           }
+          this.error_toast_message = '';
         } catch (error) {
           this.overlay.show = false;
           console.log(error);
         }
       }
     },
-    updateAllData() {
-      this.updateStatusCompany();
+    async updateAllData() {
+      await this.updateStatusCompany();
       this.updateCompany();
     },
     //
@@ -1204,11 +1390,15 @@ export default {
   // border: 1px solid blue;
   width: 100%;
   min-height: 100vh;
-	padding: 0 0rem 3.75rem 0;
+  padding: 0 0rem 3.75rem 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: stretch;
+}
+
+::v-deep .company-edit span {
+  word-break: break-all;
 }
 .company-edit-wrap {
   // border: 1px solid red;
@@ -1263,6 +1453,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+  text-align: center;
 }
 .company-change-status-options {
   // border: 1px solid;
@@ -1311,7 +1502,7 @@ export default {
   align-items: stretch;
   gap: 1rem;
   font-size: 24px;
-  font-weight: 400;
+  font-weight: 700;
 }
 .list-company-head__btns {
   // border: 1px solid red;
@@ -1321,7 +1512,7 @@ export default {
   gap: 0.25rem;
   font-size: 16px;
   font-weight: 400;
-  color: $white
+  color: $white;
 }
 .line {
   border: 1px solid #304cad;
@@ -1379,22 +1570,21 @@ export default {
 }
 
 #status-2-confirm {
-  border: 1px solid #4340FF !important;
-  color: #4340FF !important;
+  border: 1px solid #4340ff !important;
+  color: #4340ff !important;
 }
 
 #status-34-reject-stop {
-  border: 1px solid #FF6060 !important;
-  color: #FF6060 !important;
+  border: 1px solid #ff6060 !important;
+  color: #ff6060 !important;
 }
 
 ::v-deep .dropdown-custom {
   // border: 1px solid red !important;
   min-width: 152px;
   & > .dropdown-menu {
-    transform: translate(0px, 38px) !important;;
-    min-width: 152px !important;;
+    transform: translate(0px, 38px) !important;
+    min-width: 152px !important;
   }
 }
 </style>
-

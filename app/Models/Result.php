@@ -25,6 +25,7 @@ class Result extends Model
     const NOTE = 'note';
     const DISPLAY = 'display';
     const HIRE_DATE = 'hire_date';
+    const DECLINE_DATE = 'decline_date';
 
     protected $table = 'results';
 
@@ -38,6 +39,7 @@ class Result extends Model
         self::NOTE,
         self::DISPLAY,
         self::HIRE_DATE,
+        self::DECLINE_DATE,
     ];
 
     protected $dates = ['deleted_at'];

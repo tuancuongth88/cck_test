@@ -16,6 +16,10 @@ export function getHr(url) {
   return RequestApi.getOne(url);
 }
 
+export function getSelectHrOrg(url) {
+  return RequestApi.getOne(url);
+}
+
 export function getAllHr(url) {
   return RequestApi.getAll(url);
 }

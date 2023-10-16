@@ -44,7 +44,7 @@
         <b-table bordered :items="items2" :fields="fields2" />
       </div>
       <div class="distribute-msg-frame__inputs-datas px-5">
-        <h5 class="mt-4 font-weight-medium">面接形式 /interview format</h5>
+        <h5 class="mt-4 font-weight-medium">{{ $t('INTERVIEW_FORMAT') }}</h5>
         <span class="ml-3">個別面接 /private interview</span>
       </div>
     </div>
@@ -169,10 +169,6 @@ export default {
       //   });
       // }
       // this.$router.push('/home/detail');
-    },
-
-    handleSubmitDistribute() {
-      console.log('handleSubmitDistribute');
     },
   },
 };

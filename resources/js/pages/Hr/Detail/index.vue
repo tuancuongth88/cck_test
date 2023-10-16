@@ -30,7 +30,9 @@
             <div class="hr-basic-head-title">
               <div class="line" />
               <div>
-                <span>{{ $t('HR_LIST_FORM.DEAIL_FORM_TITLE') }}</span>
+                <span class="title-hr-detail">{{
+                  $t('HR_LIST_FORM.DEAIL_FORM_TITLE')
+                }}</span>
               </div>
               <!--  HR information detail -->
             </div>
@@ -38,12 +40,40 @@
             <div class="hr-detail-head-btns">
               <!-- 一覧に戻る Back to list -->
               <!-- 編集 edit -->
-              <div class="btn btn-light" @click="handleBackToHrList">
-                <span>{{ $t('BUTTON.BACK_TO_LIST') }}</span>
-              </div>
-              <div v-if="checkRole" class="btn btn-light btn-bold" @click="handleGoToEditHr">
-                <span>{{ $t('BUTTON_EDIT') }}</span>
-              </div>
+              <button
+                class="btn btn_back--custom"
+                dusk="btn_back_to_list_hr"
+                @click="handleBackToHrList"
+              >
+                <span class="btn-back-to-list-text">{{
+                  $t('BUTTON.BACK_TO_LIST')
+                }}</span>
+              </button>
+              <!-- <div
+                class="btn btn-light btn-back-to-list-hr"
+                dusk="btn_back_to_list_hr"
+                @click="handleBackToHrList"
+              >
+                <span class="btn-back-to-list-text">{{
+                  $t('BUTTON.BACK_TO_LIST')
+                }}</span>
+              </div> -->
+              <button
+                v-if="checkRole"
+                class="btn btn_save--custom"
+                dusk="btn_to_edit_hr"
+                @click="handleGoToEditHr"
+              >
+                <span class="btn-to-edit-hr-text">{{ $t('BUTTON_EDIT') }}</span>
+              </button>
+              <!-- <div
+                v-if="checkRole"
+                class="btn btn-light btn-bold btn-to-edit-hr"
+                dusk="btn_to_edit_hr"
+                @click="handleGoToEditHr"
+              >
+                <span class="btn-to-edit-hr-text">{{ $t('BUTTON_EDIT') }}</span>
+              </div> -->
             </div>
             <!--  -->
           </div>
@@ -67,7 +97,9 @@
                 <b-tab title="自己PR・備考">
                   <b-card-text>
                     <tab3PersonalPrRemarks
-                      :personal-pr-special-notes="detail_data.personal_pr_special_notes"
+                      :personal-pr-special-notes="
+                        detail_data.personal_pr_special_notes
+                      "
                       :remarks="detail_data.remarks"
                     />
                   </b-card-text>
@@ -111,7 +143,8 @@ import tab4Contact from '@/pages/Hr/Detail/TabDContact';
 import tab5MatchingSituation from '@/pages/Hr/Detail/TabEMatchingSituation';
 import HrBasicInformation from '@/pages/Hr/HrBasicInformation';
 import { getDetailsHr } from '@/api/hr.js';
-// import SelectJobsToOffer from '@/pages/Hr/HrBasicInformation/SelectJobsToOffer.vue';
+import { MakeToast } from '../../../utils/toastMessage';
+import ROLE from '@/const/role.js';
 // import { status_select_jobs_to_offer } from '@/pages/Hr/common.js';
 
 // const urlAPI = {
@@ -127,7 +160,6 @@ export default {
     tab4Contact,
     tab5MatchingSituation,
     HrBasicInformation,
-    // SelectJobsToOffer,
   },
 
   data() {
@@ -142,8 +174,6 @@ export default {
       },
       // status_select_jobs_to_offer: status_select_jobs_to_offer,
       id_hr: this.$route.params.id,
-      // Data child
-      dataMatchingSituation: [{ feild: 'dataMatchingSituation 1' }],
 
       detail_data: {
         address_city: '',
@@ -199,6 +229,7 @@ export default {
       },
 
       role_accept: [1, 3, 5],
+      ROLE: ROLE,
     };
   },
 
@@ -208,6 +239,10 @@ export default {
       const ROLE = profile.type || 0;
       return this.role_accept.includes(ROLE);
     },
+
+    permissionCheck() {
+      return this.$store.getters.permissionCheck;
+    },
   },
 
   created() {
@@ -216,24 +251,46 @@ export default {
 
   methods: {
     handleBackToHrList() {
-      console.log('handleBackToHrList');
-      this.$router.push({ path: `/hr/list` }, (onAbort) => {});
+      const REVERT_ROUTER = this.$store.getters.revertRouter;
+      if (REVERT_ROUTER) {
+        this.$router.push({ path: REVERT_ROUTER.path }, (onAbort) => {});
+      } else {
+        if (this.checkRole) {
+          this.$router.push({ path: `/hr/list` }, (onAbort) => {});
+        } else {
+          this.$router.push({ path: `/hr-search/list` }, (onAbort) => {});
+        }
+      }
     },
     handleGoToEditHr() {
-      console.log('handleGoToEditHr');
       // this.$router.push({ path: `/hr/edit` }, (onAbort) => {});
       this.$router.push({ path: `/hr/edit/${this.id_hr}` }, (onAbort) => {});
     },
 
     async getDetailHR() {
       this.overlay.show = true;
-      console.log('id_hr: this.$route.params.id,', this.$route.params.id);
       try {
         const res = await getDetailsHr(this.$route.params.id);
-        const { code, data } = res.data;
+        const { code, data, message } = res.data;
         if (code === 200) {
-          console.log('DATA detail: ', data);
           this.detail_data = data;
+        } else {
+          MakeToast({
+            variant: 'warning',
+            title: 'warning',
+            content: message,
+          });
+          if (
+            [
+              ROLE.TYPE_SUPER_ADMIN,
+              ROLE.TYPE_HR_MANAGER,
+              ROLE.TYPE_HR,
+            ].includes(this.permissionCheck)
+          ) {
+            this.$router.push('/hr/list');
+          } else if ((ROLE.TYPE_COMPANY_ADMIN, ROLE.TYPE_COMPANY)) {
+            this.$router.push('/hr-search/list');
+          }
         }
       } catch (error) {
         console.log(error);

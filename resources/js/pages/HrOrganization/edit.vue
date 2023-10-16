@@ -10,13 +10,16 @@
     <template v-if="overlay.show" #overlay>
       <div class="text-center">
         <b-icon icon="arrow-clockwise" font-scale="3" animation="spin" />
-        <p style="margin-top: 10px">{{ $t("PLEASE_WAIT") }}</p>
+        <p style="margin-top: 10px">{{ $t('PLEASE_WAIT') }}</p>
       </div>
     </template>
 
-    <div v-else class="display-user-management-list">
-      <b-row class="mb-4">
-        <b-col cols="3">
+    <div v-show="!overlay.show" class="display-user-management-list">
+      <div
+        class="mb-4 d-flex justify-space-between align-start"
+        style="gap: 1.8rem"
+      >
+        <b-col cols="3" class="px-0">
           <b-card class="text-center p-4">
             <b-card-text class="font-weight-bold">
               {{ formData.corporate_name_en }}
@@ -26,40 +29,68 @@
             </b-card-text>
             <b-card-text>（ID : {{ id }}）</b-card-text>
             <div class="detail-file d-flex flex-column">
-              <div class="d-flex align-items-center bg-gray font-weight-bold">
-                許可証
-                <b-badge
+              <div class="d-flex align-items-center font-weight-bold">
+                <span class="label-input-file mr-2">許可証</span>
+                <!-- <b-badge
                   class="badge-required mx-2"
                   variant="light"
-                >必須</b-badge>
+                >必須</b-badge> -->
+                <Require />
               </div>
-              <div class="upload-group d-flex my-2 flex-column align-items-start">
-                <input id="file" ref="upload-input" type="file" class="d-none">
-                <label for="upload-certificateFile" class="btn-upload mb-1"> ファイルを選択 </label>
-                <span class="file-name">{{ certificate_file_name }}</span>
+              <div
+                class="upload-group d-flex my-2 flex-column align-items-start"
+              >
+                <input
+                  id="file"
+                  ref="upload-input"
+                  type="file"
+                  class="d-none input-file"
+                >
+                <label for="upload-certificateFile" class="btn-upload mb-1">
+                  {{ $t('HR_REGISTER.SELECT_FILE') }}
+                </label>
+                <span class="file-name certificate-file-name-hr-org">{{
+                  certificate_file_name
+                }}</span>
               </div>
             </div>
             <b-form-select
               v-model="statusSelected"
               :options="optionStatus"
-              class="mb-3"
+              class="mb-3 change-status_hr-org"
+              dusk="change_status"
+              :disabled="role_type === 5 || optionStatus.length === 1"
               @change="handleChangeStatus"
             />
             <!-- <b-button variant="outline-secondary" class="mt-5">{{ $t('STATUS.EXAMINATION_PENDING') }}</b-button> -->
           </b-card>
         </b-col>
-        <b-col cols="9">
+        <div cols="9" style="flex: 1">
           <div class="d-flex justify-content-between align-items-center mb-3">
-            <b-col class="border-left-title font-weight-bold">{{
-              $t('TITLE.ORGANIZATION_DETAIL')
-            }}</b-col>
+            <b-col
+              class="border-left-title font-weight-bold hr-org-edit-title"
+            >{{ $t('TITLE.ORGANIZATION_DETAIL') }}</b-col>
             <div>
-              <b-button variant="outline-dark mx-1" @click="handleBackToDetail()">{{
-                $t('BUTTON.CANCEL')
-              }}</b-button>
-              <b-button variant="warning" class="text-white mx-1" @click="handleConfirmUpdate()">{{
-                $t('BUTTON.SAVE')
-              }}</b-button>
+              <!--  variant="outline-dark mx-1"
+                class="to-detail-hrorg" -->
+              <button
+                dusk="btn-cancel"
+                class="btn btn_back--custom mx-1"
+                @click="handleBackToDetail()"
+              >
+                {{ $t('BUTTON.CANCEL') }}
+              </button>
+              <!--
+             variant="warning"
+                class="text-white mx-1 save-hrorg"
+               -->
+              <button
+                class="btn btn_save--custom mx-1"
+                dusk="btn-save"
+                @click="handleConfirmUpdate()"
+              >
+                {{ $t('BUTTON.SAVE') }}
+              </button>
             </div>
           </div>
           <b-form @submit="onSubmit($event)" @reset="onReset($event)">
@@ -69,13 +100,16 @@
                 <div class="d-flex">
                   <b-col
                     cols="3"
-                    class="d-flex align-items-center bg-gray font-weight-bold"
+                    class="d-flex align-items-center bg-gray justify-content-between"
                   >
-                    {{ $t('HR_REGISTER.LABEL.CORPORATE_NAME') }}
-                    <b-badge
+                    <span class="label-name-hrorg-en">{{
+                      $t('HR_REGISTER.LABEL.CORPORATE_NAME')
+                    }}</span>
+                    <!-- <b-badge
                       class="badge-required mx-2"
                       variant="light"
-                    >必須</b-badge>
+                    >必須</b-badge> -->
+                    <Require />
                   </b-col>
                   <b-col cols="9" class="my-2">
                     <b-form-input
@@ -83,6 +117,8 @@
                       :class="
                         error.corporate_name_en === false ? ' is-invalid' : ''
                       "
+                      class="input-hrorg-name-en"
+                      dusk="corporate_name_en"
                       @input="handleChangeForm($event, 'corporate_name_en')"
                     />
                     <b-form-invalid-feedback :state="error.corporate_name_en">
@@ -96,12 +132,17 @@
                 <div class="d-flex">
                   <b-col
                     cols="3"
-                    class="d-flex align-items-center bg-gray font-weight-bold"
-                  >{{ $t('HR_REGISTER.LABEL.CORPORATE_NAME_JAPAN') }}
-                    <b-badge
+                    class="d-flex align-items-center bg-gray justify-content-between"
+                  >
+                    <div class="d-flex flex-column">
+                      <span class="label-name-hrorg-ja">{{ $t('HR_REGISTER.LABEL.CORPORATE_NAME') }}</span>
+                      <span class="label-name-hrorg-ja">{{ $t('HR_REGISTER.LABEL.CORPORATE_NAME_JAPANESE') }}</span>
+                    </div>
+                    <!-- <b-badge
                       class="badge-required mx-2"
                       variant="light"
-                    >必須</b-badge>
+                    >必須</b-badge> -->
+                    <Require />
                   </b-col>
                   <b-col cols="9" class="align-items-center my-2">
                     <b-form-input
@@ -109,6 +150,8 @@
                       :class="
                         error.corporate_name_ja === false ? ' is-invalid' : ''
                       "
+                      class="input-name-hrorg-ja"
+                      dusk="corporate_name_ja"
                       @input="handleChangeForm($event, 'corporate_name_ja')"
                     />
                     <b-form-invalid-feedback :state="error.corporate_name_ja">
@@ -122,17 +165,22 @@
                 <div class="d-flex">
                   <b-col
                     cols="3"
-                    class="d-flex align-items-center bg-gray font-weight-bold"
-                  >{{ $t('HR_REGISTER.LABEL.LICENSE_NO') }}
-                    <b-badge
+                    class="d-flex align-items-center bg-gray justify-content-between"
+                  ><span class="label-license-no">{{
+                     $t('HR_REGISTER.LABEL.LICENSE_NO')
+                   }}</span>
+                    <!-- <b-badge
                       class="badge-required mx-2"
                       variant="light"
-                    >必須</b-badge>
+                    >必須</b-badge> -->
+                    <Require />
                   </b-col>
                   <b-col cols="9" class="align-items-center my-2">
                     <b-form-input
                       v-model="formData.license_no"
                       :class="error.license_no === false ? ' is-invalid' : ''"
+                      class="input-license-no"
+                      dusk="license_no"
                       @input="handleChangeForm($event, 'license_no')"
                     />
                     <b-form-invalid-feedback :state="error.license_no">
@@ -146,12 +194,15 @@
                 <div class="d-flex">
                   <b-col
                     cols="3"
-                    class="d-flex align-items-center bg-gray font-weight-bold"
-                  >{{ $t('HR_REGISTER.LABEL.ACCOUNT_CLASSIFICATION') }}
-                    <b-badge
+                    class="d-flex align-items-center bg-gray justify-content-between"
+                  ><span class="label-account-classification">{{
+                     $t('HR_REGISTER.LABEL.ACCOUNT_CLASSIFICATION')
+                   }}</span>
+                    <!-- <b-badge
                       class="badge-required mx-2"
                       variant="light"
-                    >必須</b-badge>
+                    >必須</b-badge> -->
+                    <Require />
                   </b-col>
                   <b-col cols="9" class="align-items-center my-2">
                     <b-form-select
@@ -164,7 +215,11 @@
                           ? ' is-invalid'
                           : ''
                       "
-                      @input="handleChangeForm($event, 'account_classification')"
+                      class="input-account-classification"
+                      dusk="account_classification"
+                      @input="
+                        handleChangeForm($event, 'account_classification')
+                      "
                     />
                     <b-form-invalid-feedback
                       :state="error.account_classification"
@@ -179,17 +234,22 @@
                 <div class="d-flex">
                   <b-col
                     cols="3"
-                    class="d-flex align-items-center bg-gray font-weight-bold"
-                  >{{ $t('HR_REGISTER.LABEL.CONTRY') }}
-                    <b-badge
+                    class="d-flex align-items-center bg-gray justify-content-between"
+                  ><span class="label-county">{{
+                     $t('HR_REGISTER.LABEL.CONTRY')
+                   }}</span>
+                    <!-- <b-badge
                       class="badge-required mx-2"
                       variant="light"
-                    >必須</b-badge>
+                    >必須</b-badge> -->
+                    <Require />
                   </b-col>
                   <b-col cols="9" class="align-items-center my-2">
                     <b-form-select
                       v-model="formData.country"
                       :class="error.country === false ? ' is-invalid' : ''"
+                      class="select-country"
+                      dusk="country"
                       :options="country_option"
                       value-field="key"
                       text-field="value"
@@ -206,12 +266,15 @@
                 <div class="d-flex">
                   <b-col
                     cols="3"
-                    class="d-flex align-items-center bg-gray font-weight-bold"
-                  >{{ $t('HR_REGISTER.LABEL.REPRESENTATIVE_FULL_NAME') }}
-                    <b-badge
+                    class="d-flex align-items-center bg-gray justify-content-between"
+                  ><span class="label-representative-full-name">{{
+                     $t('HR_REGISTER.LABEL.REPRESENTATIVE_FULL_NAME')
+                   }}</span>
+                    <!-- <b-badge
                       class="badge-required mx-2"
                       variant="light"
-                    >必須</b-badge>
+                    >必須</b-badge> -->
+                    <Require />
                   </b-col>
                   <b-col cols="9" class="align-items-center my-2">
                     <b-form-input
@@ -222,6 +285,8 @@
                           ? ' is-invalid'
                           : ''
                       "
+                      class="input-representative-full-name"
+                      dusk="representative_full_name"
                       @input="
                         handleChangeForm($event, 'representative_full_name')
                       "
@@ -239,14 +304,17 @@
                 <div class="d-flex">
                   <b-col
                     cols="3"
-                    class="d-flex align-items-center bg-gray font-weight-bold"
-                  >{{
-                     $t('HR_REGISTER.LABEL.REPRESENTATIVE_FULL_NAME_FURIGANA')
-                   }}
-                    <b-badge
+                    class="d-flex align-items-center bg-gray justify-content-between"
+                  >
+                    <div class="d-flex flex-column">
+                      <span class="label-representative-full-name">{{ $t('HR_REGISTER.LABEL.REPRESENTATIVE_FULL_NAME') }}</span>
+                      <span class="label-representative-full-name">{{ $t('HR_REGISTER.LABEL.REPRESENTATIVE_FULL_NAME_FURIGANA_JAPANESE') }}</span>
+                    </div>
+                    <!-- <b-badge
                       class="badge-required mx-2"
                       variant="light"
-                    >必須</b-badge>
+                    >必須</b-badge> -->
+                    <Require />
                   </b-col>
                   <b-col cols="9" class="align-items-center my-2">
                     <b-form-input
@@ -257,6 +325,8 @@
                           ? ' is-invalid'
                           : ''
                       "
+                      class="input-representative-full-name-furigama"
+                      dusk="representative_full_name_furigana"
                       @input="
                         handleChangeForm(
                           $event,
@@ -272,38 +342,38 @@
                   </b-col>
                 </div>
               </b-list-group-item>
-              <!-- Representative contact -->
+              <!-- Representative contact 代表者連絡先 not required -->
               <b-list-group-item class="p-0">
                 <div class="d-flex">
                   <b-col
                     cols="3"
-                    class="d-flex align-items-center bg-gray font-weight-bold"
-                  >{{ $t('COMPANY.REPRESENTATIVE_CONTACT') }}
-                    <b-badge
+                    class="d-flex align-items-center bg-gray justify-content-between"
+                  ><span class="label-representative-contact">{{
+                     $t('COMPANY.REPRESENTATIVE_CONTACT')
+                   }}</span>
+                    <!-- <b-badge
                       class="badge-not-required mx-2"
                       variant="secondary"
-                    >任意</b-badge>
+                    >{{ $t('ARBITRARY') }}</b-badge> -->
+                    <Arbitrarily />
                   </b-col>
                   <b-col cols="9" class="d-flex align-items-center my-2">
                     <div class="d-flex w-100 flex-wrap">
+                      <!-- Dropdown -->
                       <b-col
                         cols="3"
-                        class="align-items-center font-weight-bold p-0"
+                        class="align-items-center pl-0"
                       >
                         <b-dropdown
                           id="representative_contact"
                           class="select-country"
-                          :class="
-                            error.assignee_contact_id === false
-                              ? 'option-error'
-                              : 'option-validate'
-                          "
+                          :class="'option-validate'"
+                          :text="formData.representative_contact_code"
                         >
                           <template #button-content>
                             <img
                               v-if="
-                                formData.representative_contact_code ===
-                                  '+84'
+                                formData.representative_contact_code === '+84'
                               "
                               :src="
                                 require(`@/assets/images/icons/flag-84.png`)
@@ -311,19 +381,44 @@
                             >
                             <img
                               v-if="
-                                formData.representative_contact_code ===
-                                  '+81'
+                                formData.representative_contact_code === '+81'
                               "
                               :src="
                                 require(`@/assets/images/icons/flag-81.png`)
                               "
                             >
-                            <span>{{ formData.representative_contact_code }}</span>
+                            <span>{{
+                              formData.representative_contact_code
+                            }}</span>
                           </template>
+                          <!-- BLANK -->
+                          <b-dropdown-item
+                            @click="
+                              handleChangeCountry(
+                                'representative_contact_code',
+                                ''
+                              );
+                              handleChangeFormOption(
+                                $event,
+                                'representative_contact_code'
+                              );
+                            "
+                            @change="
+                              handleChangeForm(
+                                $event,
+                                'representative_contact_code'
+                              )
+                            "
+                          >
+                            <span style="height: 28px" />
+                          </b-dropdown-item>
                           <!-- VIE -->
                           <b-dropdown-item
                             @click="
-                              handleChangeCountry('representative_contact_code', '+84');
+                              handleChangeCountry(
+                                'representative_contact_code',
+                                '+84'
+                              );
                               handleChangeFormOption(
                                 $event,
                                 'representative_contact_code'
@@ -346,7 +441,10 @@
                           <!-- JA -->
                           <b-dropdown-item
                             @click="
-                              handleChangeCountry('representative_contact_code', '+81');
+                              handleChangeCountry(
+                                'representative_contact_code',
+                                '+81'
+                              );
                               handleChangeFormOption(
                                 $event,
                                 'representative_contact_code'
@@ -367,123 +465,152 @@
                             <span>+81</span>
                           </b-dropdown-item>
                         </b-dropdown>
-                        <b-form-invalid-feedback
-                          id="assignee_contact"
+                        <!-- <b-form-invalid-feedback
+                          id="representative_contact"
                           :state="error.representative_contact_code"
                         >
                           {{ $t('VALIDATE.REQUIRED_SELECT') }}
-                        </b-form-invalid-feedback>
+                        </b-form-invalid-feedback> -->
                       </b-col>
                       <b-col cols="9" class="d-flex align-items-center p-0">
                         <b-form-input
                           v-model="formData.representative_contact"
                           aria-label=""
                           type="number"
-                          :class="error.assignee_contact === false ? ' is-invalid' : ''"
-                          :disabled="formData.representative_contact_code === ''"
-                          @input="handleChangeForm($event, 'representative_contact')"
+                          class="input-representative-contact"
+                          :formatter="format15characters"
+                          :disabled="
+                            formData.representative_contact_code === ''
+                          "
+                          @input="
+                            handleChangeForm($event, 'representative_contact')
+                          "
                         />
                       </b-col>
                     </div>
                   </b-col>
                 </div>
               </b-list-group-item>
-              <!-- Assignee contact -->
+              <!-- Assignee contact  担当者連絡先 : required-->
               <b-list-group-item class="p-0">
                 <div class="d-flex">
                   <b-col
                     cols="3"
-                    class="d-flex align-items-center bg-gray font-weight-bold"
-                  >{{ $t('COMPANY.ASSIGNEE_CONTACT') }}
-                    <b-badge
+                    class="d-flex align-items-center bg-gray justify-content-between"
+                  ><span class="label-assignee-contact">{{
+                     $t('COMPANY.ASSIGNEE_CONTACT')
+                   }}</span>
+                    <!-- <b-badge
                       class="badge-required mx-2"
                       variant="light"
-                    >必須</b-badge>
+                    >必須</b-badge> -->
+                    <Require />
                   </b-col>
                   <b-col cols="9" class="d-flex align-items-center my-2">
                     <div class="d-flex w-100 flex-wrap">
-                      <b-col
-                        cols="3"
-                        class="align-items-center font-weight-bold p-0"
-                      >
-                        <b-dropdown
-                          id="representative_contact"
-                          class="select-country"
+                      <b-col cols="3" class="align-items-center pl-0">
+                        <div
                           :class="
-                            error.assignee_contact_id === false
+                            error.assignee_contact_code === false
                               ? 'option-error'
                               : 'option-validate'
                           "
                         >
-                          <template #button-content>
-                            <img
-                              v-if="
-                                formData.assignee_contact_code ===
-                                  '+84'
-                              "
-                              :src="
-                                require(`@/assets/images/icons/flag-84.png`)
-                              "
-                            >
-                            <img
-                              v-if="
-                                formData.assignee_contact_code ===
-                                  '+81'
-                              "
-                              :src="
-                                require(`@/assets/images/icons/flag-81.png`)
-                              "
-                            >
+                          <b-dropdown
+                            id="assignee_contact"
+                            class="select-country"
+                          >
+                            <template #button-content>
+                              <img
+                                v-if="formData.assignee_contact_code === '+84'"
+                                :src="
+                                  require(`@/assets/images/icons/flag-84.png`)
+                                "
+                              >
+                              <img
+                                v-if="formData.assignee_contact_code === '+81'"
+                                :src="
+                                  require(`@/assets/images/icons/flag-81.png`)
+                                "
+                              >
 
-                            <span>{{ formData.assignee_contact_code }}</span>
-                          </template>
-                          <!-- VIE -->
-                          <b-dropdown-item
-                            @click="
-                              handleChangeCountry('assignee_contact_code', '+84');
-                              handleChangeFormOption(
-                                $event,
-                                'assignee_contact_code'
-                              );
-                            "
-                            @change="
-                              handleChangeForm(
-                                $event,
-                                'assignee_contact_code'
-                              )
-                            "
-                          >
-                            <img
-                              :src="
-                                require(`@/assets/images/icons/flag-84.png`)
+                              <span>{{ formData.assignee_contact_code }}</span>
+                            </template>
+                            <!-- BLANK -->
+                            <b-dropdown-item
+                              @click="
+                                handleChangeCountry(
+                                  'assignee_contact_code',
+                                  ''
+                                );
+                                handleChangeFormOption(
+                                  $event,
+                                  'assignee_contact_code'
+                                );
+                              "
+                              @change="
+                                handleChangeForm(
+                                  $event,
+                                  'assignee_contact_code'
+                                )
                               "
                             >
-                            <span>+84</span>
-                          </b-dropdown-item>
-                          <!-- JA -->
-                          <b-dropdown-item
-                            @click="
-                              handleChangeCountry('assignee_contact_code', '+81');
-                              handleChangeFormOption(
-                                $event,
-                                'assignee_contact_code'
-                              );
-                            "
-                            @change="
-                              handleChangeForm(
-                                $event,
-                                'assignee_contact_code'
-                              )
-                            "
-                          >
-                            <img
-                              :src="
-                                require(`@/assets/images/icons/flag-81.png`)
+                              <span style="height: 28px" />
+                            </b-dropdown-item>
+                            <!-- VIE -->
+                            <b-dropdown-item
+                              @click="
+                                handleChangeCountry(
+                                  'assignee_contact_code',
+                                  '+84'
+                                );
+                                handleChangeFormOption(
+                                  $event,
+                                  'assignee_contact_code'
+                                );
+                              "
+                              @change="
+                                handleChangeForm(
+                                  $event,
+                                  'assignee_contact_code'
+                                )
                               "
                             >
-                            <span>+81</span>
-                          </b-dropdown-item>
-                        </b-dropdown>
+                              <img
+                                :src="
+                                  require(`@/assets/images/icons/flag-84.png`)
+                                "
+                              >
+                              <span>+84</span>
+                            </b-dropdown-item>
+                            <!-- JA -->
+                            <b-dropdown-item
+                              @click="
+                                handleChangeCountry(
+                                  'assignee_contact_code',
+                                  '+81'
+                                );
+                                handleChangeFormOption(
+                                  $event,
+                                  'assignee_contact_code'
+                                );
+                              "
+                              @change="
+                                handleChangeForm(
+                                  $event,
+                                  'assignee_contact_code'
+                                )
+                              "
+                            >
+                              <img
+                                :src="
+                                  require(`@/assets/images/icons/flag-81.png`)
+                                "
+                              >
+                              <span>+81</span>
+                            </b-dropdown-item>
+                          </b-dropdown>
+                        </div>
                         <b-form-invalid-feedback
                           id="assignee_contact"
                           :state="error.assignee_contact_code"
@@ -496,11 +623,20 @@
                           v-model="formData.assignee_contact"
                           aria-label=""
                           type="number"
-                          :class="error.assignee_contact === false ? ' is-invalid' : ''"
+                          :class="
+                            error.assignee_contact === false
+                              ? ' is-invalid'
+                              : ''
+                          "
+                          :formatter="format15characters"
+                          class="input-assignee-contact"
+                          dusk="assignee_contact"
                           :disabled="formData.assignee_contact_code === ''"
                           @input="handleChangeForm($event, 'assignee_contact')"
                         />
-                        <b-form-invalid-feedback :state="error.assignee_contact">
+                        <b-form-invalid-feedback
+                          :state="error.assignee_contact"
+                        >
                           {{ $t('VALIDATE.REQUIRED_TEXT') }}
                         </b-form-invalid-feedback>
                       </b-col>
@@ -513,25 +649,35 @@
                 <div class="d-flex">
                   <b-col
                     cols="3"
-                    class="d-flex align-items-center bg-gray font-weight-bold"
-                  >{{ $t('COMPANY.ADDRESS') }}
-                    <b-badge
+                    class="d-flex align-items-center bg-gray justify-content-between"
+                  ><span class="label-address">{{
+                     $t('COMPANY.ADDRESS')
+                   }}</span>
+                    <!-- <b-badge
                       class="badge-required mx-2"
                       variant="light"
-                    >必須</b-badge>
+                    >必須</b-badge> -->
+                    <Require />
                   </b-col>
                   <b-col cols="9" class="d-flex align-items-center my-2">
                     <div class="d-flex w-100 flex-wrap">
                       <b-col
                         cols="3"
-                        class="d-flex align-items-center font-weight-bold p-0"
-                      >{{ $t('COMPANY.POST_CODE') }}
+                        class="d-flex align-items-center p-0"
+                      ><span class="label-post-code">{{
+                        $t('COMPANY.POST_CODE')
+                      }}</span>
                       </b-col>
                       <b-col cols="9" class="align-items-center p-0">
                         <b-form-input
                           v-model="formData.post_code"
                           aria-label=""
-                          :class="error.post_code === false ? ' is-invalid' : ''"
+                          :formatter="format7characters"
+                          :class="
+                            error.post_code === false ? ' is-invalid' : ''
+                          "
+                          class="input-post-code"
+                          dusk="post_code"
                           @input="handleChangeForm($event, 'post_code')"
                         />
                         <b-form-invalid-feedback :state="error.post_code">
@@ -544,14 +690,16 @@
                 <div class="d-flex">
                   <b-col
                     cols="3"
-                    class="d-flex align-items-center bg-gray font-weight-bold"
+                    class="d-flex align-items-center bg-gray"
                   />
                   <b-col cols="9" class="d-flex align-items-center my-2">
                     <div class="d-flex w-100 flex-wrap">
                       <b-col
                         cols="3"
-                        class="d-flex align-items-center font-weight-bold p-0"
-                      >{{ $t('COMPANY.CITY') }}
+                        class="d-flex align-items-center p-0"
+                      ><span class="label-city">{{
+                        $t('COMPANY.CITY')
+                      }}</span>
                       </b-col>
                       <b-col cols="9" class="align-items-center p-0">
                         <b-form-input
@@ -559,6 +707,8 @@
                           :class="
                             error.prefectures === false ? ' is-invalid' : ''
                           "
+                          class="input-city"
+                          dusk="prefectures"
                           @input="handleChangeForm($event, 'prefectures')"
                         />
                         <b-form-invalid-feedback :state="error.prefectures">
@@ -571,14 +721,16 @@
                 <div class="d-flex">
                   <b-col
                     cols="3"
-                    class="d-flex align-items-center bg-gray font-weight-bold"
+                    class="d-flex align-items-center bg-gray"
                   />
                   <b-col cols="9" class="d-flex align-items-center my-2">
                     <div class="d-flex w-100 flex-wrap">
                       <b-col
                         cols="3"
-                        class="d-flex align-items-center font-weight-bold p-0"
-                      >{{ $t('COMPANY.DISTINCT') }}
+                        class="d-flex align-items-center p-0"
+                      ><span class="label-distinct">{{
+                        $t('COMPANY.DISTINCT')
+                      }}</span>
                       </b-col>
                       <b-col cols="9" class="align-items-center p-0">
                         <b-form-input
@@ -586,6 +738,8 @@
                           :class="
                             error.municipality === false ? ' is-invalid' : ''
                           "
+                          class="input-distinct"
+                          dusk="municipality"
                           @input="handleChangeForm($event, 'municipality')"
                         />
                         <b-form-invalid-feedback :state="error.municipality">
@@ -598,19 +752,23 @@
                 <div class="d-flex">
                   <b-col
                     cols="3"
-                    class="d-flex align-items-center bg-gray font-weight-bold"
+                    class="d-flex align-items-center bg-gray"
                   />
                   <b-col cols="9" class="d-flex align-items-center my-2">
                     <div class="d-flex w-100 flex-wrap">
                       <b-col
                         cols="3"
-                        class="d-flex align-items-center font-weight-bold p-0"
-                      >{{ $t('COMPANY.NUMBER') }}
+                        class="d-flex align-items-center p-0"
+                      ><span class="label-number">{{
+                        $t('COMPANY.NUMBER')
+                      }}</span>
                       </b-col>
                       <b-col cols="9" class="align-items-center p-0">
                         <b-form-input
                           v-model="formData.number"
                           :class="error.number === false ? ' is-invalid' : ''"
+                          class="input-number"
+                          dusk="number"
                           @input="handleChangeForm($event, 'number')"
                         />
                         <b-form-invalid-feedback :state="error.number">
@@ -623,19 +781,22 @@
                 <div class="d-flex">
                   <b-col
                     cols="3"
-                    class="d-flex align-items-center bg-gray font-weight-bold"
+                    class="d-flex align-items-center bg-gray"
                   />
                   <b-col cols="9" class="d-flex align-items-center my-2">
                     <div class="d-flex w-100 flex-wrap">
                       <b-col
                         cols="3"
-                        class="d-flex align-items-center font-weight-bold p-0"
-                      >{{ $t('COMPANY.OTHERS') }}
+                        class="d-flex align-items-center p-0"
+                      ><span class="label-others">{{
+                        $t('COMPANY.OTHERS')
+                      }}</span>
                       </b-col>
                       <b-col cols="9" class="align-items-center p-0">
                         <b-form-input
                           v-model="formData.other"
                           :class="error.other === false ? ' is-invalid' : ''"
+                          class="input-others"
                           @input="handleChangeForm($event, 'other')"
                         />
                         <b-form-invalid-feedback :state="error.other">
@@ -651,21 +812,26 @@
                 <div class="d-flex">
                   <b-col
                     cols="3"
-                    class="d-flex align-items-center bg-gray font-weight-bold"
+                    class="d-flex align-items-center bg-gray justify-content-between"
                   >
                     <div class="d-flex flex-column">
-                      {{ $t('COMPANY.MAIL_ADDRESS') }}
+                      <span class="label-mail-address">{{
+                        $t('COMPANY.MAIL_ADDRESS')
+                      }}</span>
                       <span>（ログインID）</span>
                     </div>
-                    <b-badge
+                    <!-- <b-badge
                       class="badge-required mx-2"
                       variant="light"
-                    >必須</b-badge>
+                    >必須</b-badge> -->
+                    <Require />
                   </b-col>
                   <b-col cols="9" class="align-items-center my-2">
                     <b-form-input
                       v-model="formData.mail_address"
                       :class="error.mail_address === false ? ' is-invalid' : ''"
+                      class="input-mail-address"
+                      dusk="mail_address"
                       @input="handleChangeForm($event, 'mail_address')"
                     />
                     <b-form-invalid-feedback :state="error.mail_address">
@@ -679,19 +845,22 @@
                 <div class="d-flex">
                   <b-col
                     cols="3"
-                    class="d-flex align-items-center bg-gray font-weight-bold"
+                    class="d-flex align-items-center bg-gray justify-content-between"
                   >
                     <!-- {{ $t('URL') }} -->
-                    URL
-                    <b-badge
+                    <span class="label-url">URL</span>
+                    <!-- <b-badge
                       class="badge-required mx-2"
                       variant="light"
-                    >必須</b-badge>
+                    >必須</b-badge> -->
+                    <Require />
                   </b-col>
                   <b-col cols="9" class="align-items-center my-2">
                     <b-form-input
                       v-model="formData.url"
                       :class="error.url === false ? ' is-invalid' : ''"
+                      class="input-url"
+                      dusk="url"
                       @input="handleChangeForm($event, 'url')"
                     />
                     <b-form-invalid-feedback :state="error.url">
@@ -705,12 +874,15 @@
                 <div class="d-flex">
                   <b-col
                     cols="3"
-                    class="d-flex align-items-center bg-gray font-weight-bold"
-                  >{{ $t('HR_REGISTER.LABEL.CERTIFICATE') }}
-                    <b-badge
+                    class="d-flex align-items-center bg-gray justify-content-between"
+                  ><span class="label-certificate">{{
+                     $t('HR_REGISTER.LABEL.CERTIFICATE')
+                   }}</span>
+                    <!-- <b-badge
                       class="badge-required mx-2"
                       variant="light"
-                    >必須</b-badge>
+                    >必須</b-badge> -->
+                    <Require />
                   </b-col>
                   <b-col cols="9" class="align-items-center my-2">
                     <div
@@ -720,16 +892,19 @@
                         id="upload-certificateFile"
                         ref="CertificateFile"
                         type="file"
-                        class="d-none"
+                        class="d-none input-certificate"
                         @change="postCentificate"
-                        @input="
-                          handleChangeForm($event, 'certificate_file_id')
-                        "
+                        @input="handleChangeForm($event, 'certificate_file_id')"
                       >
-                      <label for="upload-certificateFile" class="btn-upload mb-1">
-                        ファイルを選択
+                      <label
+                        for="upload-certificateFile"
+                        class="btn-upload mb-1"
+                      >
+                        {{ $t('HR_REGISTER.SELECT_FILE') }}
                       </label>
-                      <span style="margin-left: 10px">{{ certificate_file_name }}</span>
+                      <span style="margin-left: 10px">{{
+                        certificate_file_name
+                      }}</span>
                     </div>
                     <b-form-invalid-feedback
                       id="certificate_file_id"
@@ -742,8 +917,8 @@
               </b-list-group-item>
             </b-list-group>
           </b-form>
-        </b-col>
-      </b-row>
+        </div>
+      </div>
 
       <b-modal
         ref="my-modal"
@@ -753,12 +928,13 @@
         title=""
       >
         <div class="modal-body-content">
-          <!--  -->
           <div
             class="w-100 modal-content-title-del-hr d-flex justify-center align-center"
           >
-            <div class="d-flex" style="padding-top: 30px;">
-              <span>ステータスを{{ getStatusByCode(statusSelected) }}に変更してよろしいですか？</span>
+            <div class="d-flex" style="padding-top: 30px">
+              <span>{{ $t('COMPANY.REALLY') }} +
+                {{ getStatusByCode(statusSelected) }} +
+                {{ $t('COMPANY.DO_YOU_WANT_TO_CHANGE_TO') }}</span>
             </div>
           </div>
           <div class="hr-list-btns">
@@ -767,15 +943,16 @@
               class="btn"
               @click="handleCancelUpdateStatus"
             >
-              <span>キャンセル</span>
+              <span> {{ $t('BUTTON.CANCEL') }}</span>
             </div>
             <!-- Cancel -->
             <div
               id="import-csv"
               class="btn accept"
+              dusk="btn_accept"
               @click="handleConfirmUpdateStatus"
             >
-              <span>OK</span>
+              <span>{{ $t('OK') }}</span>
             </div>
             <!-- delete -->
           </div>
@@ -786,25 +963,29 @@
 </template>
 
 <script>
-import { getDetailHrOrganization, updateStatusHrOrganization, updateHrOrganization } from '@/api/hrOrganization.js';
-import { account_classification_option, country_option } from '@/const/hrOrganization.js';
+import {
+  getDetailHrOrganization,
+  updateStatusHrOrganization,
+  updateHrOrganization,
+} from '@/api/hrOrganization.js';
+import {
+  account_classification_option,
+  country_option,
+} from '@/const/hrOrganization.js';
 import { uploadFile } from '@/api/uploadFile';
 import { validEmail } from '@/utils/validate';
 import { MakeToast } from '@/utils/toastMessage';
-// import {
-//   getAllUserManagement,
-//   deleteUserManagement,
-//   deleteAllUserManagement,
-// } from '@/api/modules/userManagement';
-// import { MakeToast } from '../../utils/toastMessage';
-// import { obj2Path } from '@/utils/obj2Path';
+import { LIMIT_FILE_SIZE, FILE_TYPE } from '@/const/config.js';
+import Require from '@/components/Require/Require.vue';
+import Arbitrarily from '@/components/Arbitrarily/Arbitrarily.vue';
 
-// const urlAPI = {
-//   urlGetLisUser: '/user',
-//   urlDeleAll: 'user/ ',
-// };
+const FILE_CAN_UPLOAD = [FILE_TYPE.PDF, FILE_TYPE.MP3, FILE_TYPE.MP4];
 export default {
   name: 'HrOrganizationEdit',
+  components: {
+    Require,
+    Arbitrarily,
+  },
   data() {
     return {
       overlay: {
@@ -819,26 +1000,8 @@ export default {
       tabIndex: 0,
       isChangeStatus: false,
       modalConfirmUpdateStatus: false,
-      // selectedCountry: '84',
-      // statusOption: [
-      //   {
-      //     value: 1,
-      //     text: '審査待ち ',
-      //   },
-      //   {
-      //     value: 2,
-      //     text: '承認 ',
-      //   },
-      //   {
-      //     value: 3,
-      //     text: '却下 ',
-      //   },
-      //   {
-      //     value: 4,
-      //     text: '利用停止 ',
-      //   },
-      // ],
       statusSelected: 1,
+      statusHrOrg: 1,
       noSort: true,
       checkbox: false,
       listId: [],
@@ -914,10 +1077,17 @@ export default {
 
       account_classification_option: account_classification_option,
       country_option: country_option,
+
+      error_toast_message: '',
     };
   },
 
   computed: {
+    role_type() {
+      const PROFILE = this.$store.getters.profile;
+      return PROFILE.type;
+    },
+
     listUser() {
       return this.$store.getters.listUser;
     },
@@ -925,12 +1095,12 @@ export default {
       return this.queryData.page;
     },
     optionStatus() {
-      if (this.statusSelected === 1) {
+      if (this.statusHrOrg === 1) {
         return [
           {
             value: 1,
             text: '審査待ち',
-            disabled: true,
+            disabled: false,
           },
           {
             value: 2,
@@ -938,18 +1108,18 @@ export default {
             disabled: false,
           },
           {
-            value: 4,
-            text: '利用停止',
+            value: 3,
+            text: '却下',
             disabled: false,
           },
         ];
       }
-      if (this.statusSelected === 2) {
+      if (this.statusHrOrg === 2) {
         return [
           {
             value: 2,
             text: '承認',
-            disabled: true,
+            disabled: false,
           },
           {
             value: 4,
@@ -958,21 +1128,21 @@ export default {
           },
         ];
       }
-      if (this.statusSelected === 3) {
+      if (this.statusHrOrg === 3) {
         return [
           {
             value: 3,
             text: '却下',
-            disabled: true,
+            disabled: false,
           },
         ];
       }
-      if (this.statusSelected === 4) {
+      if (this.statusHrOrg === 4) {
         return [
           {
             value: 4,
             text: '利用停止',
-            disabled: true,
+            disabled: false,
           },
         ];
       }
@@ -1023,6 +1193,10 @@ export default {
       }
 
       return text;
+    },
+
+    format15characters(e) {
+      return String(e).substring(0, 15);
     },
     handleChangeFormOption(event, type_dropdown) {
       switch (type_dropdown) {
@@ -1243,6 +1417,18 @@ export default {
         this.error.certificate_file_id = false;
       }
 
+      if (this.formData.assignee_contact_code === '') {
+        // option khác
+        this.error.assignee_contact_code = false;
+        this.error.assignee_contact = true;
+      } else if (this.formData.assignee_contact_code !== '') {
+        if (!this.formData.assignee_contact) {
+          this.error.assignee_contact = false;
+        } else {
+          this.error.assignee_contact = true;
+        }
+      }
+
       if (
         this.formData.corporate_name_ja !== '' &&
         this.formData.corporate_name_en !== '' &&
@@ -1251,7 +1437,7 @@ export default {
         this.formData.country.content !== '' &&
         this.formData.representative_full_name !== '' &&
         this.formData.representative_full_name_furigana !== '' &&
-        // this.formData.assignee_contact_id !== '' && //
+        this.formData.assignee_contact_code !== '' &&
         this.formData.assignee_contact !== '' &&
         this.formData.post_code !== '' &&
         this.formData.prefectures !== '' &&
@@ -1274,9 +1460,18 @@ export default {
         return false;
       }
     },
+
+    format7characters(e) {
+      const inputValue = String(e).substring(0, 7); // Giới hạn 7 ký tự
+
+      // Loại bỏ các ký tự tiếng Nhật từ giá trị nhập vào
+      const filteredValue = inputValue.replace(/[ぁ-んァ-ン一-龯。]/g, '');
+
+      return filteredValue;
+    },
     handleCancelUpdateStatus() {
       this.modalConfirmUpdateStatus = false;
-      this.handleSaveUpdate();
+      // this.handleSaveUpdate();
     },
 
     handleConfirmUpdate() {
@@ -1287,20 +1482,21 @@ export default {
       }
     },
 
-    handleConfirmUpdateStatus() {
-      this.modalConfirmUpdateStatus = true;
-      this.handleUpdateStatus();
+    async handleConfirmUpdateStatus() {
+      this.modalConfirmUpdateStatus = false;
+      this.overlay.show = true;
+      await this.handleUpdateStatus();
       this.handleSaveUpdate();
     },
 
     async handleSaveUpdate() {
+      this.checkvalidate();
+
       const resCheckvalidate = this.checkvalidate();
       const resCheckEmail = this.checkEmail();
 
       if (resCheckvalidate) {
-        if (resCheckEmail) {
-          console.log('type email success!');
-        } else {
+        if (!resCheckEmail) {
           MakeToast({
             variant: 'warning',
             title: this.$t('WARNING'),
@@ -1319,38 +1515,65 @@ export default {
         const DATA = {
           id: this.id,
           ...this.formData,
-          assignee_contact: this.formData.assignee_contact_code + ' ' + this.formData.assignee_contact,
-          representative_contact: this.formData.representative_contact_code + ' ' + this.formData.representative_contact,
+          assignee_contact:
+            this.formData?.assignee_contact_code &&
+            this.formData?.assignee_contact
+              ? this.formData.assignee_contact_code +
+                ' ' +
+                this.formData.assignee_contact
+              : '',
+          representative_contact:
+            this.formData?.representative_contact_code &&
+            this.formData?.representative_contact
+              ? this.formData.representative_contact_code +
+                ' ' +
+                this.formData.representative_contact
+              : '',
         };
         delete DATA.assignee_contact_code;
         delete DATA.representative_contact_code;
 
         // console.log('DATA update: ', DATA);
+
         try {
           const res = await updateHrOrganization(DATA);
-          // console.log('res update status ==>', res.data);
           const { code, message } = res.data;
           if (code === 200) {
             // update success: 更新の成功
-            MakeToast({
-              variant: 'success',
-              title: this.$t('SUCCESS'),
-              content: '更新の成功',
-            });
+            if (this.error_toast_message) {
+              MakeToast({
+                variant: 'danger',
+                title: this.$t('DANGER'),
+                content: this.error_toast_message,
+              });
+            } else {
+              MakeToast({
+                variant: 'success',
+                title: this.$t('SUCCESS'),
+                content: message || this.$t('HR_ORG_COMPANY_UPDATE_SUCCESS'),
+              });
+            }
             this.$router.push({
               path: `/hr-organization/detail/${this.id}`,
             });
           } else {
             MakeToast({
-              variant: 'warning',
-              title: this.$t('WARNING'),
+              variant: 'danger',
+              title: this.$t('DANGER'),
+              content: this.error_toast_message,
+            });
+            MakeToast({
+              variant: 'danger',
+              title: this.$t('DANGER'),
               content: message,
             });
           }
+          this.error_toast_message = '';
         } catch (error) {
-          console.log(' uploadStatus error ==>', error);
+          console.log(error);
         }
       }
+      this.overlay.show = false;
     },
 
     async getDetail() {
@@ -1358,20 +1581,33 @@ export default {
       await getDetailHrOrganization(this.id).then((res) => {
         const { data } = res;
         if (data.code === 200) {
-          // console.log('data detail: ', data.data);
-
           this.formData.corporate_name_en = data.data.corporate_name_en;
           this.formData.corporate_name_ja = data.data.corporate_name_ja;
           this.formData.license_no = data.data.license_no;
-          this.formData.account_classification = data.data.account_classification;
+          this.formData.account_classification =
+            data.data.account_classification;
           this.formData.country = data.data.country;
-          this.formData.representative_full_name = data.data.representative_full_name;
-          this.formData.representative_full_name_furigana = data.data.representative_full_name_furigana;
+          this.formData.representative_full_name =
+            data.data.representative_full_name;
+          this.formData.representative_full_name_furigana =
+            data.data.representative_full_name_furigana;
 
-          this.formData.representative_contact = this.convertContact('representative_contact', data.data.representative_contact);
-          this.formData.representative_contact_code = this.convertContact('representative_contact_code', data.data.representative_contact);
-          this.formData.assignee_contact = this.convertContact('assignee_contact', data.data.assignee_contact);
-          this.formData.assignee_contact_code = this.convertContact('assignee_contact_code', data.data.assignee_contact);
+          this.formData.representative_contact = this.convertContact(
+            'representative_contact',
+            data.data.representative_contact
+          );
+          this.formData.representative_contact_code = this.convertContact(
+            'representative_contact_code',
+            data.data.representative_contact
+          );
+          this.formData.assignee_contact = this.convertContact(
+            'assignee_contact',
+            data.data.assignee_contact
+          );
+          this.formData.assignee_contact_code = this.convertContact(
+            'assignee_contact_code',
+            data.data.assignee_contact
+          );
 
           this.formData.post_code = data.data.post_code;
           this.formData.prefectures = data.data.prefectures;
@@ -1384,6 +1620,7 @@ export default {
 
           this.certificate_file_name = data.data.file.file_name;
           this.statusSelected = data.data.status;
+          this.statusHrOrg = data.data.status;
         }
       });
       this.overlay.show = false;
@@ -1416,18 +1653,37 @@ export default {
       if (!rowFileData) {
         return 0;
       }
+      if (
+        !FILE_CAN_UPLOAD.includes(rowFileData.type) ||
+        rowFileData.size > LIMIT_FILE_SIZE.NORMAL_UPLOAD_FILE
+      ) {
+        MakeToast({
+          variant: 'warning',
+          title: this.$t('WARNING'),
+          content: this.$t('VALIDATE.FILE_UPLOAD_ERORR'),
+        });
+        return;
+      }
       const formDataCertificate = new FormData();
       formDataCertificate.append('file', rowFileData);
       try {
+        this.overlay.show = true;
         const res = await uploadFile(formDataCertificate);
-        // console.log('res ==>', res);
-        const { code, data } = res.data;
+        const { code, data, message } = res.data;
         if (code === 200) {
           this.formData.certificate_file_id = data.id;
           this.certificate_file_name = data.file_name;
+        } else {
+          MakeToast({
+            variant: 'warning',
+            title: 'Danger',
+            content: message,
+          });
         }
+        this.overlay.show = false;
       } catch (error) {
-        console.log(' uploadFile error ==>', error);
+        console.log(error);
+        this.overlay.show = false;
       }
     },
 
@@ -1438,7 +1694,11 @@ export default {
     },
 
     handleChangeStatus() {
-      this.isChangeStatus = true;
+      if (this.statusSelected === this.statusHrOrg) {
+        this.isChangeStatus = false;
+      } else {
+        this.isChangeStatus = true;
+      }
     },
 
     async handleUpdateStatus() {
@@ -1448,27 +1708,32 @@ export default {
           status: this.statusSelected,
         };
         const res = await updateStatusHrOrganization(PARAM);
-        // console.log('res update status ==>', res);
-        const { code, data } = res.data;
+        const { code, message } = res.data;
         if (code === 200) {
-          MakeToast({
-            variant: 'success',
-            title: this.$t('SUCCESS'),
-            content: data.message,
-          });
+          this.isChangeStatus = false;
+          this.statusHrOrg = this.statusSelected;
+          // MakeToast({
+          //   variant: 'success',
+          //   title: this.$t('SUCCESS'),
+          //   content: message,
+          // });
         } else {
-          MakeToast({
-            variant: 'warning',
-            title: this.$t('WARNING'),
-            content: data.message,
-          });
+          // MakeToast({
+          //   variant: 'danger',
+          //   title: this.$t('DANGER'),
+          //   content: message,
+          // });
+          this.error_toast_message = message;
         }
       } catch (error) {
-        console.log(' uploadStatus error ==>', error);
+        console.log(error);
       }
     },
 
     handleChangeCountry(type_select, countryCode) {
+      if (countryCode === '') {
+        this.formData.assignee_contact = '';
+      }
       // this.selectedCountry = countryCode;
       if (type_select === 'representative_contact_code') {
         this.formData.representative_contact_code = countryCode;
@@ -1477,10 +1742,6 @@ export default {
         this.formData.assignee_contact_code = countryCode;
       }
     },
-
-    // submitHandler() {
-    //   console.log('submitHandler');
-    // },
   },
 };
 </script>
@@ -1488,6 +1749,7 @@ export default {
 <style lang="scss" scoped>
 @import '@/scss/_variables.scss';
 @import '@/components/Modal/ModalStyle.scss';
+@import '@/pages/RegisterHrOrigin/RegisterHrOrigin.scss';
 
 .border-left-title {
   border-left: 4px solid #314cad;
@@ -1501,5 +1763,9 @@ export default {
 
 .bg-gray {
   background-color: #f8f8f8;
+}
+
+.certificate-file-name-hr-org {
+  max-width: 100%;
 }
 </style>

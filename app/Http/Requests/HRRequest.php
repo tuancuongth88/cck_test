@@ -8,6 +8,7 @@ namespace App\Http\Requests;
 
 use App\Models\HR;
 use App\Rules\PhoneRule;
+use App\Rules\ValidateMainJobs;
 use Enum\CountryEnum;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
@@ -53,8 +54,7 @@ class HRRequest extends FormRequest
     {
         $rules = [
 //            Hr::COUNTRY_ID => 'required|in:' . implode(',', array_keys(CountryEnum::COUNTRY)),
-//             Hr::HR_ORGANIZATION_ID => 'required|exists:hr_organization,id',
-            Hr::HR_ORGANIZATION_ID => 'required',
+            Hr::HR_ORGANIZATION_ID => 'required|exists:hr_organization,id',
             Hr::FULL_NAME => 'required|string|max:50',
             Hr::FULL_NAME_JA => 'required|string|max:50',
             Hr::GENDER => 'nullable|in:' . HRS_GENDER_MALE . ',' . HRS_GENDER_FEMALE,
@@ -67,13 +67,7 @@ class HRRequest extends FormRequest
             Hr::FINAL_EDUCATION_DEGREE => 'required|in:' . implode(',', array_keys(HR_EDUCATION_DEGREES)),
             Hr::MAJOR_CLASSIFICATION_ID => 'required|exists:job_type,id,type,'.JOB_TYPE_COL_2,
             Hr::MIDDLE_CLASSIFICATION_ID => 'required|exists:job_info,id',
-            'main_jobs' => 'required|array',
-                'main_jobs.*.main_job_career_date_from' => 'required|date_format:Y-m',
-                'main_jobs.*.to_now' => 'sometimes|in:yes,no',
-                'main_jobs.*.main_job_career_date_to' => 'required_if:main_jobs.*.to_now,no|date_format:Y-m',
-                'main_jobs.*.department_id' => 'required|exists:job_type,id,type,'.JOB_TYPE_COL_1,
-                'main_jobs.*.job_id' => 'required|exists:job_info,id',
-                'main_jobs.*.detail' => 'required|string|max:2000',
+            'main_jobs' => ['nullable', 'array', new ValidateMainJobs()],
             Hr::PERSONAL_PR_SPECIAL_NOTES => 'nullable|string|max:2000',
             Hr::REMARKS => 'nullable|string|max:2000',
 //            Hr::TELEPHONE_NUMBER => ['nullable', new PhoneRule()],
@@ -86,10 +80,12 @@ class HRRequest extends FormRequest
             Hr::HOMETOWN_CITY => 'nullable|string|max:50',
             Hr::HOME_TOWN_DISTRICT => 'nullable|string|max:50',
             Hr::HOME_TOWN_NUMBER => 'nullable|string|max:50',
-            Hr::HOME_TOWN_OTHER => 'nullable|string|max:50'
+            Hr::HOME_TOWN_OTHER => 'nullable|string|max:50',
+            Hr::STATUS => 'nullable|in:1,2,3'
         ];
         switch (Route::getCurrentRoute()->getActionMethod()){
             case 'index':
+            case 'download':
                 Validator::extend('greater_than', function($attribute, $value, $parameters)
                 {
                     if (isset($parameters[1]) && $parameters[1] > 0) {
@@ -112,10 +108,11 @@ class HRRequest extends FormRequest
                 $eduDateFrom = request('edu_date_from') ?? '';
                 return [
                     'hr_org_id' => 'nullable|exists:hr_organization,id',
+                    'country_id' => 'nullable|in:' . implode(',', array_keys(CountryEnum::COUNTRY)),
                     'gender' => 'nullable|array',
                     'gender.*' => 'required|in:' . implode(',', [HRS_GENDER_MALE, HRS_GENDER_FEMALE]),
-                    'age_from' => 'nullable|numeric|min:13|max:63',
-                    'age_to' => ['nullable', 'numeric', 'greater_than:age_from,' . $ageFrom],
+                    'age_from' => 'nullable|numeric',
+                    'age_to' => ['nullable', 'numeric', 'gte:age_from,' . $ageFrom],
                     'edu_date_from' => 'nullable|string|date_format:Y-m',
                     'edu_date_to' => ['nullable', 'date_format:Y-m', 'greater_than:edu_date_from,' . $eduDateFrom],
                     'edu_class' => 'nullable|array',
@@ -130,7 +127,7 @@ class HRRequest extends FormRequest
                     'middle_class' => 'nullable|array',
                     'middle_class.*' => 'required|exists:job_info,id',
                     'main_job_ids' => 'nullable|array',
-                    'main_job_ids.*' => 'required|exists:hrs_main_job_career,id,deleted_at,NULL',
+                    'main_job_ids.*' => 'required|exists:job_info,id',
                     'field' => 'nullable|in:id,full_name,date_of_birth,japanese_level,corporate_name_en,status',
                     'sort_by' => 'required_unless:field,null|string|in:asc,desc'
                 ];
@@ -256,11 +253,11 @@ class HRRequest extends FormRequest
 
             'age_from.*' => trans('api.hrs.search.age_from'),
             'age_to.*' => trans('api.hrs.search.age_to'),
-            'edu_date_from.*' => trans('hrs.search.edu_date_from'),
-            'edu_date_to.*' => trans('hrs.search.edu_date_to'),
-            'edu_class.*' => trans('hrs.search.edu_class'),
-            'edu_degree.*' => trans('hrs.search.edu_degree'),
-            'edu_course.*' => trans('hrs.search.edu_course'),
+            'edu_date_from.*' => trans('api.hrs.search.edu_date_from'),
+            'edu_date_to.*' => trans('api.hrs.search.edu_date_to'),
+            'edu_class.*' => trans('api.hrs.search.edu_class'),
+            'edu_degree.*' => trans('api.hrs.search.edu_degree'),
+            'edu_course.*' => trans('api.hrs.search.edu_course'),
             'work_forms.*.required' =>  trans('api.hrs.work_form.required'),
             'work_forms.*.in' =>  trans('api.hrs.work_form.in'),
             'japan_levels.*.exists' =>  trans('api.hrs.japanese_level.exists'),

@@ -9,6 +9,7 @@ namespace App\Http\Requests;
 use App\Models\City;
 use App\Models\Work;
 use App\Rules\ModelRule;
+use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -36,6 +37,10 @@ class WorkRequest extends FormRequest
 
         if ($this->isStore()) {
             return $this->storeRules();
+        }
+
+        if ($this->isIndex()) {
+            return $this->indexRules();
         }
 
         return [];
@@ -73,11 +78,34 @@ class WorkRequest extends FormRequest
             Work::OVER_TIME.'.required'                 => trans('api.work.over_time.required'),
             Work::TRANSFER.'.required'                  => trans('api.work.transfer.required'),
             Work::INTERVIEW_FOLLOW.'.required'          => trans('api.work.interview_follow.required'),
+            'field.*' =>trans('api.field.search'),
+            'sort_by.*' => trans('api.sort_by.search'),
         ];
+    }
+
+    protected function prepareForValidation()
+    {
+        if (!is_array($this->input('language_requirements'))){
+            $languageRequirements = json_decode($this->input('language_requirements'));
+            if (!is_array($languageRequirements)) {
+                $this->merge(['language_requirements' => []]);
+            } else {
+                $this->merge(['language_requirements' => $languageRequirements]);
+            }
+        }
+        if (!is_array($this->input('passions'))){
+            $passions = json_decode($this->input('passions'));
+            if (!is_array($passions)) {
+                $this->merge(['passions' => []]);
+            } else {
+                $this->merge(['passions' => $passions]);
+            }
+        }
     }
 
     private function storeRules()
     {
+
         $rules = [
             Work::TITLE                     => 'required|max:50',
             Work::MAJOR_CLASSIFICATION_ID   => 'required|exists:job_type,id',
@@ -88,14 +116,15 @@ class WorkRequest extends FormRequest
             Work::JOB_DESCRIPTION           => "required|max:".self::MAX_LENGTH,
             Work::APPLICATION_CONDITION     => "required|max:".self::MAX_LENGTH,
             Work::APPLICATION_REQUIREMENT   => "required|max:".self::MAX_LENGTH,
-            'language_requirements'         => 'required',
+            'language_requirements'         => 'required|array',
+            'language_requirements.*'       => 'integer',
             Work::OTHER_SKILL               => "required|max:".self::MAX_LENGTH,
             Work::PREFERRED_SKILL           => "max:".self::MAX_LENGTH,
             Work::FORM_OF_EMPLOYMENT        => ['required', Rule::in([WORK_FULL_TIME_EMPLOYEE, WORK_CONTRACT_EMPLOYEE, WORK_TEMPORARY_EMPLOYEE, WORK_OTHER_EMPLOYEE])],
             Work::WORKING_TIME_FROM         => 'required|date_format:H:i',
             Work::WORKING_TIME_TO           => 'required|date_format:H:i',
             Work::VACATION                  => "required|max:".self::MAX_LENGTH,
-            Work::EXPECTED_INCOME           => 'required|numeric',
+            Work::EXPECTED_INCOME           => 'required',
             Work::CITY_ID                   => ['required', new ModelRule(new City())],
             Work::WORKING_PALACE_DETAIL     => "max:".self::MAX_LENGTH,
             Work::TREATMENT_WELFARE         => "required|max:".self::MAX_LENGTH,
@@ -104,6 +133,8 @@ class WorkRequest extends FormRequest
             Work::OVER_TIME                 => ['required', Rule::in([WORK_CONFIRM_YES, WORK_CONFIRM_NO])],
             Work::TRANSFER                  => ['required', Rule::in([WORK_CONFIRM_YES, WORK_CONFIRM_NO])],
             Work::INTERVIEW_FOLLOW          => ['required', Rule::in(array_keys(Work::$interviewFlow))],
+            'passions'                      => 'nullable|array',
+            'passions.*'                      => 'integer',
         ];
 
         return $rules;
@@ -111,17 +142,48 @@ class WorkRequest extends FormRequest
 
     private function updateRules()
     {
-        $rules = $this->storeRules();
-
         $rules[Work::COMPANY_ID] = $this->getCompanyRule();
-
+        $work =  Work::find(Request::route('id'));
+        $fromDate = Carbon::parse($work->application_period_from);
+        $now = Carbon::now();
+        if ($now > $fromDate){
+            $date = $fromDate->subDay(1)->format('Y-m-d');
+        }else{
+            $date = 'yesterday';
+        }
+        $rules = $this->storeRules();
+        $rules[Work::APPLICATION_PERIOD_FROM]   = 'required|date_format:Y-m-d|after:'.$date;
+        $rules[Work::APPLICATION_PERIOD_TO]     = 'required|date_format:Y-m-d|after:application_period_from';
         return $rules;
+    }
+
+    private function indexRules()
+    {
+        return [
+            'company_id'                => 'nullable|numeric|exists:companies,id',
+            'middle_classification_id'  => 'nullable|array',
+            'middle_classification_id.*' => 'nullable|exists:job_info,id,deleted_at,NULL',
+            'income_from'  => 'nullable|numeric',
+            'income_to'  => 'nullable|numeric',
+            'city_id'  => 'nullable|array',
+            'city_id.*'  => 'nullable|exists:city,id,deleted_at,NULL',
+            'language_requirements'  => 'nullable|array',
+            'language_requirements.*'  => 'nullable|exists:language_requirements,id,deleted_at,NULL',
+            'form_of_employment'  => 'nullable|array',
+            'form_of_employment.*'  => 'nullable|in:1,2,3,4',
+            'passion_works'  => 'nullable|array',
+            'passion_works.*'  => 'nullable|exists:passions,id,deleted_at,NULL',
+            'field'  => 'nullable|in:id,title,company_name,status,updated_at',
+            'sort_by'  => 'nullable|in:asc,desc',
+            'page'  => 'nullable|numeric',
+            'per_page'  => 'nullable|numeric',
+        ];
     }
 
     private function updateStatusWorkRules()
     {
         return [
-            Work::STATUS => 'required|numeric|in:1,2,3'
+            Work::STATUS => 'required|numeric'
         ];
     }
 
@@ -146,5 +208,9 @@ class WorkRequest extends FormRequest
     private function isUpdateStatusWork()
     {
         return Route::getCurrentRoute()->getActionMethod() == 'updateStatusWork';
+    }
+
+    private function isIndex(){
+        return Route::getCurrentRoute()->getActionMethod() == 'index';
     }
 }

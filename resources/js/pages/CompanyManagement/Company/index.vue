@@ -12,16 +12,19 @@
     <template #overlay>
       <div class="text-center">
         <b-icon icon="arrow-clockwise" font-scale="3" animation="spin" />
-        <p style="margin-top: 10px">{{ $t("PLEASE_WAIT") }}</p>
+        <p style="margin-top: 10px">{{ $t('PLEASE_WAIT') }}</p>
       </div>
     </template>
     <!--  -->
-
     <div class="list-company">
       <!--  企業一覧 Company List -->
       <div class="list-company__head">
         <div class="line" />
-        <div class="list-company-head__title"><span>{{ $t('TITLE.COMPANY_LIST') }}</span></div>
+        <div class="list-company-head__title">
+          <span class="title-company-list">
+            {{ $t('TITLE.COMPANY_LIST') }}
+          </span>
+        </div>
       </div>
       <!--  -->
       <!--  -->
@@ -31,10 +34,12 @@
             <div class="list-company-table-wrap">
               <!-- Table -->
               <b-table
-                id="'gp-table'"
-                :key="`gp-table-${reRender}`"
+                id="company-list-table"
                 :fields="fieldslistCompany"
                 :items="arrlistCompany"
+                :hover="true"
+                :sort-by="convertField()['field']"
+                :sort-desc="convertField()['desc']"
                 no-sort-reset
                 no-local-sorting
                 show-empty
@@ -42,6 +47,11 @@
                 fixed
                 @sort-changed="handleSortTableCompanyList"
               >
+                <template #empty="">
+                  <div class="text-center">
+                    {{ $t('TABLE_EMPTY') }}
+                  </div>
+                </template>
                 <template #head(selected)="">
                   <b-form-checkbox
                     v-model="selectAll"
@@ -56,88 +66,110 @@
                 </template>
 
                 <!-- 1 ID -->
-                <template #cell(id)="id">
-                  <div class="cell-grid-component">
-                    {{ id.item.id }}
+                <template #cell(id)="data">
+                  <div class="w-100 h-100 d-flex justify-center align-center" :title="data.item.id">
+                    {{ data.item.id }}
                   </div>
                 </template>
                 <!-- 2 団体名 Organization name -->
                 <template #cell(company_name)="data">
-                  <div class="cell-grid-component ">
-                    <div class="w-100 h-100 d-flex justify-start align-center">
-                      <span>{{ data.item.company_name.company_name }}</span>
-                    </div>
-                    <div class="w-100 h-100 d-flex justify-start align-center">
-                      <span>{{ data.item.company_name.company_name_jp }}</span>
-                    </div>
+                  <div>
+                    <span class="one-line-paragraph" :title="data.item.company_name.company_name">{{ data.item.company_name.company_name }}</span>
+                  </div>
+                  <div>
+                    <span class="one-line-paragraph" :title="data.item.company_name.company_name_jp">{{ data.item.company_name.company_name_jp }}</span>
                   </div>
                 </template>
 
+                <!-- 3 業種分野 Field -->
                 <template #cell(field)="data">
-                  <div class="d-flex flex-column w-100 h-100">
-                    <span>{{ data.item.field }}</span>
+                  <div>
+                    <span class="one-line-paragraph" :title="data.item.field">{{ data.item.field }}</span>
                   </div>
                 </template>
 
                 <!-- 4 更新日 Updating date-->
                 <template #cell(updated_at)="data">
-                  <div class="cell-grid-component">
-                    {{ data.item.updated_at }}
+                  <div class="w-100 h-100 d-flex justify-center align-center">
+                    <span class="one-line-paragraph" :title="data.item.updated_at">{{ data.item.updated_at }}</span>
                   </div>
                 </template>
                 <!-- 5 ステータス Status-->
                 <template #cell(status)="data">
-                  <div v-if="data.item.status === '1'|| data.item.status === 1" class="w-100 h-100 d-flex justify-center align-center">
+                  <div
+                    v-if="data.item.status === '1' || data.item.status === 1"
+                    class="w-100 h-100 d-flex justify-center align-center"
+                  >
                     <div id="examination-pending" class="status-cell">
-                      <span>{{ $t('STATUS.EXAMINATION_PENDING') }}</span>
+                      <span class="one-line-paragraph">{{ $t('STATUS.EXAMINATION_PENDING') }}</span>
                     </div>
                   </div>
-                  <div v-if="data.item.status === '2'|| data.item.status === 2" class="w-100 h-100 d-flex justify-center align-center">
+                  <div
+                    v-if="data.item.status === '2' || data.item.status === 2"
+                    class="w-100 h-100 d-flex justify-center align-center"
+                  >
                     <div id="confirm" class="status-cell">
                       <span>{{ $t('STATUS.CONFIRM') }}</span>
                     </div>
                   </div>
-                  <div v-if="data.item.status === '3'|| data.item.status === 3" class="w-100 h-100 d-flex justify-center align-center">
+                  <div
+                    v-if="data.item.status === '3' || data.item.status === 3"
+                    class="w-100 h-100 d-flex justify-center align-center"
+                  >
                     <div id="decline" class="status-cell">
                       <span>{{ $t('STATUS.REJECT') }}</span>
                     </div>
                   </div>
-                  <div v-if="data.item.status === '4'|| data.item.status === 4" class="w-100 h-100 d-flex justify-center align-center">
+                  <div
+                    v-if="data.item.status === '4' || data.item.status === 4"
+                    class="w-100 h-100 d-flex justify-center align-center"
+                  >
                     <div id="discontinuance-of-use" class="status-cell">
                       <span>{{ $t('STATUS.DISCONTINUANCE_OF_USE') }}</span>
                     </div>
                   </div>
-
                 </template>
                 <!-- 6 詳細 Detail -->
                 <template #cell(detail)="detail">
-                  <button class="btn-go-detail" @click="goToDetail(detail.item.id, detail.value)">
+                  <button
+                    id="btn-go-detail"
+                    class="btn-go-detail"
+                    @click="goToDetail(detail.item.id, detail.value)"
+                  >
                     <i class="fas fa-eye icon-detail" />
                   </button>
                 </template>
-              <!--  -->
+                <!--  -->
               </b-table>
-            <!--  -->
+              <!--  -->
             </div>
           </div>
-
         </div>
-        <!--  -->
+        <!-- Pagination -->
         <!-- <div class="list-company-pagination">
-            <b-pagination
-              v-model="currentPage"
-              :total-rows="rows"
-              :per-page="perPage"
-              aria-controls="my-table"
-            />
-          </div> -->
+          <b-pagination
+            v-model="paginationNewMsglistCompany.currentPage"
+            :total-rows="paginationNewMsglistCompany.totalRows"
+            :per-page="paginationNewMsglistCompany.totalRows"
+            aria-controls="company-list-table"
+            pills
+            :next-class="'next'"
+            :prev-class="'prev'"
+            @change="($event) => getCurrentPagelistCompany($event)"
+          />
+        </div> -->
         <!--  -->
+        <custom-pagination
+          v-if="arrlistCompany && arrlistCompany.length > 0"
+          :total-rows="paginationNewMsglistCompany.totalRows"
+          :current-page="paginationNewMsglistCompany.currentPage"
+          :per-page="paginationNewMsglistCompany.perPage"
+          @pagechanged="onPageChange"
+          @changeSize="changeSize"
+        />
       </div>
-
     </div>
-
   </b-overlay>
-
 </template>
 
 <script>
@@ -146,11 +178,8 @@ import { MakeToast } from '@/utils/toastMessage';
 // import ModalCommon from '@/components/Modal/index.vue';
 import { listCompany } from '@/api/company';
 import { formattedDateTimestamp } from '@/utils/formattedDateTimestamp';
-
-// const urlAPI = {
-//   urlGetLisUser: '/user',
-//   urlDeleAll: 'user/ ',
-// };
+import { PAGINATION_CONSTANT } from '@/const/config.js';
+import { pushParamOrQueryToRouter } from '@/utils/routerUtils';
 export default {
   name: 'CompanyList',
   components: {},
@@ -165,6 +194,11 @@ export default {
         variant: 'light',
         fixed: true,
       },
+      paginationNewMsglistCompany: {
+        currentPage: 1,
+        totalRows: 0, // null
+        perPage: PAGINATION_CONSTANT.DEFALT_PER_PAGE,
+      },
       fieldslistCompany: [
         // 1 id
         {
@@ -172,8 +206,8 @@ export default {
           sortable: true,
           label: 'ID',
           class: 'id',
-          thStyle: { textAlign: 'center' },
-          thClass: 'col-1',
+          thStyle: { textAlign: 'center', width: '80px' },
+          // thClass: 'col-1',
         },
         // 2 団体名 Organization name
         {
@@ -191,7 +225,7 @@ export default {
           label: this.$t('COMPANY.FIELD'),
           class: 'field',
           thStyle: { textAlign: 'center' },
-          thClass: 'col-3',
+          thClass: 'col-3 class-dusk-field',
         },
         // 4 更新日 Updating date
         {
@@ -229,19 +263,7 @@ export default {
       // 4 更新日 Updating date
       // 5 Status ステータス
       // 6 詳細 Detail
-      arrlistCompany: [
-        // {
-        //   _isSelected: false,
-        //   id: '0000001',
-        //   company: {
-        //     company_name: ' Daisei VEHO Works',
-        //     company_name_jp: 'ダイセイ ヴェーホー ワークス',
-        //   },
-        //   field: '運輸・通信業',
-        //   updated_at: '20230301',
-        //   status: '審査待ち',
-        // },
-      ],
+      arrlistCompany: [],
       selectedItems: [],
       selectAll: true,
       // sort
@@ -249,31 +271,30 @@ export default {
         order_column: '',
         order_type: '',
       },
-      // pagination
-      perPage: 3,
-      currentPage: 1,
-
-      // Reload Table
-      reRender: 0,
       //
     };
   },
 
   computed: {
-    // listUser() {
-    //   return this.$store.getters.listUser;
-    // },
-    // currChange() {
-    //   return this.queryData.page;
-    // },
+
   },
 
   created() {
+    const queries = this.$store.getters.routerInfo[this.$route.name]?.queries;
+    if (queries){
+      this.paginationNewMsglistCompany.currentPage = queries?.page;
+      this.paginationNewMsglistCompany.perPage = queries?.per_page;
+      this.stateCollaseHrFormSearch = !!queries?.openToggle;
+      this.filterQuery.order_type = queries.sort_by;
+      this.filterQuery.order_column = queries.field;
+    }
     this.getListComany();
+    pushParamOrQueryToRouter(
+      this.$route.name
+    );
   },
 
   methods: {
-
     onSelectAllCheckboxChange() {
       if (this.selectAll) {
         this.selectedItems = [...this.arrlistCompany];
@@ -296,34 +317,39 @@ export default {
       }
       this.selectAll = this.selectedItems.length === this.arrlistCompany.length;
     },
-
+    convertField(){
+      const desc = this.filterQuery.order_type === 'desc';
+      const field = this.filterQuery.order_column;
+      return {
+        field,
+        desc,
+      };
+    },
     async handleSortTableCompanyList(ctx) {
-      console.log('handleSortTableCompanyList ctx: ', ctx);
       this.filterQuery.order_column = ctx.sortBy;
-      if (!this.sortDesc) {
-        this.sortDesc = true;
-      } else {
-        this.sortDesc = false;
-      }
-      console.log('handleSort ctx', ctx);
-      console.log('this.sortDesc', this.sortDesc);
-      this.filterQuery.order_type = (this.sortDesc === true) ? 'asc' : 'desc';
+      this.filterQuery.order_type = ctx?.sortDesc ? 'desc' : 'asc';
+      this.paginationNewMsglistCompany.currentPage = 1;
       await this.getListComany();
     },
     // Modal
     handleOpenAddGroupModal() {
-      console.log('handleOpenAddGroupModal');
       this.$refs['my-modal'].show();
     },
 
     goToDetail(id) {
+      pushParamOrQueryToRouter(
+        this.$route.name,
+        {
+          page: this.paginationNewMsglistCompany.currentPage,
+          per_page: this.paginationNewMsglistCompany.perPage,
+          field: this.filterQuery.order_column,
+          sort_by: this.filterQuery.order_type,
+          // openToggle: this.stateCollaseHrFormSearch,
+        }
+      );
       this.$router.push({ path: `/company/detail/${id}` }, (onAbort) => {});
     },
 
-    // Reload Table
-    reloadTable() {
-      this.reRender++;
-    },
     // pagination
     rows() {
       return this.items.length;
@@ -331,31 +357,24 @@ export default {
 
     // Call API
     async getListComany() {
-      let PARAMS = {};
-      if (this.filterQuery.order_column) {
-        // Sort Feild follow API
-        // PARAMS['sort_field'] = this.filterQuery.order_column;
-        // PARAMS['sort_by'] = this.filterQuery.order_type;
-        PARAMS = {
-          field: this.filterQuery.order_column,
-          sort_by: this.filterQuery.order_type,
-          // field: 'major_classification',
-          // sort_by: 'desc',
-          // sort_by: 'asc',
-        };
-      }
+      const params = {
+        page: this.paginationNewMsglistCompany.currentPage,
+        per_page: this.paginationNewMsglistCompany.perPage,
+        field: this.filterQuery.order_column,
+        sort_by: this.filterQuery.order_type,
+      };
 
-      // PARAMS['per_page'] = this.perPage;
-      // PARAMS['page'] = this.currentPage;
       try {
         this.overlay.show = true;
-        const response = await listCompany(PARAMS);
-        console.log('dataListCompany response: ', response);
+        this.arrlistCompany = [];
+        const response = await listCompany(params);
         const { data, code, message } = response.data;
-        console.log(data, code, message);
 
         if (code === 200) {
+          const total_records = response['data']['data']['pagination']['total_records'] || 0;
           this.overlay.show = false;
+          this.paginationNewMsglistCompany.totalRows = total_records;
+          this.selectAll = false;
           //
           this.convertListCompany(data.result);
           //
@@ -370,31 +389,32 @@ export default {
       } catch (error) {
         console.log(error);
       }
-      this.reloadTable();
     },
     convertListCompany(dataListCompany) {
-      const data = dataListCompany;
-      const TEMP = [];
-      data.map(item => {
-        TEMP.push({
+      this.arrlistCompany = dataListCompany.map((item) => {
+        return {
           _isSelected: false,
           id: item.id,
-          company_name:
-            {
-              company_name: item.company_name,
-              company_name_jp: item.company_name_jp,
-            },
+          company_name: {
+            company_name: item.company_name,
+            company_name_jp: item.company_name_jp,
+          },
           field: item.job_type.name_ja,
           updated_at: formattedDateTimestamp(item.updated_at),
           status: item.status,
-        });
+        };
       });
-      console.log('TEMP', TEMP);
-      this.arrlistCompany = [];
-      this.arrlistCompany = TEMP;
     },
 
-    //
+    async onPageChange(page) {
+      this.paginationNewMsglistCompany.currentPage = page;
+      await this.getListComany();
+    },
+    async changeSize(size) {
+      this.paginationNewMsglistCompany.perPage = size;
+      this.paginationNewMsglistCompany.currentPage = 1;
+      await this.getListComany();
+    },
   },
 };
 </script>
@@ -402,7 +422,8 @@ export default {
 <style lang="scss" scoped>
 @import '@/scss/_variables.scss';
 @import '@/scss/modules/common/common.scss';
-// @import '@/scss/modules/UserManagement/UserList.scss';
+@import '@/scss/modules/Job/job.scss';
+
 .list-company {
   // border: 1px solid red;
   width: 100%;
@@ -414,6 +435,9 @@ export default {
   gap: 1.375rem;
 }
 
+// ::v-deep .list-company span {
+//   word-break: break-all;
+// }
 .list-company__head {
   // border: 1px solid;
   width: 100%;
@@ -425,7 +449,7 @@ export default {
 }
 .list-company-head__title {
   font-size: 24px;
-  font-weight: 400;
+  font-weight: 700;
   line-height: 36px;
   color: $black;
 }
@@ -463,15 +487,16 @@ export default {
   display: flex;
   justify-content: flex-start;
   align-items: stretch;
-  min-height: 500px;
-  max-height: 800px;
-  overflow-y: auto;
+  // min-height: 500px;
+  // max-height: 800px;
+  // overflow-y: auto;
 }
 .list-company-table {
   width: 100%;
 }
 .list-company-table-wrap {
-  border: 1px solid #D9D9D9;
+  // border: 1px solid #d9d9d9;
+  border-bottom: 1px solid #d9d9d9;
   width: 100%;
   height: fit-content;
   display: flex;
@@ -479,12 +504,12 @@ export default {
   align-items: flex-start;
 }
 .list-company-pagination {
+  margin-top: 1rem;
   // border: 1px solid;
   width: 100%;
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
   align-items: center;
-  gap: 0.25rem;
 }
 
 .btn-light {
@@ -546,7 +571,7 @@ export default {
   justify-content: center;
   align-items: center;
   gap: 0.15rem;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 400;
   line-height: 21px;
   color: #333333;
@@ -565,7 +590,7 @@ export default {
   right: 10%;
 }
 #field {
- color: $black;
+  color: $black;
 }
 .field-cell {
   color: $black;
@@ -607,7 +632,9 @@ export default {
 ::v-deep .col-2 {
   width: 410px !important;
 }
-::v-deep .col-3, ::v-deep .col-4, ::v-deep .col-5 {
+::v-deep .col-3,
+::v-deep .col-4,
+::v-deep .col-5 {
   width: 156px !important;
   border: 1px solid red;
 }

@@ -15,9 +15,10 @@ class HRMainJobCareer extends Model
     const DEPARTMENT_ID = 'department_id';
     const JOB_ID = 'job_id';
     const DETAIL = 'detail';
+    const TO_NOW = 'to_now';
     protected $table = 'hrs_main_job_career';
 
-    protected $fillable = [self::HRS_ID,self::MAIN_JOB_CAREER_DATE_FROM,self::MAIN_JOB_CAREER_DATE_TO,self::DEPARTMENT_ID,self::JOB_ID,self::DETAIL];
+    protected $fillable = [self::HRS_ID,self::MAIN_JOB_CAREER_DATE_FROM,self::MAIN_JOB_CAREER_DATE_TO,self::DEPARTMENT_ID,self::JOB_ID,self::DETAIL, self::TO_NOW];
 
     protected $dates = ['deleted_at'];
 

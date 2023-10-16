@@ -1,11 +1,86 @@
 export default {
+  SAMA: '様',
   // VAlidate
+  DISPLAY_LABEL: '件の',
+  RESULT: 'を表示',
+  HOUSING_ALLOWANCE_AVAILABLE: '住宅手当有',
+  JOB_REGISTRATION: '求人登録',
+  MINUTES: '分',
+  INTERVIEW_ARRANGEMENT: '面接調整',
+  HIRE_DATE: '入社日',
+  AFFILIATION: '所属',
+  CURRENT: '現在',
+  AGE: '歳',
+  FINAL_ACADEMIC_BACKGROUND: '最終学歴（年月）',
+  RETURN_TO_PREVIOUS_SCREEN: '前の画面に戻る',
+  CONFIRM_BTN: '確定',
+  CLOSE_BTN: '閉じる',
+  RETURN_TO_PERSONNEL_SELECTION: '人材選択に戻る',
+  GO_CONFIRM: '確認画面へ',
+  PRIVATE_INTERVIEW: '個人面接',
+  GROUP_INTERVIEW: '集団面接',
+  PASSED: '合格',
+  RETURN_TO_DOCUMENT_REGISTRATION: '書類登録に戻る',
+  ENTER_WITH_THIS_CONTENT: 'この内容でエントリーする',
+  SEND_WITH_THIS_CONTENT: 'この内容で送信する',
+  RESUME: '履歴書',
+  CV: '職務経歴書',
+  OTHER_DOCUMENT: 'その他書類',
+  INPUT: '取り込み',
+  ADD_FILE: 'ファイルを追加する',
+  STATUS_LABEL: 'ステータス',
+  KEY_WORD: 'キーワード',
+  SELECT_LABEL: '選考',
+  ADDED_TO_FAVORITES: 'お気に入りに追加済',
+  REMOVE_FROM_FAVORITES: 'お気に入りにから外す',
+  ENTER: 'エントリーする',
+  ENTRY_LABEL: 'エントリー',
+  ARBITRARY: '任意',
+  CANCEL_INTERVIEW_TITLE: '本当に面接を中止しますか？',
+  LETTER_RECOMMENDATION: '推薦書',
+  MEETING_ID: 'ミーティングID',
+  PASSCODE: 'パスコード',
+  EXPIRE: '期限切れ',
+  SPECIAL_POINTS: 'こだわりポイント',
+  ENTRY: '《エントリー》',
+  OFFER: '《オファー》',
+  ELEMENT_NOT_FOUND: '要素が見つかりません',
+  SELECT: '選択済み',
+  SELECT_PREFECTURE: '都道府県を選ぶ',
+  SEARCH_FOR_JOB_CONDITION: '求人情報を詳細条件から探す',
+  SUPER_ADMIN: 'システム管理者',
+  COMPANY_ADMIN: '企業管理',
+  HR_ADMIN: '運営事務局',
+  RECOMMENDATION: '推薦文',
+  STAY_ON: 'このページに留まる',
+  MOVE_AWAY: 'このページから移動する',
+  TITLE_QUESTION1: 'このページから移動しますか？入力した情報は保存されません。',
+  DECISION: '決定',
+  REGIST_DOCUMENT: '書類登録',
+  WATING_FROM_COMPANY: '企業からの連絡をお待ちください。',
+  ITEM_SENT: 'エントリーを送信しました。',
+  INFORMATION_JOB: '求人情報 エントリー',
+  NOT_PERMISSION: '権限がありません。',
+  SENT: '送信しました。',
+  WAITING: '運営管理者の審査結果をお待ちください。',
+  CONFIRM_DELETE: '本当に削除しますか？',
+  NOT_DATA: '該当するデータは存在しません',
+  REQUIRED: '必須',
   VALIDATE: {
     REQUIRED_TEXT: '入力してください。',
     REQUIRED_SELECT: '選択してください。',
+    FILE_UPLOAD_ERORR: '添付できるファイルは3MB以内のPDF, mp3, mp4のみです',
+    FILE_CSV_UPLOAD_ERORR: '添付できるファイルは3MB以内のCSVのみです',
+    NOT_SELECT_HR_WHEN_CREATE_ENTRY: 'エントリーする人材を選択してください', // When create entry
+    NOT_SELECT_JOB_WHEN_CREATE_OFFER: 'オファーする求人を選択してください', // When create offer
+  },
+  WARNING_MESS: {
+    REQUIRED_FIELD_NOT_INPUT: '必須項目を入力してください',
+    NOT_SELECT_DECLINE: '辞退理由を選択してください',
   },
   // TAB
   TAB_HOME_MANAGEMENT: 'ホーム',
+  JOB_INFORMATION_SEARCH_LIST: '求人情報検索一覧',
 
   TAB_COMPANY_MANAGEMENT: '企業管理',
   TAB_JOB_LIST: '求人一覧',
@@ -16,6 +91,8 @@ export default {
   ROUTER_HR_ORGANIZATION_LIST: '人材団体一覧',
 
   TAB_MATCHING_MANAGEMENT: 'マッチング管理 ',
+  ROUTER_JOB_OFFER_LIST_COMPANY: '求人一覧(企業用)',
+  ROUTER_JOB_OFFER_LIST_HR: '求人一覧(人材用)',
 
   TAB_JOB_SEARCH: '求人検索',
   TAB_HR_SEARCH: '人材検索',
@@ -31,7 +108,7 @@ export default {
   ROUTER_MATCHING_MANAGEMENT_LIST: 'マッチング管理リスト',
 
   // Breadcrumb
-  BREADCRUMB_MASTER_MANAGEMENT: 'マスターマネジメント',
+  BREADCRUMB_MASTER_MANAGEMENT: 'マスタ管理',
   BREADCRUMB_MASTER_MANAGEMENT_LIST: 'リスト',
   BREADCRUMB_MASTER_MANAGEMENT_CREATE: '作成',
   BREADCRUMB_MASTER_MANAGEMENT_DETAIL: '詳細',
@@ -52,7 +129,7 @@ export default {
   MENU_RIGHT_LOGOUT: 'ログアウト',
   SUCCESS: '成功',
   WARNING: '警告',
-  DANGER: '危険',
+  DANGER: 'エラー',
   TOAST_HAVE_ERROR: '予期しないエラーが発生しました',
 
   // Login
@@ -61,13 +138,14 @@ export default {
   LOGIN_ID: 'ログインID',
   PASSWORD: 'パスワード',
   BUTTON_LOGIN: 'ログイン',
-  LOGIN_SUCCESS: '正常にログインしました',
+  LOGIN_SUCCESS: 'ログインしました',
   ERROR_VALIDATE_EMAIL_PASSWORD:
-		'メールアドレス、パスワードの形式を間違えました',
+    'メールアドレスまたはパスワードの形式をが正しくありません',
   IF_YOU_FORGET_YOUR_PASSWORD: 'パスワードを忘れた場合',
   REGISTRATION_FOR_HUMAN_RESOURCE_ORGANIZATIONS:
-		'人材団体向け新規登録はこちら',
+    '人材団体向け新規登録はこちら',
   CORPORATE_REGISTRATION: '企業向け新規登録はこちら',
+  LOGIN_FOOTER_TEXT: 'R2 事業再構築',
 
   // Reset Pass Word
   RESET_PASSWORD_TITLE: 'パスワードの再設定',
@@ -78,30 +156,33 @@ export default {
   GO_TO_LOGIN_SCREEN: 'ログイン画面へ',
   MAIL_ADDRESS: 'メールアドレス',
   PASSWORD_RESET_URL_HAS_BEEN_SENT_TO_YOUR_EMAIL_ADDRESS:
-		'メールアドレスにパスワード再設定URLを送信しました。',
+    'メールアドレスにパスワード再設定URLを送信しました',
   NEW_PASSWORD: '新しいパスワード',
   NEW_PASSWORD_CONFIRM: '新しいパスワード（確認）',
   TO_SET: '設定する',
   RETURN: '戻る',
-  PLEASE_ENTER_THE_CORRECT_EMAIL_ADDRESS_FORMAT: '正しいメールアドレスの形式を入力してください。',
-  PLEASE_ENTER_YOUR_EMAIL_ADDRESS: 'メールアドレスを入力してください。',
+  PLEASE_ENTER_THE_CORRECT_EMAIL_ADDRESS_FORMAT: '正しいメールアドレスの形式を入力してください',
+  PLEASE_ENTER_THE_CORRECT_PASSWORD_FORMAT: '12桁の半角英数字で入力してください',
+  PLEASE_ENTER_YOUR_EMAIL_ADDRESS: 'メールアドレスを入力してください',
 
   PLEASE_ENTER_NEW_PASSWORD: '新しいパスワードを入力してください。  ',
   PLEASE_ENTER_NEW_PASSWORD_CONFIRMATION: '  新しいパスワード（確認）を入力してください。',
-  PLEASE_ENTER_LESS_THAN_TWELVE_CHARACTERS: 'じゅうに文字未満で入力してください',
+  PLEASE_ENTER_LESS_THAN_TWELVE_CHARACTERS: '12桁の半角英数字で入力してください',
   // Change Password
   CHANGE_PASSWORD_TITLE: 'パスワードの変更',
   CHANGE_PASSWORD_DESCRIPTION:
-		'新しいパスワードを設定するために以下の情報を入力してください。',
-  CHANGE_PASSWORD_DESCRIPTION_2: '新しいパスワードを設定してください。',
-  CHANGE_PASSWORD_DESCRIPTION_3: 'パスワードを変更しました。 ',
+    '新しいパスワードを設定するために以下の情報を入力してください',
+
+  CHANGE_PASSWORD_DESCRIPTION_FORMAT: 'パスワードは大文字を含む半角英数字12桁で入力してください',
+  CHANGE_PASSWORD_DESCRIPTION_2: '新しいパスワードを設定してください',
+  CHANGE_PASSWORD_DESCRIPTION_3: 'パスワードを変更しました ',
   CURRENTLY_PASSWORD: '現在のパスワード',
   CURRENTLY_PASSWORD_CONFIRM: '現在のパスワード（確認）',
   NEXT_BTN: '次へ',
   NEW_PASSWORD_RESET_COMPLETED: '新しいパスワードを設定しました。',
-  PASS_NOT_MATCH: '新しいパスワードと新しいパスワード（確認）と一致しません。',
-  OLD_PASSWORD_IS_NOT_CORRECT: '古いパスワードが正しくありません',
-  VALIDATE_PASS_INPUT: '少なくとも大文字、小文字、数字のみを入力してください',
+  PASSWORD_NOT_MATCH: '新しいパスワードと新しいパスワード（確認）が一致しません。',
+  OLD_PASSWORD_IS_NOT_CORRECT: '以前のパスワードが正しくありません',
+  VALIDATE_PASS_INPUT: '12桁の半角英数字で入力してください',
   // Month Picker
   MONTH_1: '01',
   MONTH_2: '02',
@@ -120,22 +201,29 @@ export default {
   BUTTON_RETURN: '戻る',
 
   // Please Select
-  PLEASE_SELECT_TEXT: '--- オプションを選んでください ---',
+  PLEASE_SELECT_TEXT: '--- 選択してください ---',
 
   // Please choose a file
   PLEASE_CHOOSE_FILE: 'ファイルを選択してください。',
-  PLEASE_SELECT_DATA: '削除するデータを選択してください.',
+  PLEASE_SELECT_DATA: '削除するデータを選択してください',
 
   // Text Button Control
   BUTTON_EDIT: '編集',
   BUTTON_DELETE: '削除',
+  OK: 'OK',
+
+  // Update Company, Hr.Org success
+  HR_ORG_COMPANY_UPDATE_SUCCESS: '更新しました',
 
   // Modal
   MODAL_CONFIRM_DELETE: '以下を削除します。',
   MODAL_MESSAGE_CONFIRM_DELETE: 'ユーザー {name} を削除してもよろしいですか?',
   MODAL_BUTTON_CANCEL: 'キャンセル',
   MODAL_BUTTON_CANCEL_INTERVIEW: '面接キャンセル',
-  MODAL_BUTTON_CONFIRM: '承諾する',
+  MODAL_BUTTON_CONFIRM: '承認する',
+  MODAL_BUTTON_CONFIRM_RESULT: '承諾する',
+  MODAL_BUTTON_CONFIRM_ENTRY: '承認する',
+  MODAL_BUTTON_CONFIRM_OFFER: '承諾する',
   MODAL_BUTTON_DELETE: '削除',
   MODAL_BUTTON_DECLINE: '辞退する',
 
@@ -151,7 +239,7 @@ export default {
 
   // Date Picker
   DATE_PICKER_LABEL_HELP:
-		'カーソルキーを使用してカレンダーの日付をナビゲートする',
+    'カーソルキーを使用してカレンダーの日付をナビゲートする',
 
   // Table
   TABLE_EMPTY: 'データなし',
@@ -164,18 +252,18 @@ export default {
   COMPANY_LABEL: '企業',
 
   // User Management Create
-  USER_MANAGEMENT_CREATE_VALIDATE_FULL: 'すべての情報を入力していません!',
-  USER_MANAGEMENT_CREATE_SUCCESS: 'ユーザー {name} が正常に作成されました!',
-  USER_MANAGEMENT_DELETE_SUCCESS: 'ユーザー {name} は正常に削除されました！',
+  USER_MANAGEMENT_CREATE_VALIDATE_FULL: '必須項目をすべて入力してください',
+  USER_MANAGEMENT_CREATE_SUCCESS: 'ユーザー {name} を作成しました',
+  USER_MANAGEMENT_DELETE_SUCCESS: 'ユーザー {name} を削除しました',
   USER_MANAGEMENT_CREATE_NAME_REQUIRED: '名前（必須）：',
   USER_MANAGEMENT_CREATE_EMAIL_REQUIRED: 'メールアドレス（必須）：',
   USER_MANAGEMENT_CREATE_PASSWORD_REQUIRED: 'パスワード（必須）：',
   USER_MANAGEMENT_CREATE_AUTHORITY_REQUIRED: '権限（必須）：',
   USER_MANAGEMENT_CREATE_BUTTON_SIGN_UP: '新規登録',
   USER_MANAGEMENT_EDIT_PASSWORD_UPDATE:
-		'パスワード：（入力した場合だけ更新されます）',
+    'パスワード：（入力した場合だけ更新されます）',
   USER_MANAGEMENT_EDIT_BUTTON_SAVE: '編集保存',
-  USER_MANAGEMENT_EDIT_SUCCESS: 'ユーザー {name} 名を編集しました。',
+  USER_MANAGEMENT_EDIT_SUCCESS: 'ユーザー {name} 名を編集しました',
 
   // Button
   SIGN_UP: '新規登録',
@@ -189,18 +277,18 @@ export default {
   USER_MANAGEMENT_NAME: '名前',
   USER_MANAGEMENT_MAIL: 'メールアドレス',
   USER_MANAGEMENT_AUTH: '権限',
-  CONTENT_SUSS: 'ユーザーの削除に成功しました！',
+  CONTENT_SUSS: 'ユーザーを削除しました',
   isMessage: '選択されていません。',
 
   // Master Management Display 1
   MASTER_MANAGEMENT_DISPLAY_DELETE: '削除',
   MASTER_MANAGEMENT_DISPLAY_DELETE_MESS: ' {name} ',
-  MASTER_MANAGEMENT_CREATE_VALIDATE_FULL: 'すべての情報を入力していません! ',
-  MASTER_MANAGEMENT_CREATE_SUCCESS: 'アイテム {name} が正常に作成されました!',
+  MASTER_MANAGEMENT_CREATE_VALIDATE_FULL: '必須項目をすべて入力してください ',
+  MASTER_MANAGEMENT_CREATE_SUCCESS: '{name} を作成しました',
   MASTER_MANAGEMENT_DELETE_SUCCESS:
-		'アイテム {name} は正常に削除されました！',
-  MASTER_MANAGEMENT_EDIT_SUCCESS: 'アイテム {name} 名を編集しました!',
-  MASTER_MANAGEMENT_ADD_DUPLICATE: 'このセンターコート{name}を利用しました！',
+    'アイテム {name} を削除しました',
+  MASTER_MANAGEMENT_EDIT_SUCCESS: '{name} 名を編集しました',
+  MASTER_MANAGEMENT_ADD_DUPLICATE: '追加したデータが重複しています',
 
   // Degitacho List
   TABLE_DEGITACHO_LIST: {
@@ -250,13 +338,17 @@ export default {
   },
 
   HOME_MANAGEMENT: {
-    TITLE: '件名',
+    TITLE: 'タイトル',
     ON_GOING_JOB: '進行中の案件',
     DISTRIBUTION_MSG: '配信メッセージ',
     RECEPTION_TIME: '受信日時',
     TEXT: '本文',
     PICTURE: '絵文字',
     CREATE_MESSAGE: '新規作成',
+    CANCELLATION_CONFIRMATION: 'このページから移動しますか？入力した内容はすべて破棄されます。',
+    CREATE_DISTRIBUILT_SUCCESSFULLY: 'メッセージが配信されました',
+    PLEASE_DOWNLOAD_THE_ATTACHMENT_CORRECT_FORMAT: '添付ファイルはjpeg, jpg, gif, pngのいずれかをアップロードしてください',
+    PLEASE_UPLOAD_IMAGES_NO_LARGER_THAN_MB: '3MB以内のファイルをアップロードしてください。',
   },
 
   BUTTON: {
@@ -269,6 +361,7 @@ export default {
     CANCEL: 'キャンセル',
     EDIT: '編集',
     CHANGE: '変更する',
+    DELETE: '削除する',
     BTN_DELETE_MATCHING_MANAGEMENT: 'チェックしたものを一括削除',
     PAUSE_RECRUITMENT: '募集を一時停止する',
     BTN_BACK_TO_LOGIN: 'ログイン画面へ',
@@ -301,6 +394,7 @@ export default {
     MSG: 'メッセージ',
     DISTRIBUTION_MSG: 'マッチング関連',
     SHOW_MORE_MESSAGES: 'メッセージをさらに表示する',
+    SHOW_MORE_MESSAGES_ON_GOING_JOB: '進行中の案件をさらに表示する',
     OCCUPATION: '職種',
     DISTRIBUTE: '配信する',
     JOB_LIST: '求人一覧',
@@ -347,11 +441,11 @@ export default {
 
   JOB_DETAIL: {
     TITLE_FOR_HR: '求人情報 詳細',
-    JOB_DETAIL: '求人詳細',
+    JOB_DETAIL: '求人情報 詳細',
     JOB_INFORMATION: '求人情報',
     TITLE: '️求人名（タイトル）',
     COMPANY_NAME: '企業名',
-    COMPANY_NAME_FURIGANA: '企業名 (ﾌﾘｶﾞﾅ)',
+    COMPANY_NAME_FURIGANA: '企業名（フリガナ）',
     HR_NAME: '求人名',
     STATUS: 'ステータス',
     UPDATE_DATE: '更新日',
@@ -368,7 +462,7 @@ export default {
     VACATION: '休日・休暇',
     EXPECTED_INCOME: '想定年収',
     WORKING_PLACE: '勤務地（都道府県）',
-    WORKING_PLACE_DETAIL: '勤務地 詳細',
+    WORKING_PLACE_DETAIL: '勤務地（詳細）',
     TREATMENT_WELFARE: '待遇・福利厚生',
     COMPANY_PR_APPEAL: '会社PR・魅力',
     BONUS_PAY_RISE: '賞与・昇給の有無',
@@ -417,7 +511,7 @@ export default {
     VACATION: '休日・休暇',
     EXPECTED_INCOME: '想定年収',
     WORKING_PLACE: '勤務地（都道府県）',
-    WORKING_PLACE_DETAIL: '勤務地 詳細',
+    WORKING_PLACE_DETAIL: '勤務地（詳細）',
     TREATMENT_WELFARE: '待遇・福利厚生',
     COMPANY_PR_APPEAL: '会社PR・魅力',
     BONUS_PAY_RISE: '賞与・昇給の有無',
@@ -439,17 +533,18 @@ export default {
   JOB_SEARCH: {
     JOB_LIST_TITLE: '求人エントリー',
     CASE: '件',
-    NEW: '新しい',
+    NEW: 'NEW',
     SEE_DETAIL: '詳細を見る',
     POSTED_UNTIL: 'まで掲載',
     YEAR: '年',
     MONTH: '月',
     DAY: '日',
     TEN_THOUSAND_YEN: '万円',
+    MORE_THAN_TEN_THOUSAND_YEN: '万円以上',
   },
 
   COMPANY: {
-    CORPORATE_NAME_FURIGANA: '企業名（ﾌﾘｶﾞﾅ）',
+    CORPORATE_NAME_FURIGANA: '企業名（フリガナ）',
     FIELD: '業種分野',
     ADDRESS: '住所',
     TELEPHONE_NUMBER: '電話番号',
@@ -483,7 +578,7 @@ export default {
   TITLE_REGISTER_HR_H2: '人材団体 利用者登録',
   TITLE_REGISTER_HR_H3: '基本情報を入力してください',
   TITLE_CORPORATE_REGISTER_H1: '海外人材マッチングシステム(仮)',
-  TITLE_CORPORATE_REGISTER_H2: '利用者登録',
+  TITLE_CORPORATE_REGISTER_H2: '企業利用者登録',
   TITLE_CORPORATE_REGISTER_H3: '基本情報を入力してください',
 
   STATUS: {
@@ -519,6 +614,8 @@ export default {
     FIRST: '一次合格',
     UNOFFICIAL: '内定',
     CANCEL: 'キャンセル',
+    FAILURE: '不合格',
+    DECLINE_JOB_OFFER: '内定辞退',
 
   },
 
@@ -530,7 +627,7 @@ export default {
     ORGANIZATION_NAME_JAPANESE: '団体名（日本語）',
     COUNTRY: '国',
     FULL_NAME: '氏名',
-    FULL_NAMEFURIGANA: '氏名（ﾌﾘｶﾞﾅ） ',
+    FULL_NAMEFURIGANA: '氏名（フリガナ） ',
     GENDER: '性別',
     DATE_OF_BIRTH_: '生年月日',
     WORK_FORM: '勤務形態',
@@ -569,11 +666,13 @@ export default {
     LABEL: {
       CORPORATE_NAME: '法人名',
       CORPORATE_NAME_JAPAN: '法人名（日本語）',
+      CORPORATE_NAME_JAPANESE: '（日本語）',
       LICENSE_NO: 'ライセンス番号',
       ACCOUNT_CLASSIFICATION: 'アカウント区分',
       CONTRY: '国',
       REPRESENTATIVE_FULL_NAME: '代表者氏名',
       REPRESENTATIVE_FULL_NAME_FURIGANA: '代表者氏名（フリガナ）',
+      REPRESENTATIVE_FULL_NAME_FURIGANA_JAPANESE: '（フリガナ）',
       REPRESENTATIVE_CONTACT: '代表者連絡先',
       ASSIGNEE_CONTACT: '担当者連絡先',
       ADDRESS: '住所',
@@ -588,14 +687,15 @@ export default {
     },
     BTN_NEXT_DETAIL: '次へ',
     AGREE_WITH_TERMS_CONDITIONS: '利用規約に同意する',
-    PLEASE_ENTER_ALL_REQUIRED_INFORMATION: '必要な情報をすべて入力してください',
+    PLEASE_ENTER_ALL_REQUIRED_INFORMATION: '必須項目をすべて入力してください',
     SELECT_FILE: 'ファイルを選択',
     FILE_NOT_SELECTED: 'ファイル未選択',
+    CONFIRM_LEAVING: '入力内容が破棄されます。このページから移動してもよろしいですか？',
   },
   // Company register
   COMPANY_REGISTER: {
     TITLE_REGISTER_COMPANY_1: '海外人材マッチングシステム(仮)',
-    TITLE_REGISTER_COMPANY_2: '利用者登録',
+    TITLE_REGISTER_COMPANY_2: '企業利用者登録',
     FIELD: '業種分野',
     MAJOR_CLASSIFICATION: '大分類',
     MIDDLE_CLASSIFICATION: '中分類',
@@ -626,13 +726,14 @@ export default {
     OFFER_RECEIVED: 'オファー情報',
     ARRINTERVIEW: '面接情報',
     RESULT: '結果情報',
-    ENTRY_DATE: 'エントリー日',
+    // ENTRY_DATE: 'エントリー日',
+    ENTRY_DATE: '更新日',
 
     STATUS_PUBLIC: '公開',
     STATUS_PRIVATE: '非公開',
     STATUS_OFFICIAL_OFFER_CONFIRM: '内定承諾',
 
-    IMPORT_SUCCESS: 'インポートに成功しました。',
+    IMPORT_SUCCESS: 'インポートに成功しました',
   },
 
   HR_STATUS: {
@@ -646,14 +747,17 @@ export default {
     DEAIL_FORM_TITLE: '人材情報詳細',
     EDIT_FORM_TITLE: '人材情報編集',
     // Tab 2
+    ACADEMIC_BACKGROUND: '学歴・職歴',
     FINAL_EDUCATION: '最終学歴',
     FINAL_EDUCATION_DATE: '最終学歴（年月）',
     FINAL_EDUCATION_CLASSIFICATION: '最終学歴（区分）',
     FINAL_EDUCATION_DEGREE: '最終学歴（学位）',
     FINAL_EDUCATION_COURSE: '最終学歴（学科）',
     GRADUATION_DATE: '卒業年月',
+    FINAL_ACADEMIC: '最終学歴（選考学科）',
     YEAR: '年',
     MONTH: '月',
+    YEAR_MONTH: '年月',
     // DIVISION
     CLASSIFICATION: '区分',
     DEGREE: '学位',
@@ -683,7 +787,8 @@ export default {
   },
 
   SELECT_JOB_TO_OFFER: {
-    TITLE: 'オファーする求人を選択する',
+    // TITLE: 'オファー求人選択',
+    TITLE: 'オファー求人選択',
     JOB_NAME: '求人名',
     COMPANY_NAME: '企業名',
     STATUS: 'ステータス',
@@ -691,7 +796,7 @@ export default {
     OFFER_JOB: 'オファー求人',
     OFFER_HR: 'オファー人材',
     CHOOSE_JOB_TO_OFFER_SUCCESS: 'オファーしました',
-    CHOOSE_JOB_TO_OFFER_FAIL: 'オファーする仕事を選ぶのは失敗する',
+    CHOOSE_JOB_TO_OFFER_FAIL: 'オファーに失敗しました',
     MAKE_AN_OFFER_TITLE: 'オファーしてよろしいですか？',
 
   },
@@ -700,6 +805,7 @@ export default {
     ENTRY_HR: 'エントリー人材',
     MOVE_TO_ENTRY: 'エントリーに進む',
     FULL_NAME: '氏名',
+    MODAL_ENTRY_TITME: 'エントリー人材選択',
   },
 
   // header table
@@ -719,21 +825,36 @@ export default {
     STATUS: 'ステータス',
     DETAIL: '詳細',
   },
+
+  INTERVIEW_CANCEL_MODAL_TITLE: '本当にこのエントリーを却下しますか？',
+  INTERVIEW_CANCEL_MODAL_LABEL: '理由',
   TEXT_CONFIRM1: '本当に面接をキャンセルしますか？',
   TEXT_CONFIRM2: '面接キャンセル理由 ',
-  TEXT_CONFIRM3: '承諾してよろしいですか？ ',
+  TEXT_CONFIRM3: '承認してよろしいですか？',
+  TEXT_CONFIRM3_ENTRY: '承認してよろしいですか？',
+  TEXT_CONFIRM3_OFFER: '承諾してよろしいですか？',
+  TEXT_CONFIRM3_RESULT: '承諾してよろしいですか？',
   TEXT_CONFIRM4: 'このエントリーを承認しますか？ ',
   MOTIVATION: '志望動機 ',
-  TEXT_CONFIRM5: 'その他ファイル1 ',
+  OTHER_FILES: 'その他ファイル ',
   REMARKS: '備考',
-  TEXT_CONFIRM6: 'このオファーを承認しますか？',
+  TEXT_CONFIRM6: 'このオファーを承諾しますか？',
   SELECTION_STATUS: '選考 ｽﾃｰﾀｽ',
   INTERVIEW_ADJUSTMENT_STATUS: '面接調整ｽﾃｰﾀｽ',
   INTERVIEW_CANDIDATE_DATE: '面接候補日',
   INTERVIEW_FORMAT: '面接形式',
   INTERVIEW_GROUP: '集団面接',
+  INTERVIEW_PRIVATE: '個人面接',
+  INTERVIEW_CANDIDATE: '候補',
+  INTERVIEW_REJECT_CANDIDATE: 'いずれの日時も不可、再調整',
 
+  ALL_TIMES_ARE_JAPAN_TIME: '※時間はすべて日本時間',
   BASIC_INFORMATION_REGISTER: '基本情報の登録',
   CONFIRM_INPUT_CONTENT: '入力内容の確認',
   APPLICATION_COMPLETED: '申請完了',
+
+  FAVORITE: {
+    JOB: 'お気に入りの求人',
+    HR: 'お気に入りの人材',
+  },
 };

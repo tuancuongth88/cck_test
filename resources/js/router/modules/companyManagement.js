@@ -1,4 +1,5 @@
 import Layout from '@/layout';
+import ROLE from '@/const/role.js';
 
 const companyManagement = {
   path: '/company',
@@ -6,8 +7,7 @@ const companyManagement = {
   meta: {
     title: 'TAB_COMPANY_MANAGEMENT',
     breadcrumb: 'BREADCRUMB_COMPANY_MANAGEMENT',
-    // permissions: [1, 2, 3],
-    role: [1, 2],
+    role: [ROLE.TYPE_SUPER_ADMIN, ROLE.TYPE_COMPANY_ADMIN],
   },
   component: Layout,
   redirect: { name: 'Company' },
@@ -18,6 +18,7 @@ const companyManagement = {
       meta: {
         title: 'ROUTER_COMPANY_MANAGEMENT_LIST',
         breadcrumb: 'BREADCRUMB_COMPANY_MANAGEMENT_LIST',
+        role: [ROLE.TYPE_SUPER_ADMIN, ROLE.TYPE_COMPANY_ADMIN],
       },
       component: () => import('@/pages/CompanyManagement/Company/index.vue'),
     },
@@ -27,6 +28,7 @@ const companyManagement = {
       meta: {
         title: 'ROUTER_COMPANY_MANAGEMENT_DETAIL',
         breadcrumb: 'BREADCRUMB_COMPANY_MANAGEMENT_DETAIL',
+        role: [ROLE.TYPE_SUPER_ADMIN, ROLE.TYPE_COMPANY_ADMIN, ROLE.TYPE_COMPANY],
       },
       component: () => import('@/pages/CompanyManagement/Company/form.vue'),
     },
@@ -36,18 +38,9 @@ const companyManagement = {
       meta: {
         title: 'ROUTER_COMPANY_MANAGEMENT_EDIT',
         breadcrumb: 'BREADCRUMB_COMPANY_MANAGEMENT_EDIT',
+        role: [ROLE.TYPE_SUPER_ADMIN, ROLE.TYPE_COMPANY_ADMIN, ROLE.TYPE_COMPANY],
       },
-      // component: () => import('@/pages/CompanyManagement/Company/edit.vue'),
       component: () => import('@/pages/CompanyManagement/Company/form.vue'),
-    },
-    {
-      path: 'create',
-      name: 'CompanyCreate',
-      meta: {
-        title: 'ROUTER_COMPANY_MANAGEMENT_CREATE',
-        breadcrumb: 'BREADCRUMB_COMPANY_MANAGEMENT_CREATE',
-      },
-      component: () => import('@/pages/CompanyManagement/Company/create.vue'),
     },
   ],
 };

@@ -18,7 +18,7 @@
 
     <div class="content-modal">
       <div class="w-100 content-modal-options">
-        <div class="collapse-parents">
+        <div id="dusk_parent_option_job" class="collapse-parents">
           <div
             v-for="(item, index) in options"
             :key="index"
@@ -33,19 +33,28 @@
           >
             <span>{{ item.name_ja }}</span>
 
-            <img :src="require('@/assets/images/login/chervon-right-white.png')" alt="collapse" style="height: 18px; width: 8px">
+            <img
+              :src="require('@/assets/images/login/chervon-right-white.png')"
+              alt="collapse"
+              style="height: 18px; width: 8px"
+            >
           </div>
         </div>
 
-        <div class="content-collapse-options">
-          <div class="head-collapse-parents-title" :class="{ 'd-none': !parentSelected.id }">
+        <div id="dusk_children_option_job" class="content-collapse-options">
+          <div
+            class="head-collapse-parents-title"
+            :class="{ 'd-none': !parentSelected.id }"
+          >
             <b-form-checkbox
               id="checkbox-1"
               v-mode="parentCheck[`${parentSelected.id}`]"
               :checked="parentCheck[`${parentSelected.id}`]"
               @change="handleSelectAllChild"
             >
-              <span>{{ parentSelected.name_ja ? parentSelected.name_ja : '' }}</span>
+              <span>{{
+                parentSelected.name_ja ? parentSelected.name_ja : ''
+              }}</span>
             </b-form-checkbox>
           </div>
 
@@ -64,7 +73,11 @@
       </div>
 
       <div class="select-job-btns">
-        <div class="btn btn-reflect-the-content" @click="handleReflectContent()">
+        <div
+          class="btn btn-reflect-the-content"
+          dusk="btn_reflect_job"
+          @click="handleReflectContent()"
+        >
           <span>{{ $t('SEARCH_JOB_LIST.REFLECT_CONTENT') }}</span>
         </div>
 
@@ -77,6 +90,7 @@
 </template>
 
 <script>
+import EventBus from '@/utils/eventBus';
 export default {
   name: 'ModalMultipleSelect',
   components: {},
@@ -113,11 +127,11 @@ export default {
       },
     },
     show() {
-      this.$bus.emit('modalSpecifyJobExpShowStatusChanged', this.show);
+      EventBus.$emit('modalSpecifyJobExpShowStatusChanged', this.show);
     },
   },
   created() {
-    this.$bus.on('removeSelected', (id) => {
+    EventBus.$on('removeSelected', (id) => {
       delete this.childrentSelected[id];
       delete this.parentCheck[id];
 
@@ -125,18 +139,18 @@ export default {
       this.childOptions = [];
     });
 
-    this.$bus.on('showModalSelect', (status) => {
+    EventBus.$on('showModalSelect', (status) => {
       this.show = status;
     });
 
-    this.$bus.on('handleClearSettingsModal', () => {
+    EventBus.$on('handleClearSettingsModal', () => {
       this.handleClearSettingsModal();
     });
   },
   destroyed() {
-    this.$bus.off('removeSelected');
-    this.$bus.off('showModalSelect');
-    this.$bus.off('handleClearSettingsModal');
+    // EventBus.$off('removeSelected');
+    // EventBus.$off('showModalSelect');
+    // EventBus.$off('handleClearSettingsModal');
   },
   methods: {
     handleCloseModal() {
@@ -147,17 +161,21 @@ export default {
 
       const childList = [];
 
-      item.childOptions.length > 0 && item.childOptions.map((item) => {
-        childList.push({
-          text: item.name_ja,
-          value: item.id,
+      item.childOptions.length > 0 &&
+        item.childOptions.map((item) => {
+          childList.push({
+            text: item.name_ja,
+            value: item.id,
+          });
         });
-      });
 
       this.childOptions = childList;
     },
     changeChildCheckbox() {
-      if (this.parentSelected.childOptions.length === this.childrentSelected[this.parentSelected.id].length) {
+      if (
+        this.parentSelected.childOptions.length ===
+        this.childrentSelected[this.parentSelected.id].length
+      ) {
         this.parentCheck = {
           ...this.parentCheck,
           [`${this.parentSelected.id}`]: true,
@@ -180,9 +198,10 @@ export default {
       if (checked) {
         const childChecked = [];
 
-        this.parentSelected.childOptions.length > 0 && this.parentSelected.childOptions.map((item) => {
-          childChecked.push(item.id);
-        });
+        this.parentSelected.childOptions.length > 0 &&
+          this.parentSelected.childOptions.map((item) => {
+            childChecked.push(item.id);
+          });
 
         this.childrentSelected = {
           ...this.childrentSelected,
@@ -200,18 +219,19 @@ export default {
 
       let newListChildrentSelected = {};
 
-      listSelectedKeys.length > 0 && listSelectedKeys.map((id) => {
-        if (this.childrentSelected[id].length > 0) {
-          newListChildrentSelected = {
-            ...newListChildrentSelected,
-            [id]: this.childrentSelected[id],
-          };
-        }
-      });
+      listSelectedKeys.length > 0 &&
+        listSelectedKeys.map((id) => {
+          if (this.childrentSelected[id].length > 0) {
+            newListChildrentSelected = {
+              ...newListChildrentSelected,
+              [id]: this.childrentSelected[id],
+            };
+          }
+        });
 
       this.childrentSelected = newListChildrentSelected;
 
-      this.$bus.emit('dataModalMultiple', this.childrentSelected);
+      EventBus.$emit('dataModalMultiple', this.childrentSelected);
 
       this.show = false;
     },
@@ -222,14 +242,13 @@ export default {
       this.childrentSelected = {};
       this.childOptions = [];
 
-      this.$bus.emit('dataModalMultiple', this.childrentSelected);
+      EventBus.$emit('dataModalMultiple', this.childrentSelected);
     },
   },
 };
 </script>
 
 <style lang="scss" scoped>
-
 @import '@/scss/_variables.scss';
 
 ::v-deep .modal-content {

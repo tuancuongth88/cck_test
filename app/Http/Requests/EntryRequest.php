@@ -108,7 +108,7 @@ class EntryRequest extends FormRequest
                     'hr_org_id' => 'nullable|exists:hr_organization,id',
                     'gender' => 'nullable|array',
                     'gender.*' => 'required|in:' . implode(',', [HRS_GENDER_MALE, HRS_GENDER_FEMALE]),
-                    'age_from' => 'nullable|numeric|min:18|max:60',
+                    'age_from' => 'nullable|numeric',
                     'age_to' => ['nullable', 'numeric', 'greater_than:age_from,' . $ageFrom],
                     'edu_date_from' => 'nullable|string|date_format:Y-m',
                     'edu_date_to' => ['nullable', 'date_format:Y-m', 'greater_than:edu_date_from,' . $eduDateFrom],
@@ -124,8 +124,8 @@ class EntryRequest extends FormRequest
                     'middle_class' => 'nullable|array',
                     'middle_class.*' => 'required|exists:job_info,id',
                     'main_job_ids' => 'nullable|array',
-                    'main_job_ids.*' => 'required|exists:hrs_main_job_career,id,deleted_at,NULL',
-                    'field' => 'nullable|in:id,entry_code,full_name,work_title,request_date,updated_at,status',
+                    'main_job_ids.*' => 'required|exists:job_info,id,deleted_at,NULL',
+                    'field' => 'nullable|in:id,hr_id,entry_code,full_name,work_title,request_date,updated_at,status',
                     'sort_by' => 'required_unless:field,null|string|in:asc,desc'
                 ];
             case 'update':

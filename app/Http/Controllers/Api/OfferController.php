@@ -235,7 +235,10 @@ class OfferController extends Controller
     {
         try {
             $data = $this->repository->create($request->all());
-            return $this->responseJson(200, new OfferResource($data));
+            if ($data['status'] != 'success') {
+                return $this->responseJsonError($data['code'],$data['message'],$data['message'],$data['message']);
+            }
+            return $this->responseJson(CODE_SUCCESS, new OfferResource($data['data']));
         } catch (\Exception $e) {
             return $this->responseJsonEx($e);
         }

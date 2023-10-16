@@ -1,6 +1,12 @@
 <template>
-  <div class="btn btn-move-to-entry mb-3" :style="`background-color: ${bgColor}`">
-    <i v-if="direction === 'previous'" class="far fa-caret-circle-left previous" />
+  <div
+    class="btn btn-move-to-entry mb-3"
+    :style="`background-color: ${bgColor}`"
+  >
+    <i
+      v-if="direction === 'previous'"
+      class="far fa-caret-circle-left previous"
+    />
     <span>{{ text }}</span>
     <i v-if="direction === 'next'" class="far fa-caret-circle-right next" />
   </div>
@@ -31,12 +37,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
 @import '@/scss/_variables.scss';
 @import '@/scss/modules/common/common.scss';
 
 .far {
-  color: #FFFFFF;
+  color: #ffffff;
   font-size: 24px;
 }
 
@@ -53,21 +58,20 @@ export default {
 }
 
 .btn-move-to-entry {
-	width: 100%;
-	height: 52px;
-	padding: 1rem;
+  width: 100%;
+  height: 52px;
+  padding: 1rem;
   display: flex;
-	max-width: 359px;
-	position: relative;
-	border-radius: 50px;
-	align-items: center;
-	justify-content: center;
+  max-width: 359px;
+  position: relative;
+  border-radius: 50px;
+  align-items: center;
+  justify-content: center;
 
-	& span {
-		color: #FFFFFF;
-		font-size: 20px;
-		font-weight: 400;
-	}
+  & span {
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: 400;
+  }
 }
 </style>
-

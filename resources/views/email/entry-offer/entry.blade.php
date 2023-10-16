@@ -25,10 +25,9 @@
         <hr>
         <div style="padding-left: 60px">
             <p>
-                {{ $data['email'] }}　様
+                {{ @$data['permission'] }}様
             </p>
             <p>
-
                 求人にエントリーが実行されました。<br>
                 <a href="{{ url('matching-management') }}">こちら</a>よりエントリーの内容を確認してください。
             </p>

@@ -1,0 +1,251 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TEST SCREEN HR LIST Test 3: test action sort data 1`] = `
+<div aria-busy="true" class="b-overlay-wrap position-relative" style="min-height: 100vh; height: 100%;">
+  <div class="hr-list">
+    <div class="hr-list__search">
+      <hrformsearch-stub></hrformsearch-stub>
+    </div>
+    <div class="hr-list__wrap">
+      <div class="btn collapse-bar-btn">
+        <div class="rotate-180deg"><img src="" alt="collapse"></div>
+      </div>
+      <div class="hr-list-head">
+        <div class="hr-list-head-title">
+          <div class="line"></div>
+          <div><span>人材一覧</span></div>
+        </div>
+        <div class="hr-list-head-btns">
+          <div><button class="btn btn-light btn-delete-hr"><span>チェックしたものを一括削除</span>
+              <bicon-stub icon="trash-fill"></bicon-stub></button></div> <button type="button" class="btn btn btn-bold btn-export-csv-hr btn-secondary"><span>ダウンロード</span></button>
+          <div id="dropdown-1" class="dropdown b-dropdown btn-bold btn-group" style="padding: 0px;">
+            <!----><button id="dropdown-1__BV_toggle_" aria-haspopup="menu" aria-expanded="false" type="button" class="btn dropdown-toggle btn-secondary">新規登録</button>
+            <ul role="menu" tabindex="-1" aria-labelledby="dropdown-1__BV_toggle_" class="dropdown-menu">
+              <li role="presentation" class="btn-to-register-hr"><a role="menuitem" href="#" target="_self" class="dropdown-item">一人追加</a></li>
+              <li role="presentation" class="btn-import-csv-hr"><a id="show-btn" role="menuitem" href="#" target="_self" class="dropdown-item">一括追加</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="hr-list-table-list-wrap">
+        <div class="list-table-list__auto-flow-x">
+          <div class="hr-list-table-list__table">
+            <table id="hr-table-list" role="table" aria-busy="false" aria-colcount="8" class="table b-table">
+              <!---->
+              <!---->
+              <thead role="rowgroup" class="">
+                <!---->
+                <tr role="row" class="">
+                  <th role="columnheader" scope="col" aria-colindex="1" aria-label="Selected" class="choose col-1">
+                    <div class="custom-control custom-checkbox"><input type="checkbox" class="custom-control-input" value="true" id="__BVID__120"><label class="custom-control-label" for="__BVID__120"></label></div>
+                  </th>
+                  <th role="columnheader" scope="col" tabindex="0" aria-colindex="2" aria-sort="none" class="position-relative id col-2">
+                    <div>ID</div><span class="sr-only"> (Click to sort ascending)</span>
+                  </th>
+                  <th role="columnheader" scope="col" tabindex="0" aria-colindex="3" aria-sort="none" class="position-relative fullName col-3">
+                    <div>HR_REGISTER.FULL_NAME</div><span class="sr-only"> (Click to sort ascending)</span>
+                  </th>
+                  <th role="columnheader" scope="col" tabindex="0" aria-colindex="4" aria-sort="none" class="position-relative organization_name col-4">
+                    <div>HR_REGISTER.ORGANIZATION_NAME</div><span class="sr-only"> (Click to sort ascending)</span>
+                  </th>
+                  <th role="columnheader" scope="col" tabindex="0" aria-colindex="5" aria-sort="none" class="position-relative age col-5">
+                    <div>HR_REGISTER.AGE</div><span class="sr-only"> (Click to sort ascending)</span>
+                  </th>
+                  <th role="columnheader" scope="col" tabindex="0" aria-colindex="6" aria-sort="none" class="position-relative japanese_level col-6">
+                    <div>HR_REGISTER.JAPANESE_LEVEL</div><span class="sr-only"> (Click to sort ascending)</span>
+                  </th>
+                  <th role="columnheader" scope="col" tabindex="0" aria-colindex="7" aria-sort="none" class="position-relative status col-7">
+                    <div>HR_REGISTER.STATUS</div><span class="sr-only"> (Click to sort ascending)</span>
+                  </th>
+                  <th role="columnheader" scope="col" aria-colindex="8" class="detail col-8">
+                    <div>HR_LIST_FORM.DETAIL</div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody role="rowgroup">
+                <!---->
+                <tr role="row" class="">
+                  <td aria-colindex="1" role="cell" class="choose">
+                    <div class="custom-control custom-checkbox"><input type="checkbox" class="custom-control-input" value="true"><label class="custom-control-label"></label></div>
+                  </td>
+                  <td aria-colindex="2" role="cell" class="id">
+                    <div class="w-100 justify-start" style="align-items: center;">
+                      34
+                    </div>
+                  </td>
+                  <td aria-colindex="3" role="cell" class="fullName">
+                    <div class="w-100 justify-space-between flex-column" style="align-items: flex-start;">
+                      <div class="w-100 justify-space-between flex-column">
+                        <div class="text-overflow-ellipsis">
+                          Hoa
+                        </div>
+                        <div class="text-overflow-ellipsis">
+                          Hoa
+                        </div>
+                      </div> <img src="" alt="heart" style="height: 20px; width: 20px; position: absolute; bottom: 0.5rem; right: 0.5rem;">
+                    </div>
+                  </td>
+                  <td aria-colindex="4" role="cell" class="organization_name">
+                    <div class="w-100 justify-space-between flex-column" style="align-items: flex-start;">
+                      <div class="w-100 justify-space-between flex-column">
+                        <div class="text-overflow-ellipsis">
+                          Công ty Cổ phần phát triển nguồn nhân lực LOD
+                        </div>
+                        <div class="text-overflow-ellipsis">
+                          LOD人材開発株式会社
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td aria-colindex="5" role="cell" class="age">
+                    <div class="w-100 justify-end" style="align-items: center;">
+                      23
+                    </div>
+                  </td>
+                  <td aria-colindex="6" role="cell" class="japanese_level">
+                    <div class="w-100 justify-center" style="align-items: center;">
+                      N1
+                    </div>
+                  </td>
+                  <td aria-colindex="7" role="cell" class="status">
+                    <div class="status-item w-100 justify-center" style="align-items: center;"><span>HR_LIST.STATUS_PUBLIC</span>
+                      <!---->
+                      <!---->
+                    </div>
+                  </td>
+                  <td aria-colindex="8" role="cell" class="detail">
+                    <div class="w-100 justify-center" style="align-items: center;"><i class="btn fas fa-eye icon-detail"></i></div>
+                  </td>
+                </tr>
+                <!---->
+                <!---->
+              </tbody>
+              <!---->
+            </table>
+          </div>
+        </div>
+        <ul role="menubar" aria-disabled="false" aria-label="Pagination" class="pagination b-pagination" style="padding-top: 20px;">
+          <li role="presentation" aria-hidden="true" class="page-item disabled"><span role="menuitem" aria-label="Go to first page" aria-controls="hr-list-table" aria-disabled="true" class="page-link">«</span></li>
+          <li role="presentation" aria-hidden="true" class="page-item disabled"><span role="menuitem" aria-label="Go to previous page" aria-controls="hr-list-table" aria-disabled="true" class="page-link">‹</span></li>
+          <!---->
+          <!---->
+          <li role="presentation" class="page-item active"><button role="menuitemradio" type="button" aria-controls="hr-list-table" aria-label="Go to page 1" aria-checked="true" aria-posinset="1" aria-setsize="1" tabindex="0" class="page-link">1</button></li>
+          <!---->
+          <!---->
+          <li role="presentation" aria-hidden="true" class="page-item disabled"><span role="menuitem" aria-label="Go to next page" aria-controls="hr-list-table" aria-disabled="true" class="page-link">›</span></li>
+          <li role="presentation" aria-hidden="true" class="page-item disabled"><span role="menuitem" aria-label="Go to last page" aria-controls="hr-list-table" aria-disabled="true" class="page-link">»</span></li>
+        </ul>
+      </div>
+    </div>
+    <!---->
+    <!---->
+    <!---->
+  </div>
+  <transition-stub name="" appear="true" css="true" enterclass="" leaveclass="show" entertoclass="show" leavetoclass="" enteractiveclass="fade" leaveactiveclass="fade" appearclass="" appearactiveclass="fade" appeartoclass="show">
+    <div class="b-overlay position-absolute" style="top: 0px; left: 0px; bottom: 0px; right: 0px; z-index: 10;">
+      <div class="position-absolute bg-light" style="top: 0px; left: 0px; bottom: 0px; right: 0px; opacity: 0;"></div>
+      <div class="position-absolute" style="top: 50%; left: 50%; transform: translateX(-50%) translateY(-50%);">
+        <div class="text-center">
+          <bicon-stub icon="arrow-clockwise" font-scale="3" animation="spin"></bicon-stub>
+          <p style="margin-top: 10px;">PLEASE_WAIT</p>
+        </div>
+      </div>
+    </div>
+  </transition-stub>
+</div>
+`;
+
+exports[`TEST SCREEN HR LIST Test 8: test render go to detail button and click 1`] = `
+<table id="hr-table-list" role="table" aria-busy="false" aria-colcount="8" class="table b-table">
+  <!---->
+  <!---->
+  <thead role="rowgroup" class="">
+    <!---->
+    <tr role="row" class="">
+      <th role="columnheader" scope="col" aria-colindex="1" aria-label="Selected" class="choose col-1">
+        <div class="custom-control custom-checkbox"><input type="checkbox" class="custom-control-input" value="true" id="__BVID__275"><label class="custom-control-label" for="__BVID__275"></label></div>
+      </th>
+      <th role="columnheader" scope="col" tabindex="0" aria-colindex="2" aria-sort="none" class="position-relative id col-2">
+        <div>ID</div><span class="sr-only"> (Click to sort ascending)</span>
+      </th>
+      <th role="columnheader" scope="col" tabindex="0" aria-colindex="3" aria-sort="none" class="position-relative fullName col-3">
+        <div>HR_REGISTER.FULL_NAME</div><span class="sr-only"> (Click to sort ascending)</span>
+      </th>
+      <th role="columnheader" scope="col" tabindex="0" aria-colindex="4" aria-sort="none" class="position-relative organization_name col-4">
+        <div>HR_REGISTER.ORGANIZATION_NAME</div><span class="sr-only"> (Click to sort ascending)</span>
+      </th>
+      <th role="columnheader" scope="col" tabindex="0" aria-colindex="5" aria-sort="none" class="position-relative age col-5">
+        <div>HR_REGISTER.AGE</div><span class="sr-only"> (Click to sort ascending)</span>
+      </th>
+      <th role="columnheader" scope="col" tabindex="0" aria-colindex="6" aria-sort="none" class="position-relative japanese_level col-6">
+        <div>HR_REGISTER.JAPANESE_LEVEL</div><span class="sr-only"> (Click to sort ascending)</span>
+      </th>
+      <th role="columnheader" scope="col" tabindex="0" aria-colindex="7" aria-sort="none" class="position-relative status col-7">
+        <div>HR_REGISTER.STATUS</div><span class="sr-only"> (Click to sort ascending)</span>
+      </th>
+      <th role="columnheader" scope="col" aria-colindex="8" class="detail col-8">
+        <div>HR_LIST_FORM.DETAIL</div>
+      </th>
+    </tr>
+  </thead>
+  <tbody role="rowgroup">
+    <!---->
+    <tr role="row" class="">
+      <td aria-colindex="1" role="cell" class="choose">
+        <div class="custom-control custom-checkbox"><input type="checkbox" class="custom-control-input" value="true"><label class="custom-control-label"></label></div>
+      </td>
+      <td aria-colindex="2" role="cell" class="id">
+        <div class="w-100 justify-start" style="align-items: center;">
+          34
+        </div>
+      </td>
+      <td aria-colindex="3" role="cell" class="fullName">
+        <div class="w-100 justify-space-between flex-column" style="align-items: flex-start;">
+          <div class="w-100 justify-space-between flex-column">
+            <div class="text-overflow-ellipsis">
+              Hoa
+            </div>
+            <div class="text-overflow-ellipsis">
+              Hoa
+            </div>
+          </div> <img src="" alt="heart" style="height: 20px; width: 20px; position: absolute; bottom: 0.5rem; right: 0.5rem;">
+        </div>
+      </td>
+      <td aria-colindex="4" role="cell" class="organization_name">
+        <div class="w-100 justify-space-between flex-column" style="align-items: flex-start;">
+          <div class="w-100 justify-space-between flex-column">
+            <div class="text-overflow-ellipsis">
+              Công ty Cổ phần phát triển nguồn nhân lực LOD
+            </div>
+            <div class="text-overflow-ellipsis">
+              LOD人材開発株式会社
+            </div>
+          </div>
+        </div>
+      </td>
+      <td aria-colindex="5" role="cell" class="age">
+        <div class="w-100 justify-end" style="align-items: center;">
+          23
+        </div>
+      </td>
+      <td aria-colindex="6" role="cell" class="japanese_level">
+        <div class="w-100 justify-center" style="align-items: center;">
+          N1
+        </div>
+      </td>
+      <td aria-colindex="7" role="cell" class="status">
+        <div class="status-item w-100 justify-center" style="align-items: center;"><span>HR_LIST.STATUS_PUBLIC</span>
+          <!---->
+          <!---->
+        </div>
+      </td>
+      <td aria-colindex="8" role="cell" class="detail">
+        <div class="w-100 justify-center" style="align-items: center;"><i class="btn fas fa-eye icon-detail"></i></div>
+      </td>
+    </tr>
+    <!---->
+    <!---->
+  </tbody>
+  <!---->
+</table>
+`;

@@ -50,19 +50,37 @@ class RemindOfferJob extends RemindJob
             }
             foreach ($listOfferRemind as $offer)
             {
-                $user = $offer->hr->user;
-                $users = User::query()->whereIn(User::TYPE, [SUPER_ADMIN, HR_MANAGER])->orWhere('id', $user->id)->get();
+                $users = User::query()->where(function ($query) use ($offer) {
+                    $query->whereIn('type', [SUPER_ADMIN, COMPANY_MANAGER, HR_MANAGER])
+                        ->orWhereHas('hrOrganization', function ($q) use ($offer) {
+                            $q->where('id', $offer->hr->hr_organization_id);
+                        })
+                        ->orWhereHas('company', function ($q) use ($offer) {
+                            $q->where('id', $offer->work->company->id);
+                        });
+                })->get();
                 foreach ($users as $user) {
+                    $data['permission'] = User::getPermissionName($user);
+                    $data['type'] = $user->type;
+                    $data['type_noti'] = NOTI_TYPE_REMIND_OFFER;
                     $data['email']  = @$user->mail_address;
                     $data['job']    = @$offer->work->title;
-                    $data['company']= @$offer->work->company->company_name_jp;
+                    $data['company']= @$offer->work->company->company_name;
                     $data['full_name']= @$offer->hr->full_name;
                     $data['full_name_ja']= @$offer->hr->full_name_ja;
+                    $data['full_name'] = @$offer->hr->full_name;
                     $data['date']= Carbon::now()->format('Y/m/d');
-                    $partViewWeb = 'messages.entry-offer.offer';
-                    $subjectEmail = trans('messages.mes.subject_offer_stagnant_status');
-                    $viewEmail = 'email.entry-offer.offer';
-                    $this->send($user, $data, $partViewWeb, $subjectEmail, $viewEmail);
+//                    $partViewWeb = 'messages.entry-offer.offer';
+//                    $subjectEmail = trans('messages.mes.subject_offer_stagnant_status');
+//                    $viewEmail = 'email.entry-offer.offer';
+                    $data['job_id'] = @$offer->work_id;
+                    $data['company_id'] = @$offer->work->company->id;
+                    $data['hrs_id'] = @$offer->hr_id;
+                    $data['request_date'] = @$offer->request_date;
+                    $data['status'] = $offer->status;
+                    $data['remarks'] = $offer->remarks;
+                    $data['note'] = $offer->note;
+                    $this->send($user, $data);
                 }
             }
 

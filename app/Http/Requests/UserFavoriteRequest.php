@@ -50,12 +50,18 @@ class UserFavoriteRequest extends FormRequest
                 ];
             return [];
         }
-        if(Route::getCurrentRoute()->getActionMethod() == 'store' || Route::getCurrentRoute()->getActionMethod() == 'destroy'){
+        if(Route::getCurrentRoute()->getActionMethod() == 'store'){
             return  [
                 'relation_id' => ['bail', 'required', new CheckFavorite($this->get('type'))],
                 'type' => ['bail', 'required', Rule::in([FAVORITE_TYPE_HRS, FAVORITE_TYPE_WORK]), new CheckFavorite($this->get('type'), true)],
             ];
         }
+         if(Route::getCurrentRoute()->getActionMethod() == 'destroy'){
+             return  [
+                 'relation_id' => ['bail', 'required', 'exists:user_favorites,relation_id,type,'.$this->get('type'), new CheckFavorite($this->get('type'), false, true)],
+                 'type' => ['bail', 'required', Rule::in([FAVORITE_TYPE_HRS, FAVORITE_TYPE_WORK]), new CheckFavorite($this->get('type'), true)],
+             ];
+         }
      }
 
     public function messages()

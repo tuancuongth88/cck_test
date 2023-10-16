@@ -12,6 +12,7 @@ use App\Repositories\Contracts\NotificationRepositoryInterface;
 use App\Http\Resources\BaseResource;
 use App\Http\Resources\NotificationResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class NotificationController extends Controller
 {
@@ -151,8 +152,11 @@ class NotificationController extends Controller
     public function show($id)
     {
         try {
-            $department = $this->repository->find($id);
-            return $this->responseJson(200, new BaseResource($department));
+            $department = $this->repository->detail($id);
+            if ($department['status']!='success'){
+                return $this->responseJsonError($department['code'], $department['message'],$department['message']);
+            }
+            return $this->responseJson(200, new BaseResource($department['data']));
         } catch (\Exception $e) {
              return $this->responseJsonEx($e);
         }
@@ -246,5 +250,47 @@ class NotificationController extends Controller
     {
         $this->repository->delete($id);
         return $this->responseJson(200, null, trans('messages.mes.delete_success'));
+    }
+    /**
+     * @OA\Get(
+     *   path="/api/notification/distribution/other",
+     *   tags={"Notification"},
+     *   summary="Get notify",
+     *   operationId="Notification_other",
+     *   @OA\Parameter(
+     *     name="page",
+     *     in="query",
+     *     @OA\Schema(
+     *      type="integer",
+     *     ),
+     *   ),
+     *   @OA\Parameter(
+     *     name="per_page",
+     *     in="query",
+     *     @OA\Schema(
+     *      type="integer",
+     *     ),
+     *   ),
+     *   @OA\Response(
+     *     response=200,
+     *     description="Gửi yêu cầu thành công",
+     *     @OA\MediaType(
+     *      mediaType="application/json",
+     *      example={"code":200,"data":{}}
+     *     )
+     *   ),
+     *   security={{"auth": {}}},
+     * )
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
+    public function otherList(Request $request)
+    {
+        try{
+            return $this->repository->otherList($request);
+        } catch (\Exception $e) {
+            return $this->responseJsonError($e->getCode(), $e->getMessage());
+        }
     }
 }

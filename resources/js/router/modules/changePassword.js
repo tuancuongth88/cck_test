@@ -1,25 +1,16 @@
-import Layout from '@/layout';
+import ROLE from '@/const/role.js';
 
-const changePassword = {
+const changePassWord = {
   path: '/change-password',
-  name: 'CompanyManagement',
+  // name: 'ChangePassWord',
   meta: {
-    title: 'Change password',
-    breadcrumb: 'Change password',
+    title: 'CHANGE_PASSWORD_TITLE',
+    breadcrumb: 'CHANGE_PASSWORD_TITLE',
+    role: [ROLE.TYPE_SUPER_ADMIN, ROLE.TYPE_COMPANY_ADMIN, ROLE.TYPE_HR_MANAGER, ROLE.TYPE_COMPANY, ROLE.TYPE_HR],
   },
-  component: Layout,
-  redirect: { name: 'Company' },
-  children: [
-    {
-      path: 'list',
-      name: 'Company',
-      meta: {
-        title: 'ROUTER_COMPANY_MANAGEMENT_LIST',
-        breadcrumb: 'BREADCRUMB_COMPANY_MANAGEMENT_LIST',
-      },
-      component: () => import('@/pages/ChangePassword/changePassword.vue'),
-    },
-  ],
+  hidden: true,
+  component: () => import('@/pages/PassWords/ChangePassWord/index.vue'),
+  // redirect: { name: 'ChangePassWord' },
 };
 
-export default changePassword;
+export default changePassWord;

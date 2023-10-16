@@ -11,6 +11,7 @@ use App\Http\Requests\EntryRequest;
 use App\Repositories\Contracts\EntryRepositoryInterface;
 use App\Http\Resources\BaseResource;
 use App\Http\Resources\EntryResource;
+use Helper\ResponseService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -257,7 +258,10 @@ class EntryController extends Controller
     {
         try {
             $data = $this->repository->create($request->all());
-            return $this->responseJson(200, new EntryResource($data));
+            if ($data['status'] != 'success') {
+                return $this->responseJsonError($data['code'],$data['message'],$data['message'],$data['message']);
+            }
+            return $this->responseJson(200, new EntryResource(isset($data['data'])?$data['data']:[]));
         } catch (\Exception $e) {
             return $this->responseJsonEx($e);
         }
@@ -303,10 +307,10 @@ class EntryController extends Controller
     {
         try {
             $department = $this->repository->findOne($id);
-            if ($department['status'] != 'success'){
-                return $this->responseJsonError($department['code'],$department['message'],$department['message']);
+            if ($department['status'] != 'success') {
+                return $this->responseJsonError($department['code'], $department['message'], $department['message']);
             }
-            return $this->responseJson(200, new BaseResource(isset($department['data'])?$department['data']:[]));
+            return $this->responseJson(200, new BaseResource(isset($department['data']) ? $department['data'] : []));
         } catch (\Exception $e) {
             return $this->responseJsonEx($e);
         }

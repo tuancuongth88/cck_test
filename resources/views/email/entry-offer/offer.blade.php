@@ -27,7 +27,7 @@
         <hr>
         <div style="padding-left: 60px">
             <p>
-                {{ $data['email'] }} 様
+                {{ @$data['permission'] }}様
             </p>
             <p>
                 人材にオファーが実行されました。<br>

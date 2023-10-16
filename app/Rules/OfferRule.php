@@ -29,18 +29,25 @@ class OfferRule implements Rule
     {
         $userLogin = Auth::user();
         $arrayListIdOffer = array_unique($value);
-        if ($userLogin->type == COMPANY) {
+        if ($userLogin->type == COMPANY || $userLogin->type == HR) {
             $company = $userLogin->company;
+            $hrOrg = $userLogin->hrOrganization;
             $listIdForCompany =  Offer::query()->where(Offer::STATUS,'!=',OFFER_STATUS_REQUESTING)
-                ->whereIn('id',$arrayListIdOffer)
-                ->whereHas('work',function ($q) use ($company){
+                ->whereIn(Offer::DISPLAY,['on', 'stop'])
+                ->whereIn('id',$arrayListIdOffer);
+            if ($userLogin->type == COMPANY)
+                $listIdForCompany= $listIdForCompany->whereHas('work',function ($q) use ($company){
                     $q->where('company_id',$company->id);
+                })->count();
+            if ($userLogin->type == HR)
+                $listIdForCompany= $listIdForCompany->whereHas('hr',function ($q) use ($hrOrg){
+                    $q->where('hr_organization_id',$hrOrg->id);
                 })->count();
             if (count($arrayListIdOffer) != $listIdForCompany){
                 return false;
             }
         }
-        if ($userLogin->type == COMPANY_MANAGER || $userLogin->type == SUPER_ADMIN ) {
+        if ($userLogin->type == COMPANY_MANAGER || $userLogin->type == SUPER_ADMIN || $userLogin->type == HR_MANAGER) {
             $listIdForCompany =  Offer::query()->where(Offer::STATUS,'!=',OFFER_STATUS_REQUESTING)
                 ->whereIn('id',$arrayListIdOffer)
                 ->count();

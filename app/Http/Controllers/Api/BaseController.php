@@ -63,8 +63,8 @@ class BaseController extends Controller
             ],
             'final_educations' => [
                 HRS_CLASSIFICATION_GRADUATION => '卒業',
-                HRS_CLASSIFICATION_FINISH => '中退',
-                HRS_CLASSIFICATION_DROPOUT => '卒業見込み',
+                HRS_CLASSIFICATION_FINISH => '卒業見込み',
+                HRS_CLASSIFICATION_DROPOUT => '中退',
             ],
             'education_degrees' => [
                 1 => '大学卒業以上',

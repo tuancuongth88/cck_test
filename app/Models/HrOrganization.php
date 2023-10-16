@@ -12,13 +12,15 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  *     title="AccountClassification",
  *     description="Account Classification:
  *     - `1`: 自社プラットフォーム
- *     - `2`: 送り出し期間
+ *     - `2`: 送り出し機関
  *     - `3`: 派遣会社
- *     - `4`: 学校",
+ *     - `4`: 学校
+ *     - `5`: 企業",
  *     type="int",
- *     enum={1,2,3,4},
+ *     enum={1,2,3,4,5 },
  * )
  **/
+
 class HrOrganization extends Model
 {
     use HasFactory;
@@ -31,6 +33,7 @@ class HrOrganization extends Model
     const LICENSE_NO = 'license_no';
     const ACCOUNT_CLASSIFICATION = 'account_classification';
     const COUNTRY = 'country';
+    const COUNTRY_NAME = 'country_name';
     const REPRESENTATIVE_FULL_NAME = 'representative_full_name';
     const REPRESENTATIVE_FULL_NAME_FURIGANA = 'representative_full_name_furigana';
     const REPRESENTATIVE_CONTACT = 'representative_contact';
@@ -45,6 +48,13 @@ class HrOrganization extends Model
     const CERTIFICATE_FILE = 'certificate_file_id';
     const STATUS = 'status';
 
+    const ACCOUNT_CLASSIFICATION_AWN_PLATFORM = 1;
+    const ACCOUNT_CLASSIFICATION_SEND_AGENCY = 2;
+    const ACCOUNT_CLASSIFICATION_DISPATCH_AGENCY = 3;
+    const ACCOUNT_CLASSIFICATION_SCHOOL = 4;
+    const ACCOUNT_CLASSIFICATION_COMPANY = 5;
+
+
     protected $fillable = [
         self::USER_ID,
         self::CORPORATE_NAME_EN,
@@ -52,6 +62,7 @@ class HrOrganization extends Model
         self::LICENSE_NO,
         self::ACCOUNT_CLASSIFICATION,
         self::COUNTRY,
+        self::COUNTRY_NAME,
         self::REPRESENTATIVE_FULL_NAME,
         self::REPRESENTATIVE_FULL_NAME_FURIGANA,
         self::REPRESENTATIVE_CONTACT,
@@ -78,9 +89,10 @@ class HrOrganization extends Model
     }
 
     public static $listAccountClassification = [
-        ACC_CLASS_OWN_PLATFORM => '自社プラットフォーム',
-        ACC_CLASS_SEND_AGENCY => '送り出し期間',
-        ACC_CLASS_DISPATCH_AGENCY => '派遣会社',
-        ACC_CLASS_SCHOOL => '学校'
+        self::ACCOUNT_CLASSIFICATION_AWN_PLATFORM => '自社プラットフォーム',
+        self::ACCOUNT_CLASSIFICATION_SEND_AGENCY => '送り出し機関',
+        self::ACCOUNT_CLASSIFICATION_DISPATCH_AGENCY => '派遣会社',
+        self::ACCOUNT_CLASSIFICATION_SCHOOL => '学校関連',
+        self::ACCOUNT_CLASSIFICATION_COMPANY => '企業',
     ];
 }

@@ -1,0 +1,110 @@
+<?php
+
+namespace App\Jobs;
+
+use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
+
+class NotificationResultJob extends RemindJob
+{
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    protected $user;
+    protected $result;
+    protected $status;
+    protected $note;
+    protected $data;
+
+    /**
+     * Create a new job instance.
+     *
+     * @return void
+     */
+    public function __construct($user, $result, $status, $note, $data = null)
+    {
+        $this->user = $user;
+        $this->result = $result;
+        $this->status = $status;
+        $this->note = $note;
+        $this->data = $data;
+    }
+
+    public function handle()
+    {
+        $company = $this->result->work->company;
+        $hrOrg = $this->result->hr->hrOrg;
+        try {
+            $this->sendNotificationResult($company, $hrOrg, $this->result, $this->status, $this->note);
+        } catch (\Exception $exception) {
+            Log::error($exception);
+        }
+    }
+
+    private function sendNotificationResult($company, $hrOrg, $result, $status, $note){
+        $partView = $this->partViewRemind(21);
+        if ($this->status == RESULT_STATUS_SELECTION_OFFER && $result['time']){
+            $title = '内定承諾期限の変更が設定されました';
+            $subject = '内定承諾期限の変更が設定されました';
+            $content = self::getContent(30);
+        }
+        if ($this->status == RESULT_STATUS_SELECTION_OFFER_DECLINE){
+//            $subject = $this->getSubject(self::TYPE_NOTIFY_REMIND_ACCOUNT);
+            $subject = 'オファー承認可否が設定されました';
+            $title = '内定辞退が設定されました';
+            $content = self::getContent(21);
+        }
+
+        if ($this->status == RESULT_STATUS_SELECTION_OFFER_CONFIRM){
+            Log::error($this->status);
+            $subject = '内定承諾可否が設定されました';
+            $title =   '内定承諾可否が設定されました';
+            $content = self::getContent(21);
+            if ($result->hire_date){
+                $subject = '入社日が設定されました';
+                $title =   '入社日が設定されました';
+                $content = self::getContent(32);
+            }
+        }
+
+        $users = User::query()->where(function ($query) use ($company, $hrOrg) {
+            $query->whereIn('type', [SUPER_ADMIN, COMPANY_MANAGER, HR_MANAGER])
+                ->orWhereHas('company', function ($q) use ($company) {
+                    $q->where('id', $company->id);
+                })
+                ->orWhereHas('hrOrganization', function ($q) use ($hrOrg) {
+                    $q->where('id', $hrOrg->id);
+                });
+        })->get();
+        foreach ($users as $user) {
+            $this->sendNotify($user, $partView, $subject, $title, $note, $company, $content, $result);
+        }
+    }
+
+    private function sendNotify($user, $partView, $subject, $title, $note, $company, $content, $result){
+        $data['permission'] = User::getPermissionName($user);
+        $data['type'] = $user->type;
+        $data['title'] = $title;
+        $data['text'] = $note;
+        $data['company'] = $company->company_name;
+        $data['content'] = $content;
+        $data['entry_code'] = $result->code;
+        $data['job'] = $result->work->title;
+        $data['full_name_ja'] = $result->hr->full_name_ja;
+        $data['full_name'] = $result->hr->full_name;
+        $data['status'] = RESULT_STATUS_LIST[$result->status_selection];
+        $interviewDate = @$result->interview->interview_date;
+        $data['interview_date'] = $interviewDate ?: '-';
+        $data['date'] = Carbon::now()->format('Y/m/d');
+        $data['job_id'] = $result->work_id;
+        $data['company_id'] = $company->id;
+        $data['hrs_id'] = $result->hr_id;
+        $this->send($user, $data, $partView['web'], $subject, '', self::TYPE_NOTIFY_RESULT_CONFIRM);
+    }
+}

@@ -19,8 +19,8 @@ class HrsMainJobCareFactory extends Factory
     {
         $jobType = JobType::query()->where('type', MAJOR_CLASSIFICATION)->first();
         return [
-            HRMainJobCareer::MAIN_JOB_CAREER_DATE_FROM  => $this->faker->date,
-            HRMainJobCareer::MAIN_JOB_CAREER_DATE_TO    => $this->faker->date,
+            HRMainJobCareer::MAIN_JOB_CAREER_DATE_FROM  => $this->faker->dateTimeBetween('-3 years', '-2 years')->format('Y-m'),
+            HRMainJobCareer::MAIN_JOB_CAREER_DATE_TO    => $this->faker->dateTimeBetween('-1 years')->format('Y-m'),
             HRMainJobCareer::DEPARTMENT_ID  => $jobType->id,
             HRMainJobCareer::JOB_ID => $jobType->jobInfo->id,
             HRMainJobCareer::DETAIL => $this->faker->text,

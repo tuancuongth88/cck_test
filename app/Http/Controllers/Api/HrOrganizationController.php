@@ -119,6 +119,45 @@ class HrOrganizationController extends Controller
 
     /**
      * @OA\Get(
+     *   path="/api/hr-org",
+     *   tags={"Hr-organization"},
+     *   summary="Select option hr-org",
+     *   operationId="hr_organization_list_all",
+     *   @OA\Response(
+     *     response=200,
+     *     description="Send request success",
+     *     @OA\MediaType(
+     *      mediaType="application/json",
+     *      example={"code":200,
+     *     "data":{
+     *           "company_name": "City Computer Co., Ltd.",
+     *           "company_name_jp": "シティコンピュータ株式会社",
+     *           "id": 1
+     *     }},
+     *     )
+     *   ),
+     *   @OA\Response(
+     *     response=401,
+     *     description="Login false",
+     *     @OA\MediaType(
+     *      mediaType="application/json",
+     *      example={"code":401,"message":"Username or password invalid"}
+     *     )
+     *   ),
+     *   security={{"auth": {}}},
+     * )
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function listAll(Request $request)
+    {
+        $data = $this->repository->getAllName();
+        return $this->responseJson(CODE_SUCCESS, BaseResource::collection($data));
+    }
+
+    /**
+     * @OA\Get(
      *   path="/api/hr-organization/{id}",
      *   tags={"Hr-organization"},
      *   summary="Detail Hr-organization",
@@ -182,9 +221,10 @@ class HrOrganizationController extends Controller
     {
         try {
             $hrOrganization = $this->repository->getDetail($id);
+            $this->authorize('show', $hrOrganization);
             return $this->responseJson(CODE_SUCCESS, $hrOrganization);
         } catch (\Exception $e) {
-            return $this->responseJsonEx($e);
+            return $this->responseJsonError($e->getCode(), $e->getMessage());
         }
     }
 
@@ -219,7 +259,7 @@ class HrOrganizationController extends Controller
      *       @OA\Property(property="corporate_name_en", format="string", example="Công ty Cổ phần phát triển nguồn nhân lực LOD"),
      *       @OA\Property(property="corporate_name_ja", format="string", example="LOD人材開発株式会社"),
      *       @OA\Property(property="license_no", format="string", example="12345678"),
-     *       @OA\Property(property="account_classification", format="integer", enum={1, 2, 3, 4}, example=1, description="1:自社プラットフォーム, 2:送り出し期間, 3:派遣会社, 4:学校"),
+     *       @OA\Property(property="account_classification", format="integer", enum={1, 2, 3, 4, 5}, example=1, description="1:自社プラットフォーム, 2:送り出し機関, 3:派遣会社, 4:学校, 5:企業"),
      *       @OA\Property(property="country", format="integer", example="1", enum={1, 2, 3, 4, 5, 6, 7}, example=1, description="1:ベトナム, 2:ミャンマー, 3:フィリピン, 4:バングラデシュ, 5:ネパール, 6:カンボジア, 7:タイ"),
      *       @OA\Property(property="representative_full_name", format="string", example="鈴木　一郎"),
      *       @OA\Property(property="representative_full_name_furigana", format="string", example="スズキ　イチロウ"),
@@ -335,7 +375,7 @@ class HrOrganizationController extends Controller
      *          @OA\Property(property="corporate_name_en", format="string", example="Công ty Cổ phần phát triển nguồn nhân lực LOD"),
      *          @OA\Property(property="corporate_name_ja", format="string", example="LOD人材開発株式会社"),
      *          @OA\Property(property="license_no", format="string", example="12345678"),
-     *          @OA\Property(property="account_classification", format="integer", enum={1, 2, 3, 4}, example=1, description="1:自社プラットフォーム, 2:送り出し期間, 3:派遣会社, 4:学校"),
+     *       @OA\Property(property="account_classification", format="integer", enum={1, 2, 3, 4, 5}, example=1, description="1:自社プラットフォーム, 2:送り出し機関, 3:派遣会社, 4:学校, 5:企業"),
      *          @OA\Property(property="country", format="integer", example="1", enum={1, 2, 3, 4, 5, 6, 7}, example=1, description="1:ベトナム, 2:ミャンマー, 3:フィリピン, 4:バングラデシュ, 5:ネパール, 6:カンボジア, 7:タイ"),
      *          @OA\Property(property="representative_full_name", format="string", example="鈴木　一郎"),
      *          @OA\Property(property="representative_full_name_furigana", format="string", example="スズキ　イチロウ"),
@@ -400,13 +440,15 @@ class HrOrganizationController extends Controller
     public function update(HrOrganizationRequest $request, $id){
         try {
             $request->except(['status', 'mail_address']);
+            $item = $this->repository->find($id);
+            $this->authorize('update', $item);
             $data = $this->repository->update($request->toArray(), $id);
             if (!$data){
                 return $this->responseJsonError(Response::HTTP_NO_CONTENT, trans('messages.data_does_not_exist'), trans('messages.data_does_not_exist'));
             }
             return $this->responseJson(CODE_SUCCESS, $data);
         }catch (\Exception $e){
-            return $this->responseJsonEx($e);
+            return $this->responseJsonError($e->getCode(), $e->getMessage());
         }
     }
 }

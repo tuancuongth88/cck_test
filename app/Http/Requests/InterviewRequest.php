@@ -8,10 +8,13 @@ namespace App\Http\Requests;
 
 use App\Models\HR;
 use App\Models\Interview;
+use App\Rules\InterviewRule;
+use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class InterviewRequest extends FormRequest
 {
@@ -57,8 +60,18 @@ class InterviewRequest extends FormRequest
 
         if ($action == 'hide') {
             return [
-                'ids' => 'required|array',
-                'ids.*' => 'required|exists:interviews,id,status_selection,' . INTERVIEW_STATUS_SELECTION_INTERVIEW_DECLINE . ',display,on,deleted_at,NULL',
+                'ids' => ['required','array',new InterviewRule()],
+                'ids.*' => 'required',
+            ];
+        }
+        if ($action == 'confirmedInterviewHrDecline') {
+            return [
+                'note' => 'required|string|max:2000'
+            ];
+        }
+        if ($action == 'confirmedInterviewCompanyCancel') {
+            return [
+                'note' => 'nullable|string|max:2000'
             ];
         }
 
@@ -87,7 +100,7 @@ class InterviewRequest extends FormRequest
                 'hr_org_id' => 'nullable|exists:hr_organization,id',
                 'gender' => 'nullable|array',
                 'gender.*' => 'required|in:' . implode(',', [HRS_GENDER_MALE, HRS_GENDER_FEMALE]),
-                'age_from' => 'nullable|numeric|min:18|max:60',
+                'age_from' => 'nullable|numeric',
                 'age_to' => ['nullable', 'numeric', 'greater_than:age_from,' . $ageFrom],
                 'edu_date_from' => 'nullable|string|date_format:Y-m',
                 'edu_date_to' => ['nullable', 'date_format:Y-m', 'greater_than:edu_date_from,' . $eduDateFrom],
@@ -103,35 +116,21 @@ class InterviewRequest extends FormRequest
                 'middle_class' => 'nullable|array',
                 'middle_class.*' => 'required|exists:job_info,id',
                 'main_job_ids' => 'nullable|array',
-                'main_job_ids.*' => 'required|exists:hrs_main_job_career,id,deleted_at,NULL',
-                'field' => 'nullable|in:id,entry_code,interview_date,full_name,job_name,status_selection,status_interview_adjustment',
+                'main_job_ids.*' => 'nullable|exists:hrs_main_job_career,id,deleted_at,NULL',
+                'field' => 'nullable|in:id,hr_id,code,interview_date,full_name,job_name,status_selection,status_interview_adjustment',
                 'sort_by' => 'required_unless:field,null|string|in:asc,desc'
             ];
         }
 
         if ($action == 'setupCalendar') {
-            $id = $this->route('id');
-            $statusAdjustment = INTERVIEW_STATUS_INTERVIEW_ADJUSTMENT_BEFORE_ADJUSTMENT;
             return [
-                'id' => $this->getIdRules($statusAdjustment),
-                'interview_type' => [
-                    'required',
-                    'in:1,2',
-                    function ($attribute, $value, $fail) use ($id) {
-                        if ($value == INTERVIEW_TYPE_GROUP) {
-                            $item = Interview::find($id);
-
-                            if (!$item->code || $item->status_selection >= INTERVIEW_STATUS_SELECTION_FIRST_PASS) {
-                                $fail(trans('The selected interview type is invalid.'));
-                            }
-                        }
-                    }
-                ],
-                'times' => 'required|array|size:1',
+                'interview_type' => 'required','in:'.INTERVIEW_TYPE_GROUP.','.INTERVIEW_TYPE_PRIVATE,
+                'times' => 'required|array|min:1|max:5',
                 'times.*' => 'required|array',
-                'times.*.date' => 'required|date|date_format:Y-m-d|after:today',
-                'times.*.start_time' => 'required|string|date_format:g',
-                'times.*.start_time_at' => 'required|in:AM,PM',
+                'times.*.date' => 'required|date|date_format:Y-m-d|after_or_equal:today',
+                'times.*.start_time' => 'required|string|date_format:H:i|after:7:59|before:22:01',
+//                'times.*.start_time' => 'required|string|date_format:g:i',
+//                'times.*.start_time_at' => 'required|in:AM,PM',
                 'times.*.expected_time' => 'required|in:30,60,90'
             ];
         }
@@ -139,16 +138,12 @@ class InterviewRequest extends FormRequest
         if ($action == 'confirmedCalendar') {
             $statusAdjustment = INTERVIEW_STATUS_INTERVIEW_ADJUSTMENT_ADJUSTING;
             return [
-                'id' => $this->getIdRules($statusAdjustment),
-                'confirmed' => 'required|in:yes,no',
-                'confirmed_time' => 'nullable|in:1,2,3,4,5,6'
+                'time' => ['required',Rule::in(CALENDAR_TIMELINE)],
             ];
         }
 
         if ($action == 'setupZoom') {
-            $statusAdjustment = INTERVIEW_STATUS_INTERVIEW_ADJUSTMENT_URL_SETTING;
             return [
-                'id' => $this->getIdRules($statusAdjustment),
                 'url_zoom' => 'required|string|max:50',
                 'id_zoom' => 'required|string|max:50',
                 'password_zoom' => 'required|string|max:50'
@@ -156,17 +151,11 @@ class InterviewRequest extends FormRequest
         }
 
         if ($action == 'review') {
-            $id = $this->route('id');
-            $statusAdjustment = INTERVIEW_STATUS_INTERVIEW_ADJUSTMENT_ADJUSTED;
+            $timeDateOfferReview = Carbon::now()->addDay(6)->format('Y-m-d');
             return [
-                'id' => $this->getIdRules($statusAdjustment),
-                'reviewed' => 'required|in:yes,no',
-                'option' => $this->getOptionRules($id),
-                'goto' => [
-                    'nullable',
-                    'required_if:option,' . REVIEW_PASS,
-                    'in:' . implode(',', array_keys(GOTOSTEPS))
-                ]
+                'status' =>['required',Rule::in(INTERVIEW_STATUS_REVIEW)],
+                'date_offer' => 'nullable|date|date_format:Y-m-d|after:'.$timeDateOfferReview,
+                'action' => ['nullable',Rule::in(OPTION_PASS_OPERATION)],
             ];
         }
 
@@ -192,33 +181,41 @@ class InterviewRequest extends FormRequest
         ];
     }
 
-    private function getIdRules($statusAdjustment, $isRejected = false)
-    {
-        return [
-            "required",
-            "exists:interviews,id,status_interview_adjustment,$statusAdjustment,deleted_at,NULL",
-            function ($attribute, $value, $fail) use ($isRejected) {
-                $query = Interview::where('id', $value);
-                    if (!$isRejected) {
-                        $query->where('status_selection', '<=', INTERVIEW_STATUS_SELECTION_FOURTH_PASS);
-                    } else {
-                        $query->whereIn('status_selection', [
-                            INTERVIEW_STATUS_SELECTION_FIFTH_PASS,
-                            INTERVIEW_STATUS_SELECTION_INTERVIEW_CANCEL,
-                            INTERVIEW_STATUS_SELECTION_INTERVIEW_DECLINE
-                        ]);
-                    }
-                if (!$query->first()) {
-                    $fail(trans('The selected id is invalid.'));
-                }
-            }
-        ];
-    }
-
     public function messages()
     {
         return [
-            'required' => ':attribute not null'
+            'interview_type.*' => trans('api.interview.create.calendar.type'),
+            'times.required' => trans('api.interview.create.calendar.time.required'),
+            'times.size' => trans('api.interview.create.calendar.time.size'),
+            'times.*.date.*' => trans('api.interview.create.calendar.time.date'),
+            'times.*.start_time.*' => trans('api.interview.create.calendar.time.start_time'),
+//            'times.*.start_time_at.*' => trans('api.interview.create.calendar.time.start_time_at'),
+            'times.*.expected_time.*' => trans('api.interview.create.calendar.time.expected_time'),
+            'time.*' => trans('api.interview.confrim.calendar.time'),
+            'url_zoom.*' => trans('api.interview.hr.url_zoom'),
+            'id_zoom.*' => trans('api.interview.hr.id_zoom'),
+            'password_zoom.*' => trans('api.interview.hr.password_zoom'),
+            'date_offer.*' => trans('api.interview.review.date'),
+            'status.*' => trans('api.interview.review.status'),
+            'action.*' => trans('api.interview.review.action'),
+            'hr_org_id.*' => trans('api.interview.hrs.invalid'),
+            'gender.*' => trans('api.interview.gender.invalid'),
+            'age_from.numeric' => trans('api.interview.age.from.numeric'),
+            'age_from.min' => trans('api.interview.age.from.numeric.min'),
+            'age_from.max' => trans('api.interview.age.from.numeric.max'),
+            'age_to.numeric' => trans('api.interview.age.to.numeric'),
+            'age_to.min' => trans('api.interview.age.to.numeric.min'),
+            'age_to.max' => trans('api.interview.age.to.numeric.max'),
+            'edu_date_from.date_format' => trans('api.interview.edu.date_from.format'),
+            'edu_date_to.date_format' => trans('api.interview.edu.date_to.format'),
+            'edu_date_to.greater_than' => trans('api.interview.edu.date_to.greater_than'),
+            'edu_class.*' => trans('api.interview.edu.edu_class.array'),
+            'edu_degree.*' => trans('api.interview.edu.edu_degree.array'),
+            'work_forms.*' => trans('api.interview.work.forms.array'),
+            'work_hour.*' => trans('api.interview.work.hour.array'),
+            'japan_levels.*' => trans('api.interview.japan.levels'),
+            'middle_class.*' => trans('api.interview.middle.class.array'),
+            'main_job_ids.*' => trans('api.interview.main_job_ids.invalid'),
         ];
     }
 }

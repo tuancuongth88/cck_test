@@ -5,15 +5,15 @@
 	// justify-content: center;
 	// align-items: center;
 	// gap: 0.25rem;
-	cursor: pointer !important;
+	// cursor: pointer !important;
 	user-select: none !important;
-	transition: all 0.3s ease !important;
-	&:hover {
-		opacity: 0.7 !important;
-	}
-	&:active {
-		opacity: 1 !important;
-	}
+	// transition: all 0.3s ease !important;
+	// &:hover {
+	// 	opacity: 0.7 !important;
+	// }
+	// &:active {
+	// 	opacity: 1 !important;
+	// }
 }
 .btn-effect {
 	cursor: pointer !important;
@@ -50,17 +50,9 @@
 }
 
 .one-line-paragraph {
-	display: block; /* Fallback trong trường hợp trình duyệt không hỗ trợ display dạng box */
-	display: -webkit-box;
-	line-height: 16px; /* Fallback  */
-	max-height: 74px; /* Fallback số dòng bạn muốn giới hạn */
-	-webkit-line-clamp: 1; /* Số dòng bạn muốn giới hạn */
-	-webkit-box-orient: vertical;
-	visibility: visible;
-	text-overflow: ellipsis;
-	overflow:hidden;
-	// max-width: 300px;
-	// width: 100%;
+	overflow: hidden; /* make sure it hides the content that overflows */
+	white-space: nowrap; /* don't break the line */
+	text-overflow: ellipsis; /* give the beautiful '...' effect */
 }
 
 // Remove Arrows/Spinners

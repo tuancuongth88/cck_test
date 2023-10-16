@@ -3,7 +3,7 @@
     <div class="hr-content-tab-wrap">
       <div class="hr-content-tab-item border-t border-l border-r">
         <div id="hr-type-edit" class="hr-content-tab-item__title">
-          <span>氏名</span>
+          <span>{{ $t('HR_REGISTER.FULL_NAME') }}</span>
           <Require v-if="type_form === 'edit'" />
         </div>
 
@@ -24,7 +24,7 @@
 
       <div class="hr-content-tab-item border-t border-l border-r">
         <div id="hr-type-edit" class="hr-content-tab-item__title">
-          <span>氏名（ﾌﾘｶﾞﾅ）</span>
+          <span>{{ $t('HR_REGISTER.FULL_NAMEFURIGANA') }}</span>
           <Require v-if="type_form === 'edit'" />
         </div>
 
@@ -44,7 +44,7 @@
 
       <div class="hr-content-tab-item border-t border-l border-r">
         <div id="hr-type-edit" class="hr-content-tab-item__title">
-          <span>性別</span>
+          <span>{{ $t('HR_REGISTER.GENDER') }}</span>
           <Arbitrarily v-if="type_form === 'edit'" />
         </div>
 
@@ -66,7 +66,7 @@
 
       <div class="hr-content-tab-item border-t border-l border-r">
         <div id="hr-type-edit" class="hr-content-tab-item__title">
-          <span>生年月日</span>
+          <span>{{ $t('HR_REGISTER.DATE_OF_BIRTH_') }}</span>
           <Require v-if="type_form === 'edit'" />
         </div>
 
@@ -79,7 +79,8 @@
             <span>{{
               `${formData.date_of_birth_year}年${formData.date_of_birth_month}月${formData.date_of_birth_day}日`
             }}</span>
-            <span>{{ calculateAge(formData.date_of_birth_original) }} 歳</span>
+            <span>{{ calculateAge(formData.date_of_birth_original) }}
+              {{ $t('AGE') }}</span>
           </div>
 
           <div v-if="type_form === 'edit'" style="">
@@ -104,7 +105,7 @@
                 "
               />
 
-              <span>年</span>
+              <span>{{ $t('HR_LIST_FORM.YEAR') }}</span>
             </div>
 
             <div
@@ -128,7 +129,7 @@
                 "
               />
 
-              <span>月</span>
+              <span>{{ $t('JOB_SEARCH.MONTH') }}</span>
             </div>
 
             <div
@@ -146,7 +147,7 @@
                 @change="handleChangeDayDoB"
               />
 
-              <span>日</span>
+              <span>{{ $t('JOB_SEARCH.MONTH') }}</span>
             </div>
           </div>
         </div>
@@ -154,7 +155,7 @@
 
       <div class="hr-content-tab-item border-t border-l border-r">
         <div id="hr-type-edit" class="hr-content-tab-item__title">
-          <span>勤務形態</span>
+          <span>{{ $t('HR_REGISTER.WORK_FORM') }}</span>
           <Arbitrarily v-if="type_form === 'edit'" />
         </div>
 
@@ -176,7 +177,7 @@
 
       <div class="hr-content-tab-item border-t border-l border-r">
         <div id="hr-type-edit" class="hr-content-tab-item__title">
-          <span>勤務形態（非常勤）</span>
+          <span>{{ $t('HR_REGISTER.WORK_FORM_PARTTIME') }}</span>
           <Arbitrarily v-if="type_form === 'edit'" />
         </div>
 
@@ -205,7 +206,7 @@
 
       <div class="hr-content-tab-item border-t border-l border-r border-b">
         <div id="hr-type-edit" class="hr-content-tab-item__title">
-          <span>日本語レベル</span>
+          <span>{{ $t('HR_REGISTER.JAPANESE_LEVEL') }}</span>
           <Require v-if="type_form === 'edit'" />
         </div>
 

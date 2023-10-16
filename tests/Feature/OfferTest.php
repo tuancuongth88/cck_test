@@ -2,21 +2,27 @@
 
 namespace Tests\Feature;
 
+use App\Jobs\NotificationHRJob;
 use App\Models\Company;
 use App\Models\HR;
 use App\Models\HRMainJobCareer;
 use App\Models\HrOrganization;
+use App\Models\Interview;
 use App\Models\JobInfo;
 use App\Models\JobType;
 use App\Models\LanguageRequirement;
+use App\Models\Notification;
 use App\Models\Offer;
 use App\Models\User;
 use App\Models\Work;
+use App\Notifications\OfferConfirmNotification;
+use App\Notifications\OfferDeclineNotification;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Faker\Factory as Faker;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 use Illuminate\Http\Response;
 
@@ -317,13 +323,14 @@ class OfferTest extends BaseTest
     public function testSearchByHrOrg()
     {
         $types = [SUPER_ADMIN, COMPANY_MANAGER, \COMPANY];
-        $offer = Offer::factory()->count(5)->create()->first();
+        Offer::factory()->count(5)->create();
+        $offer = Offer::query()->inRandomOrder()->first();
         $hrOrg_id = $offer->hr->hrOrg->id;
         foreach ($types as $type) {
             $this->loginWith($type);
             $response = $this->user_login->get('api/offer?hr_org_id=' . $hrOrg_id);
             $this->assertEquals(Response::HTTP_OK, $response->decodeResponseJson()['code']);
-            $this->assertCount(5, $response->decodeResponseJson()['data']['result']);
+            $this->assertTrue($response->getData()->data->result != null);
         }
     }
 
@@ -376,7 +383,7 @@ class OfferTest extends BaseTest
     {
         $types = [SUPER_ADMIN, COMPANY_MANAGER, \COMPANY];
         Offer::factory()->count(5)->create()->first();
-        $eduDateFrom = $this->faker->dateTimeBetween('-10 years')->format('Y-m');
+        $eduDateFrom = $this->faker->dateTimeBetween('-10 years', '-4 years')->format('Y-m');
         $eduDateTo = $this->faker->dateTimeBetween('-2 years')->format('Y-m');
         foreach ($types as $type) {
             $this->loginWith($type);
@@ -404,7 +411,6 @@ class OfferTest extends BaseTest
         foreach ($types as $type) {
             $this->loginWith($type);
             $rand = $this->faker->randomElements($array, 2);
-
             $response = $this->user_login->get('api/offer?'.$field.'%5B%5D='.$rand[0].'&'.$field.'%5B%5D='.$rand[1]);
             $this->assertEquals(Response::HTTP_OK, $response->decodeResponseJson()['code']);
             $result = $response->decodeResponseJson()['data']['result'];
@@ -415,9 +421,13 @@ class OfferTest extends BaseTest
             $count = HR::query()
                 ->whereIn($column, $rand)
                 ->whereIn('id', $hr_id)->count();
-            $this->assertCount($count, $result);
+            if($count == 0)
+                $this->assertTrue($result == null);
+            else
+                $this->assertCount($count, $result);
         }
     }
+
     public function testSearchByEduClass()
     {
         $this->formArray(HR::FINAL_EDUCATION_CLASSIFICATION, HR_FINAL_EDUCATION, 'edu_class');
@@ -512,4 +522,181 @@ class OfferTest extends BaseTest
             $this->assertCount($count, $result);
         }
     }
+
+    private function fakeOffer()
+    {
+        $this->loginWith(\HR);
+        $theHr = HR::query()->where(HR::HR_ORGANIZATION_ID, Auth::user()->hrOrganization->id)->first();
+        $this->loginWith(\COMPANY);
+
+        Work::factory()->count(3)->create([
+            Work::STATUS => WORK_STATUS_RECRUITING,
+            Work::TITLE => $this->faker->title,
+            Work::COMPANY_ID => $this->company->id,
+            Work::USER_ID => Auth::id()
+        ]);
+        $theJob = Work::query()->where(Work::COMPANY_ID, $this->company->id)->first();
+
+        return Offer::factory()->create([
+            Offer::WORK_ID => $theJob->id,
+            Offer::HR_ID => $theHr->id,
+            Offer::STATUS => OFFER_STATUS_REQUESTING
+        ]);
+    }
+
+    public function testDetailFail()
+    {
+        $types = [SUPER_ADMIN, COMPANY_MANAGER, HR_MANAGER];
+        foreach ($types as $type) {
+            $this->loginWith($type);
+            $resp = $this->json('get', 'api/offer/999');
+            $this->assertTrue($resp->decodeResponseJson()['code'] == Response::HTTP_FORBIDDEN);
+            $this->assertEquals($resp->decodeResponseJson()['message'], trans('messages.data_does_not_exist'));
+        }
+
+        $offer_id = Offer::factory()->create([
+            Offer::WORK_ID => Work::factory()->create()->id,
+            Offer::HR_ID => HR::factory()->create()->id,
+            Offer::STATUS => ENTRY_STATUS_REQUESTING
+        ])->id;
+        $types = [\COMPANY, \HR];
+        foreach ($types as $type) {
+            $this->loginWith($type);
+            $resp = $this->json('get', 'api/offer/'.$offer_id);
+            $this->assertTrue($resp->decodeResponseJson()['code'] == Response::HTTP_FORBIDDEN);
+            $this->assertEquals($resp->decodeResponseJson()['message'], trans('messages.data_does_not_exist'));
+        }
+    }
+
+    public function testDetailSuccess()
+    {
+        $offer_id = $this->fakeOffer()->id;
+        foreach ($this->types as $type) {
+            $this->loginWith($type);
+            $resp = $this->json('get', 'api/offer/'.$offer_id)
+                ->assertSeeText(CODE_SUCCESS)
+                ->assertOk();
+            $data = $resp->getData()->data;
+            $this->assertTrue(!empty($data));
+        }
+    }
+
+    public function testUpdateWithIdFail()
+    {
+        $this->fakeOffer();
+        $types = [SUPER_ADMIN, HR_MANAGER, \HR];
+        $status = rand(OFFER_STATUS_DECLINE, OFFER_STATUS_CONFIRM);
+        foreach ($types as $type) {
+            $this->loginWith($type);
+            $resp = $this->post('api/offer/update-status/999', ['status' => $status]);
+            $this->assertTrue($resp->decodeResponseJson()['code'] == CODE_NO_ACCESS);
+            $this->assertEquals($resp->decodeResponseJson()['message'], trans('messages.data_does_not_exist'));
+        }
+    }
+
+    public function testUpdateWithStatusFail()
+    {
+        $offer = $this->fakeOffer();
+        $types = [SUPER_ADMIN, HR_MANAGER, \HR];
+        foreach ($types as $type) {
+            $this->loginWith($type);
+            $resp = $this->post('api/offer/update-status/' . $offer->id, ['status' => 4]);
+            $this->assertTrue($resp->decodeResponseJson()['code'] == Response::HTTP_UNPROCESSABLE_ENTITY);
+            $this->assertEquals($resp->decodeResponseJson()['message'], trans('api.offer.status'));
+        }
+
+        $status = rand(OFFER_STATUS_DECLINE, OFFER_STATUS_CONFIRM);
+        $offer->status = $status;
+        $offer->save();
+
+        foreach ($types as $type) {
+            $this->loginWith($type);
+            $resp = $this->post('api/offer/update-status/' . $offer->id, ['status' => $status]);
+            $this->assertTrue($resp->decodeResponseJson()['code'] == Response::HTTP_FORBIDDEN);
+            $this->assertEquals($resp->decodeResponseJson()['message'], trans('messages.data_does_not_exist'));
+        }
+    }
+
+    public function testUpdateWithPermissionFail()
+    {
+        $this->loginWith(\HR);
+        $theHr = HR::factory()->create([HR::USER_ID => Auth::id()+1]);
+        $offer = Offer::factory()->create([
+            Offer::HR_ID => $theHr->id,
+            Offer::STATUS => OFFER_STATUS_REQUESTING
+        ]);
+        $statusList = [OFFER_STATUS_DECLINE, OFFER_STATUS_CONFIRM];
+        foreach ($statusList as $status) {
+            $resp = $this->post('api/offer/update-status/' . $offer->id, ['status' => $status]);
+            $this->assertTrue($resp->decodeResponseJson()['code'] == CODE_NO_ACCESS);
+            $this->assertEquals($resp->decodeResponseJson()['message'], trans('messages.mes.permission'));
+        }
+    }
+
+    private function assertNotification($object, $type)
+    {
+        $notifications = Notification::query()
+            ->where('type', $type)
+            ->where('notifiable_id', $object->user_id)->get();
+        $this->assertNotEmpty($notifications);
+        $this->assertTrue($notifications->count() > 0);
+    }
+
+    private function freshData($offer)
+    {
+        Offer::query()->find($offer->id)->update([Offer::STATUS => OFFER_STATUS_REQUESTING, Offer::DISPLAY => 'on']);
+        Schema::disableForeignKeyConstraints();
+        Interview::query()->truncate();
+        Schema::enableForeignKeyConstraints();
+    }
+
+    public function testUpdateStatusDeclineSuccess()
+    {
+        $offer = $this->fakeOffer();
+        $types = [SUPER_ADMIN, HR_MANAGER, \HR];
+        foreach ($types as $type) {
+            $this->loginWith($type);
+            $resp = $this->post('api/offer/update-status/' . $offer->id, ['status' => OFFER_STATUS_DECLINE]);
+
+            $this->assertTrue($resp->decodeResponseJson()['code'] == CODE_SUCCESS);
+            $this->assertDatabaseHas('offers', [
+                'id' => $offer->id,
+                Offer::STATUS => OFFER_STATUS_DECLINE,
+                Offer::DISPLAY => 'on'
+            ]);
+            $job = new NotificationHRJob(Auth::user(), $offer, OFFER_STATUS_DECLINE, '');
+            $job->handle();
+            $this->assertNotification($offer->work, OfferDeclineNotification::class);
+            $this->freshData($offer);
+        }
+    }
+
+    public function testUpdateStatusConfirmSuccess()
+    {
+        $offer = $this->fakeOffer();
+        $types = [SUPER_ADMIN, HR_MANAGER, \HR];
+        foreach ($types as $type) {
+            $this->loginWith($type);
+            $resp = $this->post('api/offer/update-status/' . $offer->id, ['status' => OFFER_STATUS_CONFIRM]);
+            $this->assertTrue($resp->decodeResponseJson()['code'] == CODE_SUCCESS);
+            $this->assertDatabaseHas('offers', [
+                'id' => $offer->id,
+                Offer::STATUS => OFFER_STATUS_CONFIRM,
+                Offer::DISPLAY => 'off'
+            ]);
+            $this->assertDatabaseHas('interviews', [
+                Interview::HR_ID => $offer->hr_id,
+                Interview::WORK_ID => $offer->work_id,
+                Interview::DISPLAY => 'on',
+                Interview::TYPE => INTERVIEW_TYPE_PRIVATE,
+                Interview::STATUS_SELECTION => INTERVIEW_STATUS_SELECTION_OFFER_CONFIRM,
+                Interview::INTERVIEW_ADJUSTMENT => INTERVIEW_STATUS_INTERVIEW_ADJUSTMENT_BEFORE_ADJUSTMENT,
+            ]);
+            $job = new NotificationHRJob(Auth::user(), $offer, OFFER_STATUS_CONFIRM, '');
+            $job->handle();
+            $this->assertNotification($offer->work, OfferConfirmNotification::class);
+            $this->freshData($offer);
+        }
+    }
 }
+

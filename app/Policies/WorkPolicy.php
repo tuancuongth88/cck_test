@@ -40,4 +40,14 @@ class WorkPolicy
         }
         return false;
     }
+
+    public function show(User $user, Work $work){
+        if ($user->type == COMPANY){
+            if ($user->id == $work->user_id){
+                return true;
+            }
+            return false;
+        }
+        return true;
+    }
 }

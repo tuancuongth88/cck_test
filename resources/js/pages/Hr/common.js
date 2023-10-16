@@ -7,10 +7,11 @@ const status_select_jobs_to_offer = false;
 
 // Static
 const gender_option = [
-  { value: { id: null, content: '' }, text: '選択してください', translate: 'please select',
+  {
+    value: { id: null, content: '' }, text: '選択してください', translate: 'please select',
   }, // Không xác định
-  { value: { id: 1, content: '男' }, text: '男', translate: 'male' },
-  { value: { id: 2, content: '女' }, text: '女', translate: 'female' },
+  { value: { id: 1, content: '男性' }, text: '男性', translate: 'male' },
+  { value: { id: 2, content: '女性' }, text: '女性', translate: 'female' },
 ];
 
 const gender_option_search = [
@@ -30,11 +31,32 @@ const renderAge = () => {
 
 const renderYears = () => {
   let year_arr = [];
-  const year_from = 1900;
+  const year_from = 1960;
   const year_to = 2050;
   const number_length = Math.abs(parseInt(year_from - year_to)) + 1; // + 1 Thêm số cuối mảng là year_to
   year_arr = Array.from({ length: number_length }, (_, i) => year_from + i);
   return year_arr;
+};
+
+const renderYearNotRequire = () => {
+  let year_arr = [];
+
+  const year_from = 1960;
+  const year_to = 2050;
+  const number_length = Math.abs(parseInt(year_from - year_to)) + 1;
+
+  year_arr = Array.from({ length: number_length }, (_, i) => year_from + i);
+
+  const result = [
+    // { value: null, text: '選択してください', disabled: false },
+    { value: null, text: '', disabled: false },
+  ];
+
+  year_arr.forEach((item) => {
+    result.push({ value: item, text: item, disabled: false });
+  });
+
+  return result;
 };
 
 const renderYearsEducationTiming = () => {
@@ -53,6 +75,27 @@ const renderMonth = () => {
   const number_length = Math.abs(parseInt(month_from - month_to)) + 1; // + 1 Thêm số cuối mảng là month_to
   month_arr = Array.from({ length: number_length }, (_, i) => month_from + i);
   return month_arr;
+};
+
+const renderMonthNotRequire = () => {
+  let month_arr = [];
+
+  const month_from = 1;
+  const month_to = 12;
+  const number_length = Math.abs(parseInt(month_from - month_to)) + 1;
+
+  month_arr = Array.from({ length: number_length }, (_, i) => month_from + i);
+
+  const result = [
+    // { value: null, text: '選択してください', disabled: false },
+    { value: null, text: '', disabled: false },
+  ];
+
+  month_arr.forEach((item) => {
+    result.push({ value: item, text: item, disabled: false });
+  });
+
+  return result;
 };
 
 const renderDay = () => {
@@ -119,9 +162,9 @@ const final_education_degree_options = [
   { value: { id: 1, content: '博士' }, text: '博士', translate: 'Doctor' },
   { value: { id: 2, content: '修士' }, text: '修士', translate: 'master s degree' },
   { value: { id: 3, content: '学士' }, text: '学士', translate: 'expected to graduate' },
-  { value: { id: 3, content: '短期大学卒業' }, text: '短期大学卒業', translate: 'graduated from junior college' },
-  { value: { id: 3, content: '専門学校卒業' }, text: '専門学校卒業', translate: 'graduated from vocational school' },
-  { value: { id: 3, content: '高校卒業' }, text: '高校卒業', translate: 'high school graduation' },
+  { value: { id: 4, content: '短期大学卒業' }, text: '短期大学卒業', translate: 'graduated from junior college' },
+  { value: { id: 5, content: '専門学校卒業' }, text: '専門学校卒業', translate: 'graduated from vocational school' },
+  { value: { id: 6, content: '高校卒業' }, text: '高校卒業', translate: 'high school graduation' },
 ];
 
 const phone_number_options_common = [
@@ -180,6 +223,7 @@ const provincesr_option = [
   { value: { id: 47, content: '男' }, text: '鹿児島県' },
   { value: { id: 48, content: '男' }, text: '沖縄県' },
 ];
+
 const deparment_option_api = [
   { value: { id: null, content: '' }, text: '選択してください', translate: 'please select' },
   { value: { id: 1, content: 'Deparment 1' }, text: 'Deparment 1', translate: 'Selection department (major classification)' },
@@ -242,6 +286,7 @@ const major_classification_options_api = [
     ],
   },
 ];
+
 // Test tạm
 const middle_classification_options_api = [
   { value: { id: null, content: '' }, text: '選択してください', translate: 'please select' },
@@ -257,13 +302,15 @@ const middle_classification_options_api = [
 const format2characters = (e) => {
   return String(e).substring(0, 2);
 };
+
 const format20characters = (e) => {
-  console.log('format20characters', e);
   return String(e).substring(0, 20);
 };
+
 const format50characters = (e) => {
   return String(e).substring(0, 50);
 };
+
 const format2000characters = (e) => {
   return String(e).substring(0, 2000);
 };
@@ -292,5 +339,7 @@ export {
   format2characters,
   format20characters,
   format50characters,
-  format2000characters
+  format2000characters,
+  renderMonthNotRequire,
+  renderYearNotRequire
 };

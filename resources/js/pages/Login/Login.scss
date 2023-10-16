@@ -11,6 +11,7 @@
 	height: inherit;
 	width: 100%;
 	display: flex;
+	flex-direction: column;
 	justify-content: center;
 	align-items: center;
 	position: relative;
@@ -22,6 +23,10 @@
 	height: 100vh;
 	overflow: hidden;
 	background-size: cover;
+}
+
+.bd-logo {
+    width: 250px;
 }
 
 .login-bg__img {
@@ -39,13 +44,21 @@
 	max-width: 800px;
 	min-height: 600px;
 	width: 100%;
-	padding: 6.5rem 6.5rem 2.6rem 6.5rem;
+	padding: 6.5rem;
 	display: flex;
 	flex-direction: column;
 	justify-content: flex-start;
 	align-items: center;
-	position: absolute;
+	// position: absolute;
 	z-index: 2;
+}
+
+.login-footer-text {
+	z-index: 2;
+	// position: absolute;
+	// bottom: 0.5rem;
+	padding-top: 0.5rem;
+	color: #686868;
 }
 
 .login-title {
@@ -54,11 +67,10 @@
 	font-size: 36px;
 	line-height: 54px;
 	color: #0282CB;
+	margin-bottom: 1.5rem;
 }
 
 .login-descriptions {
-	margin-top: 2.75rem;
-	font-weight: 400;
 	font-size: 16px;
 	line-height: 24px;
 	text-align: center;
@@ -98,7 +110,7 @@
 
 	& input {
 		background: #FFFFFF;
-		border: 1px solid #999999;
+		// border: 1px solid #999999;
 		box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 		border-radius: 10px;
 		width: 100%;

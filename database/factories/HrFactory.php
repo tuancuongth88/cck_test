@@ -23,7 +23,7 @@ class HrFactory extends Factory
     public function definition()
     {
         $user = Auth::user();
-        if ($user->type == HR) {
+        if ($user && $user->type == HR) {
             $hrOrg = $user->hrOrganization;
             $userId = $user->id;
         } else {
@@ -41,8 +41,8 @@ class HrFactory extends Factory
             HR::FULL_NAME => $name,
             HR::FULL_NAME_JA => $name,
             HR::GENDER => rand(HRS_GENDER_MALE, HRS_GENDER_FEMALE),
-            HR::CREATED_BY => $user->id,
-            HR::DATE_OF_BIRTH => $this->faker->dateTimeBetween('-50 years'),
+            HR::CREATED_BY => $userId,
+            HR::DATE_OF_BIRTH => $this->faker->dateTimeBetween('-50 years', '-20 years'),
             HR::FINAL_EDUCATION_DATE => $this->faker->dateTimeBetween('-20 years')->format('Y-m'),
             HR::FINAL_EDUCATION_CLASSIFICATION => $this->faker->randomElement(HR_FINAL_EDUCATION),
             HR::FINAL_EDUCATION_DEGREE => $this->faker->randomElement(array_keys(HR_EDUCATION_DEGREES)),
@@ -50,6 +50,7 @@ class HrFactory extends Factory
             HR::JAPANESE_LEVEL => LanguageRequirement::query()->inRandomOrder()->pluck('id')->first(),
             HR::MAJOR_CLASSIFICATION_ID => $major_id,
             HR::MIDDLE_CLASSIFICATION_ID => $middle_id,
+            HR::MAIL_ADDRESS => $this->faker->email,
         ];
     }
 }

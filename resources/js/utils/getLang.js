@@ -10,6 +10,5 @@ export function getLanguage() {
   if (chooseLanguage) {
     return chooseLanguage;
   }
-
   return process.env.MIX_LARAVEL_LANG || 'en';
 }

@@ -25,10 +25,9 @@
         <hr>
         <div style="padding-left: 60px">
             <p>
-                {{ $data['company'] }}　様
+                {{ @$data['permission'] }}様
             </p>
             <p>
-
                 以下の面接候補日が設定されました。<br>
                 <a href="{{ url('matching-management') }}">こちら</a>より詳細を確認してください。
             </p>

@@ -47,7 +47,7 @@ class ResultController extends Controller
      *     in="query",
      *     @OA\Schema(
      *      type="string",
-     *      enum={"id","entry_code","full_name","work_title","request_date","updated_at","status"}
+     *      enum={"id","code","full_name","job_title","time","updating_date","status_selection"}
      *     ),
      *   ),
      *   @OA\Parameter(
@@ -338,8 +338,7 @@ class ResultController extends Controller
      */
     public function update(ResultRequest $request, $id)
     {
-        $attributes = $request->except([]);
-        return $this->repository->update($attributes, $id);
+        return $this->repository->update($request, $id);
     }
 
     /**

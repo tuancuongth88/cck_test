@@ -10,10 +10,10 @@
     <hr>
     <div class="distribute_msg-line" ></div>
     <div class="distribute-msg-frame__inputs-datas">
-        <h6 class="my-4">{{ $data['company'] }} &nbsp;&nbsp;様</h6>
+        <h6 class="my-4">{{ $data['permission'] }}様</h6>
         <div>
             申請されたエントリーを審査するのタスクが停滞しています。<br>
-            <a href="{{ url('matching-management') }}">こちら</a>より確認してください。
+            マッチング管理より確認してください。
         </div>
     </div>
 </div>

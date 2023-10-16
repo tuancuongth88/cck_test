@@ -1,9 +1,26 @@
 <!-- Select Jobs To Offer - Modal -->
 <template>
-  <div>
-    <div class="select-jobs-to-offer-modal">
-      <div class="select-jobs-to-offer-modal-container">
-        <!-- <div class="btn btn-close" @click="handleToggleModalSelectJobsToOffer">
+  <b-overlay
+    :show="overlaySelectJobsToOffer.show"
+    :blur="overlaySelectJobsToOffer.blur"
+    :rounded="overlaySelectJobsToOffer.sm"
+    :style="'min-height: 100vh; height: 100%'"
+    :variant="overlaySelectJobsToOffer.variant"
+    :opacity="overlaySelectJobsToOffer.opacity"
+  >
+    <template #overlay>
+      <div class="text-center">
+        <b-icon icon="arrow-clockwise" font-scale="3" animation="spin" />
+        <p style="margin-top: 10px">
+          {{ $t('PLEASE_WAIT') }}
+        </p>
+      </div>
+    </template>
+    <!--  -->
+    <div>
+      <div class="select-jobs-to-offer-modal">
+        <div class="select-jobs-to-offer-modal-container">
+          <!-- <div class="btn btn-close" @click="handleToggleModalSelectJobsToOffer">
           <img
             :src="require('@/assets/images/login/close.png')"
             alt="heart"
@@ -11,243 +28,306 @@
           >
         </div> -->
 
-        <!-- <div>data_make_an_offer: {{ data_make_an_offer }}</div> -->
+          <!-- <div>data_make_an_offer: {{ data_make_an_offer }}</div> -->
 
-        <div class="select-jobs-to-offer-modal__title">
-          <span>{{ $t('SELECT_JOB_TO_OFFER.TITLE') }}</span>
-        </div>
-        <!--  -->
-        <div class="select-jobs-to-offer-modal-content">
+          <div class="select-jobs-to-offer-modal__title">
+            <span>{{ $t('SELECT_JOB_TO_OFFER.TITLE') }}</span>
+          </div>
           <!--  -->
-          <div class="w-100 d-flex justify-center align-start">
-            <div class="select-jobs-to-offer-search-job">
-              <JobFormSearch
-                :has-company="true"
-                @handleSearch="handleSearchJob"
-              />
-            </div>
+          <div class="select-jobs-to-offer-modal-content">
+            <!--  -->
+            <div class="w-100 d-flex justify-center align-start">
+              <div class="select-jobs-to-offer-search-job">
+                <JobFormSearch
+                  :has-company="true"
+                  @handleSearch="handleSearchJob"
+                />
+              </div>
 
-            <div class="select-jobs-to-offer-modal-list">
-              <div class="select-jobs-to-offer-wrapper">
-                <!--  -->
-                <!-- no-sort-reset -->
-                <!-- no-local-sorting -->
-                <div class="table-list-auto-x">
-                  <div class="table-list">
-                    <b-table
-                      :key="`select-job-to-offer-table-${reRender}`"
-                      :items="listJobSelect"
-                      :fields="selectJobFields"
-                      hover
-                      responsive
-                      fixed
-                      show-empty
-                      @sort-changed="handleSortSelectToOfferList"
-                    >
-                      <template #empty="">
-                        <span>{{ $t('TABLE_EMPTY_LIST') }}</span>
-                      </template>
-                      <!-- 1 ID -->
-                      <template #cell(id)="data">
-                        <div
-                          class="table-cell-wrap d-flex justify-center align-center blue"
-                          :class="{
-                            'make-an-offer-item-selected':
-                              data.item.id === id_offer_data_selected,
-                          }"
-                          @click="handleSelectRowJob(data.item)"
-                        >
-                          <span>{{ data.item.id }}</span>
-                        </div>
-                      </template>
-                      <!-- 2 求人名 Job name -->
-                      <template #cell(title)="data">
-                        <div
-                          :class="{
-                            'make-an-offer-item-selected':
-                              data.item.id === id_offer_data_selected,
-                          }"
-                          class="table-cell-wrap d-flex justify-start align-center blue"
-                          @click="handleSelectRowJob(data.item)"
-                        >
-                          {{ data.item.title }}
-                        </div>
-                      </template>
-                      <!-- 3 企業名 Company name -->
-                      <template #cell(company_name_jp)="data">
-                        <div
-                          :class="{
-                            'make-an-offer-item-selected':
-                              data.item.id === id_offer_data_selected,
-                          }"
-                          class="table-cell-wrap d-flex justify-start align-center blue"
-                          @click="handleSelectRowJob(data.item)"
-                        >
-                          {{ data.item.company_name_jp }}
-                        </div>
-                      </template>
-                      <!-- 4 ステータス Status -->
-                      <template #cell(status)="data">
-                        <!-- 1 募集中 recruiting -->
-                        <div
-                          v-if="data.item.status === 'recruiting'"
-                          :class="{
-                            'make-an-offer-item-selected':
-                              data.item.id === id_offer_data_selected,
-                          }"
-                          class="table-cell-wrap blue"
-                        >
+              <div class="select-jobs-to-offer-modal-list">
+                <div class="select-jobs-to-offer-wrapper">
+                  <!--  -->
+                  <!-- no-sort-reset -->
+                  <!-- no-local-sorting -->
+                  <div class="table-list-auto-x">
+                    <div class="table-list">
+                      <b-table
+                        id="dusk_job_to_offer"
+                        :key="`select-job-to-offer-table-${reRender}`"
+                        :items="listJobSelect"
+                        :fields="selectJobFields"
+                        hover
+                        responsive
+                        fixed
+                        show-empty
+                        @sort-changed="handleSortSelectToOfferList"
+                      >
+                        <template v-if="listJobSelect.length <= 0" #empty="">
+                          <div class="w-100 d-flex justify-center align-center">
+                            <span>{{ $t('TABLE_EMPTY') }}</span>
+                          </div>
+                        </template>
+                        <!-- 1 ID -->
+                        <template #cell(id)="data">
                           <div
-                            class="d-flex status-item w-100 justify-center align-center status-recruiting"
+                            class="table-cell-wrap d-flex justify-center align-center blue"
+                            :class="[
+                              {
+                                'make-an-offer-item-selected':
+                                  data.item.id === id_offer_data_selected,
+                              },
+                              {
+                                'disable-select': data.item.disabled,
+                              },
+                            ]"
                             @click="handleSelectRowJob(data.item)"
                           >
-                            <span>{{ $t('STATUS.RECRUITING') }}</span>
+                            <span>{{ data.item.id }}</span>
                           </div>
-                        </div>
-                        <!-- 2 一時停止中 paused -->
-                        <div
-                          v-if="data.item.status === 'paused'"
-                          :class="{
-                            'make-an-offer-item-selected':
-                              data.item.id === id_offer_data_selected,
-                          }"
-                          class="table-cell-wrap blue"
-                        >
+                        </template>
+                        <!-- 2 求人名 Job name -->
+                        <template #cell(title)="data">
                           <div
-                            class="d-flex status-item w-100 justify-center align-center status-paused"
+                            :class="[
+                              {
+                                'make-an-offer-item-selected':
+                                  data.item.id === id_offer_data_selected,
+                              },
+                              {
+                                'disable-select': data.item.disabled,
+                              },
+                            ]"
+                            class="table-cell-wrap d-flex justify-start align-center blue"
                             @click="handleSelectRowJob(data.item)"
                           >
-                            <span>{{ $t('STATUS.PAUSED') }}</span>
+                            {{ data.item.title }}
                           </div>
-                        </div>
-                        <!-- 3 - 募集終了 recruitment-completed -->
-                        <div
-                          v-if="data.item.status === 'recruitment-completed'"
-                          :class="{
-                            'make-an-offer-item-selected':
-                              data.item.id === id_offer_data_selected,
-                          }"
-                          class="table-cell-wrap blue"
-                        >
+                        </template>
+                        <!-- 3 企業名 Company name -->
+                        <template #cell(company_name_jp)="data">
                           <div
-                            class="d-flex status-item w-100 justify-center align-center status-recruitment-completed"
+                            :class="[
+                              {
+                                'make-an-offer-item-selected':
+                                  data.item.id === id_offer_data_selected,
+                              },
+                              {
+                                'disable-select': data.item.disabled,
+                              },
+                            ]"
+                            class="table-cell-wrap d-flex justify-start align-center blue"
                             @click="handleSelectRowJob(data.item)"
                           >
-                            <span>{{
-                              $t('STATUS.RECRUITMENT_COMPLETED')
-                            }}</span>
+                            {{ data.item.company_name_jp }}
                           </div>
-                        </div>
-                        <div
-                          v-if="data.item.status === ''"
-                          :class="{
-                            'make-an-offer-item-selected':
-                              data.item.id === id_offer_data_selected,
-                          }"
-                          class="table-cell-wrap blue"
+                        </template>
+                        <!-- 4 ステータス Status -->
+                        <template #cell(status)="data">
+                          <!-- 1 募集中 recruiting -->
+                          <div
+                            v-if="data.item.status === 'recruiting'"
+                            :class="[
+                              {
+                                'make-an-offer-item-selected':
+                                  data.item.id === id_offer_data_selected,
+                              },
+                              {
+                                'disable-select': data.item.disabled,
+                              },
+                            ]"
+                            class="table-cell-wrap blue"
+                          >
+                            <div
+                              class="d-flex status-item w-100 justify-center align-center status-recruiting"
+                              @click="handleSelectRowJob(data.item)"
+                            >
+                              <span>{{ $t('STATUS.RECRUITING') }}</span>
+                            </div>
+                          </div>
+                          <!-- 2 一時停止中 paused -->
+                          <div
+                            v-if="data.item.status === 'paused'"
+                            :class="[
+                              {
+                                'make-an-offer-item-selected':
+                                  data.item.id === id_offer_data_selected,
+                              },
+                              {
+                                'disable-select': data.item.disabled,
+                              },
+                            ]"
+                            class="table-cell-wrap blue"
+                          >
+                            <div
+                              class="d-flex status-item w-100 justify-center align-center status-paused"
+                              @click="handleSelectRowJob(data.item)"
+                            >
+                              <span>{{ $t('STATUS.PAUSED') }}</span>
+                            </div>
+                          </div>
+                          <!-- 3 - 募集終了 recruitment-completed -->
+                          <div
+                            v-if="data.item.status === 'recruitment-completed'"
+                            :class="[
+                              {
+                                'make-an-offer-item-selected':
+                                  data.item.id === id_offer_data_selected,
+                              },
+                              {
+                                'disable-select': data.item.disabled,
+                              },
+                            ]"
+                            class="table-cell-wrap blue"
+                          >
+                            <div
+                              class="d-flex status-item w-100 justify-center align-center status-recruitment-completed"
+                              @click="handleSelectRowJob(data.item)"
+                            >
+                              <span>{{
+                                $t('STATUS.RECRUITMENT_COMPLETED')
+                              }}</span>
+                            </div>
+                          </div>
+                          <div
+                            v-if="data.item.status === ''"
+                            :class="[
+                              {
+                                'make-an-offer-item-selected':
+                                  data.item.id === id_offer_data_selected,
+                              },
+                              {
+                                'disable-select': data.item.disabled,
+                              },
+                            ]"
+                            class="table-cell-wrap blue"
+                          />
+                        </template>
+                      </b-table>
+                      <div class="w-100 d-flex justify-end align-center">
+                        <!-- <b-pagination
+                          v-model="currentPage"
+                          style="padding-top: 20px"
+                          :total-rows="totalRows"
+                          :per-page="perPage"
+                          aria-controls="job-select-table"
+                          pills
+                          :next-class="'next'"
+                          :prev-class="'prev'"
+                          @change="
+                            ($event) => getCurrentPageSelectJobsToOffer($event)
+                          "
+                        /> -->
+                        <custom-pagination
+                          v-if="listJobSelect && listJobSelect.length > 0"
+                          :total-rows="totalRows"
+                          :current-page="currentPage"
+                          :per-page="perPage"
+                          @pagechanged="onPageChange"
+                          @changeSize="changeSize"
                         />
-                      </template>
-                    </b-table>
-
-                    <b-pagination
-                      v-model="currentPage"
-                      style="padding-top: 20px"
-                      :total-rows="totalRows"
-                      :per-page="perPage"
-                      aria-controls="job-select-table"
-                    />
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <!--  -->
+                  <!--  -->
 
-                <!--  -->
-              </div>
-            </div>
-          </div>
-          <!--  -->
-          <div class="select-jobs-to-offer-modal-list__btn">
-            <!-- Cancel -->
-            <div class="btn btn-cancle" @click="cancleFormSelectJob">
-              <span>{{ $t('MODAL_BUTTON_CANCEL') }}</span>
-            </div>
-            <div class="btn btn-ok" @click="goToConfirmSelectJobToOffer">
-              <span>OK</span>
-            </div>
-            <!-- <ButtonRadius /> -->
-          </div>
-          <!-- BTN -->
-        </div>
-      </div>
-    </div>
-    <!-- Modal make an offer -->
-    <b-modal
-      ref="modal"
-      v-model="statusModalMakeAnOffer"
-      hide-footer
-      aria-describedby="select-jobs-to-offer"
-      no-close-on-backdrop
-      hide-backdrop
-      dialog-class
-      :no-fade="false"
-      centered
-      :size="'md'"
-      title=""
-    >
-      <!-- BODY MODAL -->
-      <div class="make-an-offer">
-        <div class="w-100 d-flex justify-center align-center title">
-          <span>{{ $t('SELECT_JOB_TO_OFFER.MAKE_AN_OFFER_TITLE') }}</span>
-        </div>
-        <!--  -->
-        <div class="make-an-offer-content">
-          <div class="make-an-offer-content-wrap">
-            <!-- 1 Offer HR -->
-            <div
-              class="w-100 d-flex justify-start align-center"
-              style="gap: 3rem"
-            >
-              <div class=" ">
-                <span>{{ $t('SELECT_JOB_TO_OFFER.OFFER_JOB') }}</span>
-              </div>
-              <div class=" ">
-                <span>{{ hrFullName + ' ' + hrFullNameJp }}</span>
-              </div>
-            </div>
-            <!-- 2 Offer Job -->
-            <div
-              class="w-100 d-flex justify-start align-center"
-              style="gap: 3rem"
-            >
-              <div class=" ">
-                <span>{{ $t('SELECT_JOB_TO_OFFER.OFFER_HR') }}</span>
-              </div>
-              <div class=" ">
-                <span>{{ offer_job }}</span>
+                  <!--  -->
+                </div>
               </div>
             </div>
             <!--  -->
+            <div class="select-jobs-to-offer-modal-list__btn">
+              <!-- Cancel -->
+              <div
+                class="btn btn-cancle btn-cancel-offer"
+                @click="cancleFormSelectJob"
+              >
+                <span>{{ $t('MODAL_BUTTON_CANCEL') }}</span>
+              </div>
+              <div
+                class="btn btn-ok btn-confirm-offer"
+                @click="goToConfirmSelectJobToOffer"
+              >
+                <span>{{ $t('OK') }}</span>
+              </div>
+              <!-- <ButtonRadius /> -->
+            </div>
+            <!-- BTN -->
           </div>
         </div>
-        <!-- Back Offer -->
-        <div
-          class="select-jobs-to-offer-modal-list__btn"
-          style="gap: 0.5rem; margin-top: 6.25rem"
-        >
-          <!-- Back -->
-          <div class="btn btn-cancle" @click="toggleModalMakeAnOffer">
-            <span>{{ $t('RETURN') }}</span>
-          </div>
-          <div class="btn btn-ok" @click="handleConfirmThisJobToOffer">
-            <span>{{ $t('SELECT_JOB_TO_OFFER.OFFER') }}</span>
-          </div>
-          <!-- <ButtonRadius /> -->
-        </div>
-        <!--  -->
       </div>
-      <!-- BODY MODAL -->
-    </b-modal>
-    <!--  -->
-  </div>
+      <!-- Modal make an offer -->
+      <b-modal
+        ref="modal"
+        v-model="statusModalMakeAnOffer"
+        hide-footer
+        aria-describedby="select-jobs-to-offer"
+        no-close-on-backdrop
+        hide-backdrop
+        dialog-class
+        :no-fade="false"
+        centered
+        :size="'lg'"
+        title=""
+        modal-key="select-jobs-to-offer-confirm"
+      >
+        <!-- BODY MODAL -->
+        <div class="make-an-offer">
+          <div class="w-100 d-flex justify-center align-center title">
+            <span>{{ $t('SELECT_JOB_TO_OFFER.MAKE_AN_OFFER_TITLE') }}</span>
+          </div>
+          <!--  -->
+          <div class="make-an-offer-content">
+            <div class="make-an-offer-content-wrap">
+              <!-- 1 Offer HR -->
+              <b-row class="w-100 d-flex justify-start align-start px-0">
+                <b-col
+                  cols="4"
+                  class="d-flex justify-start align-center px-0 text-left"
+                >
+                  <span>{{ $t('SELECT_JOB_TO_OFFER.OFFER_JOB') }}</span>
+                </b-col>
+                <b-col cols="8" class="px-0 pl-2 text-left">
+                  <span>{{ hrFullName + ' ' + hrFullNameJp }}</span>
+                </b-col>
+              </b-row>
+
+              <!-- 2 Offer Job -->
+              <b-row class="w-100 d-flex justify-start align-start px-0">
+                <b-col
+                  cols="4"
+                  class="d-flex justify-start align-center px-0 text-left"
+                >
+                  <span>{{ $t('SELECT_JOB_TO_OFFER.OFFER_HR') }}</span>
+                </b-col>
+                <b-col cols="8" class="px-0 pl-2 text-left">
+                  <span>{{ offer_job }}</span>
+                </b-col>
+              </b-row>
+              <!--  -->
+              <!--  -->
+            </div>
+          </div>
+          <!-- Back Offer -->
+          <div
+            class="select-jobs-to-offer-modal-list__btn"
+            style="gap: 0.5rem; margin-top: 6.25rem"
+          >
+            <!-- Back -->
+            <div class="btn btn-cancle" @click="toggleModalMakeAnOffer">
+              <span>{{ $t('RETURN') }}</span>
+            </div>
+            <div class="btn btn-ok" @click="handleConfirmThisJobToOffer">
+              <span>{{ $t('SELECT_JOB_TO_OFFER.OFFER') }}</span>
+            </div>
+            <!-- <ButtonRadius /> -->
+          </div>
+          <!--  -->
+        </div>
+        <!-- BODY MODAL -->
+      </b-modal>
+      <!--  -->
+    </div>
+  </b-overlay>
 </template>
 
 <script>
@@ -258,7 +338,8 @@ import JobFormSearch from '@/layout/components/search/JobFormSearch.vue';
 // import ButtonRadius from '@/components/ButtonRadius';
 import { status_select_jobs_to_offer } from '@/pages/Hr/common.js';
 import { listJob } from '@/api/job.js';
-// import { offerJob } from '@/api/hr.js';
+import { offerJob } from '@/api/hr.js';
+import { PAGINATION_CONSTANT } from '@/const/config.js';
 
 // const urlAPI = {
 //   urlGetLisUser: '/user',
@@ -309,6 +390,13 @@ export default {
 
   data() {
     return {
+      overlaySelectJobsToOffer: {
+        show: true,
+        variant: 'light',
+        opacity: 0,
+        blur: '1rem',
+        rounded: 'sm',
+      },
       statusModalSelectJobsToOffer: false,
       statusModalMakeAnOffer: false,
       // Reload Table
@@ -346,47 +434,13 @@ export default {
           thClass: 'col-4',
         },
       ],
-      // listJobSelect: [],
-      listJobSelect: [
-        {
-          id: '00000001',
-          title: '電気設計エンジニア',
-          company_name_jp: '電気設計エンジニア1',
-          status: 'recruiting',
-        },
-        {
-          id: '00000002',
-          title: '電気設計エンジニア',
-          company_name_jp: '電気設計エンジニア2',
-          status: 'paused',
-        },
-        {
-          id: '00000003',
-          title: '電気設計エンジニア',
-          company_name_jp: '電気設計エンジニア3',
-          status: 'recruitment-completed',
-        },
-        {
-          id: '00000004',
-          title: '電気設計エンジニア',
-          company_name_jp: '電気設計エンジニア4',
-          status: 'recruiting',
-        },
-      ],
-      // 募集中 recruiting
-      // 一時停止中 Paused
-      // 募集終了 recruitment completed
+      listJobSelect: [],
       id_offer_data_selected: null,
       offer_job: '',
-      // Modal make an offer : Nguyen Thi Nhi ｸﾞｴﾝ ﾃｨ ﾆｰ | 電気設計エンジニア
-      // data_make_an_offer: {
-      //   offer_hr: '',
-      //   offer_job: '',
-      // },
 
       currentPage: 1,
       totalRows: 0,
-      perPage: 20,
+      perPage: PAGINATION_CONSTANT.DEFALT_PER_PAGE,
       //
       paramsSearch: null,
       sort: {
@@ -407,40 +461,57 @@ export default {
   watch: {
     sort: {
       handler: function() {
-        // this.getListWork();
+        this.getListWork();
       },
       deep: true,
     },
-    currentPage: {
-      handler: function() {
-        // this.getListWork();
-      },
-      deep: true,
-    },
+    // currentPage: {
+    //   handler: function() {
+    //     this.getListWork();
+    //   },
+    //   deep: true,
+    // },
     paramsSearch: {
       handler: function() {
         this.currentPage = 1;
-        // this.getListWork();
+        this.getListWork();
       },
       deep: true,
     },
   },
 
   created() {
-    // this.getListWork();
+    this.getListWork();
   },
 
   methods: {
+    // getCurrentPageSelectJobsToOffer(value) {
+    //   if (value) {
+    //     this.currentPage = parseInt(value);
+    //   }
+    // },
+    onPageChange(page) {
+      this.currentPage = page;
+      this.getListWork();
+    },
+    changeSize(size) {
+      this.perPage = size;
+      this.currentPage = 1;
+      this.getListWork();
+    },
     handleSearchJob(data) {
       this.paramsSearch = data;
     },
     async getListWork() {
+      this.overlaySelectJobsToOffer.show = true;
       this.listJobSelect = [];
       try {
         let PARAM = {};
         if (this.paramsSearch) {
           PARAM = this.paramsSearch;
         }
+        PARAM.display = 'offer';
+        PARAM.hrs_id = this.hrId ? this.hrId : this.$route.params.id;
         PARAM.page = this.currentPage;
         PARAM.per_page = this.perPage;
 
@@ -448,25 +519,51 @@ export default {
           PARAM.field = this.sort.field;
           PARAM.sort_by = this.sort.sort_by;
         }
-        const res = await listJob(PARAM);
+        const finalParams = {
+          ...PARAM,
+          middle_classification_id: PARAM['middle_classification_id']
+            ? PARAM['middle_classification_id'].flatMap(
+              (item) => item.childOptions
+            )
+            : null,
+          city_id: PARAM['city_id']
+            ? PARAM['city_id'].map((item) => item.id)
+            : null,
+        };
+        const res = await listJob(finalParams);
         const { code, data } = res.data;
+
         if (code === 200) {
-          this.listJobSelect = data.result.map(item => {
+          this.overlaySelectJobsToOffer.show = false;
+          this.listJobSelect = data.result.map((item) => {
             return {
               id: item.id,
               title: item.title,
               company_name: item.company.company_name,
               company_name_jp: item.company.company_name_jp,
               status: this.converStatusJob(item.status),
+              disabled: this.checkDisabled(item.status, item.list_disabled_hrs),
             };
           });
           this.totalRows = data.pagination.total_records;
         }
       } catch (error) {
+        this.overlaySelectJobsToOffer.show = false;
         console.log(error);
       }
       this.reloadTable();
     },
+
+    checkDisabled(status_id, list_disabled_hrs) {
+      if (status_id !== 1) {
+        return true;
+      }
+      // if (list_disabled_hrs.includes(this.hrId)) {
+      //   return true;
+      // }
+      return false;
+    },
+
     converStatusJob(status_id) {
       if (!status_id) {
         return '';
@@ -481,6 +578,7 @@ export default {
         return 'recruitment-completed';
       }
     },
+
     handleCloseModalSelectJobToOffer: function() {
       this.$emit('clicked-something', this.statusModalMakeAnOffer);
     },
@@ -514,7 +612,7 @@ export default {
         MakeToast({
           variant: 'warning',
           title: this.$t('WARNING'),
-          content: this.$t('VALIDATE.REQUIRED_TEXT'),
+          content: this.$t('VALIDATE.NOT_SELECT_JOB_WHEN_CREATE_OFFER'),
         });
         return;
       }
@@ -526,48 +624,44 @@ export default {
         MakeToast({
           variant: 'warning',
           title: this.$t('WARNING'),
-          content: this.$t('VALIDATE.REQUIRED_TEXT'),
+          content: this.$t('VALIDATE.NOT_SELECT_JOB_WHEN_CREATE_OFFER'),
         });
       }
     },
 
     async handleConfirmThisJobToOffer() {
-      MakeToast({
-        variant: 'success',
-        title: this.$t('SUCCESS'),
-        content: this.$t('SELECT_JOB_TO_OFFER.CHOOSE_JOB_TO_OFFER_SUCCESS'),
-      });
-      // if (!this.hrId || !this.id_offer_data_selected) {
-      //   MakeToast({
-      //     variant: 'warning',
-      //     title: this.$t('WARNING'),
-      //     content: this.$t('VALIDATE.REQUIRED_TEXT'),
-      //   });
-      //   return;
-      // }
-      // try {
-      //   const PARAM = {
-      //     hr_id: this.hrId,
-      //     work_id: this.id_offer_data_selected,
-      //   };
-      //   const res = await offerJob(PARAM);
-      //   const { code, message } = res.data;
-      //   if (code === 200) {
-      //     MakeToast({
-      //       variant: 'success',
-      //       title: this.$t('SUCCESS'),
-      //       content: this.$t('SELECT_JOB_TO_OFFER.CHOOSE_JOB_TO_OFFER_SUCCESS'),
-      //     });
-      //   } else {
-      //     MakeToast({
-      //       variant: 'danger',
-      //       title: this.$t('DANGER'),
-      //       content: message,
-      //     });
-      //   }
-      // } catch (error) {
-      //   console.log(error);
-      // }
+      if (!this.hrId || !this.id_offer_data_selected) {
+        MakeToast({
+          variant: 'warning',
+          title: this.$t('WARNING'),
+          content: this.$t('VALIDATE.REQUIRED_TEXT'),
+        });
+        return;
+      }
+      try {
+        const PARAM = {
+          hr_id: this.hrId,
+          work_id: this.id_offer_data_selected,
+        };
+        const res = await offerJob(PARAM);
+        const { code, message } = res.data;
+        if (code === 200) {
+          MakeToast({
+            variant: 'success',
+            title: this.$t('SUCCESS'),
+            content: this.$t('SELECT_JOB_TO_OFFER.CHOOSE_JOB_TO_OFFER_SUCCESS'),
+          });
+          this.$emit('close-modal');
+        } else {
+          MakeToast({
+            variant: 'danger',
+            title: this.$t('DANGER'),
+            content: message,
+          });
+        }
+      } catch (error) {
+        console.log(error);
+      }
       this.toggleModalMakeAnOffer();
     },
     // Sắp xếp theo trường - cột
@@ -596,6 +690,9 @@ export default {
     },
     // Chọn 1 row
     handleSelectRowJob(data) {
+      if (data.status !== 'recruiting') {
+        return;
+      }
       this.id_offer_data_selected = data.id;
       this.offer_job = data.title;
       this.reloadTable();
@@ -608,6 +705,10 @@ export default {
 <style lang="scss" scoped>
 @import '@/scss/_variables.scss';
 @import '@/scss/modules/common/common.scss';
+
+.disable-select {
+  background-color: #dedede;
+}
 
 .select-jobs-to-offer-modal {
   // border: 1px solid blue;
@@ -660,7 +761,7 @@ export default {
   flex-direction: column;
   justify-content: flex-start;
   align-items: stretch;
-  gap: 1.5rem;
+  // gap: 1.5rem;
   & > div:nth-child(1) {
     display: flex;
     justify-content: flex-start;
@@ -724,7 +825,7 @@ export default {
 }
 // BTN
 .select-jobs-to-offer-modal-list__btn {
-  margin-top: 6.25rem;
+  margin: 1rem 0 2.5rem 0;
   width: 100%;
   display: flex;
   justify-content: center;

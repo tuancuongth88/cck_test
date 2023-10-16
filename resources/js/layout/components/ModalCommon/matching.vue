@@ -7,6 +7,8 @@
     static
     no-fade
     centered
+    :modal-key="refs"
+    @hidden="closeModal"
   >
     <template #modal-header>
       <button type="button" class="close" @click="closeModal">
@@ -20,6 +22,8 @@
 </template>
 
 <script>
+import EventBus from '@/utils/eventBus';
+
 export default {
   name: 'ModalCommon',
   components: {},
@@ -49,18 +53,27 @@ export default {
   computed: {},
 
   created() {
-    this.$bus.on('open-modal', (param) => {
+    EventBus.$on('open-modal', (param) => {
       if (Object.keys(this.$refs)[0] === param) {
-        this.$refs[param].show();
+        if (!this.$refs[param]) {
+          return 0;
+        } else {
+          this.$refs[param].show();
+        }
       }
     });
 
-    this.$bus.on('close-modal', () => {
-      this.$refs[this.refs].hide();
-      this.$emit('reset-modal');
-      // if (Object.keys(this.$refs)[0] === param) {
-      //   this.$refs[param].hide();
-      // }
+    EventBus.$on('close-modal', (param) => {
+      // this.$refs[this.refs].hide();
+      // this.$emit('reset-modal');
+      if (Object.keys(this.$refs)[0] === param) {
+        if (!this.$refs[param]) {
+          return 0;
+        } else {
+          this.$refs[param].hide();
+          this.$emit('reset-modal');
+        }
+      }
     });
   },
 

@@ -27,7 +27,8 @@ return [
     'mes.subject_mail_confirm_account_hr' => '[Overseas Talent Matching System] Application has been approved',
     'mes.subject_mail_confirm_account_company' => '[Overseas Talent Matching System] Application has been approved',
     'status_invalid' => 'Invalid status value',
-    'account_subject_examination_email' => 'Account examination msg :type',
+    'account_subject_examination_email_hro' => 'Notice of new account application for human resources organization',
+    'account_subject_examination_email_company' => 'Notification of new corporate account application',
     'account_type_hr' => ' (HR organization)',
     'account_type_company' => ' (Company)',
     'mes.subject_entry_stagnant_status' => 'Remind msg',
@@ -36,4 +37,15 @@ return [
     'mes.invalid_photo' => 'Invalid photo. Please check again',
     'mes.import_success' => 'Import Hr success',
     'mes.official_offer_has_expired' => 'Official offer has expired',
+    'mes.not.action.permission' => 'You do not have permission to perform this function',
+    'mes.subject_forget_password' => 'Reset password',
+
+    //mess modal
+    'mes.modal.entry.confirm' => 'Approved.',
+    'mes.modal.entry.decline' => 'Canceled.',
+    'mes.modal.entry.reject' => 'Canceled.',
+    'mes.modal.offer.decline' => 'Approved.',
+    'mes.modal.offer.confirm' => 'Approved.',
+    'mes.modal.interview.sent' => 'Sent.',
+    'mes.modal.interview.submit.calendar' => 'Sent.',
 ];

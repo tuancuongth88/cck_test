@@ -16,7 +16,7 @@ use Illuminate\Http\JsonResponse;
 class InterviewController extends Controller
 {
 
-     /**
+    /**
      * var Repository
      */
     protected $repository;
@@ -45,7 +45,7 @@ class InterviewController extends Controller
      *     in="query",
      *     @OA\Schema(
      *      type="string",
-     *      enum={"id","entry_code","interview_date","full_name","job_name","status_selection", "status_interview_adjustment"}
+     *      enum={"id","code","interview_date","full_name","job_name","status_selection", "status_interview_adjustment"}
      *     ),
      *   ),
      *   @OA\Parameter(
@@ -232,7 +232,7 @@ class InterviewController extends Controller
             $data = $this->repository->create($request->all());
             return $this->responseJson(200, new InterviewResource($data));
         } catch (\Exception $e) {
-             return $this->responseJsonEx($e);
+            return $this->responseJsonEx($e);
         }
     }
 
@@ -275,19 +275,23 @@ class InterviewController extends Controller
     public function show($id)
     {
         try {
-            $item = $this->repository->findOne($id);
-            return $this->responseJson(200, new BaseResource($item));
+            $department = $this->repository->findOne($id);
+            if ($department['status'] != 'success') {
+                return $this->responseJsonError($department['code'], $department['message'], $department['message']);
+            }
+            return $this->responseJson(200, new BaseResource(isset($department['data']) ? $department['data'] : []));
         } catch (\Exception $e) {
-             return $this->responseJsonEx($e);
+            return $this->responseJsonEx($e);
         }
     }
 
     /**
      * @OA\Put(
-     *   path="/api/interview/{id}/setup-calendar",
+     *   path="/api/interview/setup-calendar/{id}",
      *   tags={"Interview"},
      *   summary="setup calendar",
      *   operationId="setup_calendar",
+     *   description="interview_type:1[Group],2[Private]",
      *   @OA\Parameter(
      *     name="id",
      *     in="path",
@@ -304,10 +308,29 @@ class InterviewController extends Controller
      *              "times": {
      *                  {
      *                      "date": "2030-01-01",
-     *                      "start_time": "9",
-     *                      "start_time_at": "AM",
+     *                      "start_time": "9:00",
      *                      "expected_time": "60"
-     *                  }
+     *                  },
+     *                  {
+     *                      "date": "2030-01-02",
+     *                      "start_time": "9:00",
+     *                      "expected_time": "60"
+     *                  },
+     *                  {
+     *                      "date": "2030-01-03",
+     *                      "start_time": "9:00",
+     *                      "expected_time": "60"
+     *                  },
+     *                  {
+     *                      "date": "2030-01-04",
+     *                      "start_time": "9:00",
+     *                      "expected_time": "60"
+     *                  },
+     *                  {
+     *                      "date": "2030-01-05",
+     *                      "start_time": "9:00",
+     *                      "expected_time": "60"
+     *                  },
      *              },
      *          },
      *          @OA\Schema(
@@ -349,17 +372,21 @@ class InterviewController extends Controller
      */
     public function setupCalendar(InterviewRequest $request, $id)
     {
-        if (!$this->repository->isOwner([$id])) {
-            return $this->responseJsonError(CODE_NO_ACCESS, trans('messages.mes.permission'));
+
+        $department = $this->repository->setupCalendar($request->all(), $id);
+        if ($department['status'] != 'success') {
+            return $this->responseJsonError($department['code'], $department['message'], $department['message']);
         }
-        return $this->repository->setupCalendar($request->all(), $id);
+        return $this->responseJson(200, new BaseResource(isset($department['data']) ? $department['data'] : []));
     }
+
     /**
      * @OA\Put(
-     *   path="/api/interview/{id}/confirm-calendar",
+     *   path="/api/interview/confirm-calendar/{id}",
      *   tags={"Interview"},
      *   summary="confirm calendar",
      *   operationId="confirm_calendar",
+     *   description="time:1[Timeline 1],2[Timeline 2],3[Timeline 3],4[Timeline 4],5[Timeline 5],6[Timeline Disagree]",
      *   @OA\Parameter(
      *     name="id",
      *     in="path",
@@ -372,18 +399,12 @@ class InterviewController extends Controller
      *       @OA\MediaType(
      *          mediaType="application/json",
      *          example={
-     *              "confirmed": "yes",
-     *              "confirmed_time": "1"
+     *            "time": "1",
      *          },
      *          @OA\Schema(
-     *            required={"confirmed"},
+     *            required={"time"},
      *            @OA\Property(
-     *              property="confirmed",
-     *              type="string",
-     *              enum={"yes", "no"},
-     *            ),
-     *            @OA\Property(
-     *              property="confirmed_time",
+     *              property="time",
      *              type="integer",
      *              enum={1, 2, 3, 4, 5, 6},
      *            ),
@@ -414,14 +435,18 @@ class InterviewController extends Controller
      */
     public function confirmedCalendar(InterviewRequest $request, $id)
     {
-        if (!$this->repository->isOwner([$id])) {
-            return $this->responseJsonError(CODE_NO_ACCESS, trans('messages.mes.permission'));
+
+        $result = $this->repository->confirmedCalendar($request->all(), $id);
+        if ($result['status'] == 'success') {
+            return $this->responseJson(200, null, trans('messages.mes.update_success'));
+        } else {
+            return $this->responseJsonError(HTTP_UNPROCESSABLE_ENTITY, $result['message'], $result['message']);
         }
-        return $this->repository->confirmedCalendar($request->all(), $id);
     }
+
     /**
      * @OA\Put(
-     *   path="/api/interview/{id}/setup-zoom",
+     *   path="/api/interview/setup-zoom/{id}",
      *   tags={"Interview"},
      *   summary="setup zoom",
      *   operationId="setup_zoom",
@@ -485,17 +510,22 @@ class InterviewController extends Controller
      */
     public function setupZoom(InterviewRequest $request, $id)
     {
-        if (!$this->repository->isOwner([$id])) {
-            return $this->responseJsonError(CODE_NO_ACCESS, trans('messages.mes.permission'));
+        $result = $this->repository->setupZoom($request->all(), $id);
+        if ($result['status'] == 'success') {
+            return $this->responseJson(200, null, trans('messages.mes.update_success'));
+        } else {
+            return $this->responseJsonError(HTTP_UNPROCESSABLE_ENTITY, $result['message'], $result['message']);
         }
-        return $this->repository->setupZoom($request->all(), $id);
+
     }
+
     /**
      * @OA\Put(
-     *   path="/api/interview/{id}/review",
+     *   path="/api/interview/confirm-interview-company-review/{id}",
      *   tags={"Interview"},
      *   summary="review",
      *   operationId="review",
+     *   description="status:1[PASS],2[NO PASS],3[OFFICIAL OFFER]   |  action : 1 [FIRST] , 2[SECOND] ,3 [THIRD] , 4 [FOURTH] , 5 [FINAL]",
      *   @OA\Parameter(
      *     name="id",
      *     in="path",
@@ -508,26 +538,26 @@ class InterviewController extends Controller
      *       @OA\MediaType(
      *          mediaType="application/json",
      *          example={
-     *              "reviewed": "yes",
-     *              "option": "1",
-     *              "goto": "1"
+     *              "status": "1",
+     *              "date_offer": "2023-09-01",
+     *              "action" : "2",
      *          },
      *          @OA\Schema(
-     *            required={"reviewed", "option"},
+     *            required={"status", "option"},
      *            @OA\Property(
      *              property="reviewed",
      *              type="string",
-     *              enum={"yes", "no"},
+     *              enum={"1", "2","3"},
      *            ),
      *            @OA\Property(
-     *              property="option",
-     *              type="integer",
-     *              enum={1, 2, 3},
+     *              property="date_offer",
+     *              type="date",
+     *              enum={},
      *            ),
-     *            @OA\Property(
-     *              property="goto",
+     *          @OA\Property(
+     *              property="action",
      *              type="integer",
-     *              enum={1, 2},
+     *              enum={1,2,3,4,5},
      *            ),
      *         )
      *      )
@@ -556,9 +586,6 @@ class InterviewController extends Controller
      */
     public function review(InterviewRequest $request, $id)
     {
-        if (!$this->repository->isOwner([$id])) {
-            return $this->responseJsonError(CODE_NO_ACCESS, trans('messages.mes.permission'));
-        }
         return $this->repository->review($request->all(), $id);
     }
 
@@ -632,11 +659,136 @@ class InterviewController extends Controller
     public function hide(InterviewRequest $request)
     {
         $ids = $request->ids;
-        if (!$this->repository->isOwner($ids)) {
-            return $this->responseJsonError(CODE_NO_ACCESS, trans('messages.mes.permission'));
+        $result = $this->repository->hide($ids);
+        if ($result) {
+            return $this->responseJson(200, null, trans('messages.mes.delete_success'));
+        } else {
+            return $this->responseJsonError(HTTP_UNPROCESSABLE_ENTITY, trans('messages.mes.delete_error'), 'messages.mes.delete_error');
         }
-        $this->repository->hide($ids);
+    }
 
-        return $this->responseJson(200, null, trans('messages.mes.delete_success'));
+    /**
+     * @OA\Put(
+     *   path="/api/interview/confirm-interview-hr-decline/{id}",
+     *   tags={"Interview"},
+     *   summary="hr decline",
+     *   operationId="hr_decline",
+     *   @OA\Parameter(
+     *     name="id",
+     *     in="path",
+     *     required=true,
+     *     @OA\Schema(
+     *      type="string",
+     *     ),
+     *   ),
+     *   @OA\RequestBody(
+     *       @OA\MediaType(
+     *          mediaType="application/json",
+     *          example={
+     *            "note": "i love you",
+     *          },
+     *          @OA\Schema(
+     *            required={"true"},
+     *            @OA\Property(
+     *              property="note",
+     *              type="string",
+     *            ),
+     *         )
+     *      )
+     *   ),
+     *   @OA\Response(
+     *     response=200,
+     *     description="Send request success",
+     *     @OA\MediaType(
+     *      mediaType="application/json",
+     *      example={"code":200,"data":{"id": 1,"name":  "............."}}
+     *     ),
+     *   ),
+     *   @OA\Response(
+     *     response=403,
+     *     description="Access Deny permission",
+     *     @OA\MediaType(
+     *      mediaType="application/json",
+     *      example={"code":403,"message":"Access Deny permission"}
+     *     ),
+     *   ),
+     *   security={{"auth": {}}},
+     * )
+     * Display a listing of the resource.
+     *
+     * @return JsonResponse
+     */
+
+    public function confirmedInterviewHrDecline(InterviewRequest $request, $id)
+    {
+        $note = $request->note;
+        $result = $this->repository->confirmedInterviewHrDecline($id, $note);
+        if ($result['status'] == 'success') {
+            return $this->responseJson(200, null, trans('api.interview.hr.comfim.cancel'));
+        } else {
+            return $this->responseJsonError(HTTP_UNPROCESSABLE_ENTITY, $result['message'], $result['message']);
+        }
+    }
+
+    /**
+     * @OA\Put(
+     *   path="/api/interview/confirm-interview-company-cancel/{id}",
+     *   tags={"Interview"},
+     *   summary="company cancel",
+     *   operationId="company_cancel",
+     *   @OA\Parameter(
+     *     name="id",
+     *     in="path",
+     *     required=true,
+     *     @OA\Schema(
+     *      type="string",
+     *     ),
+     *   ),
+     *   @OA\RequestBody(
+     *       @OA\MediaType(
+     *          mediaType="application/json",
+     *          example={
+     *            "note": "i love you",
+     *          },
+     *          @OA\Schema(
+     *            required={"true"},
+     *            @OA\Property(
+     *              property="note",
+     *              type="string",
+     *            ),
+     *         )
+     *      )
+     *   ),
+     *   @OA\Response(
+     *     response=200,
+     *     description="Send request success",
+     *     @OA\MediaType(
+     *      mediaType="application/json",
+     *      example={"code":200,"data":{"id": 1,"name":  "............."}}
+     *     ),
+     *   ),
+     *   @OA\Response(
+     *     response=403,
+     *     description="Access Deny permission",
+     *     @OA\MediaType(
+     *      mediaType="application/json",
+     *      example={"code":403,"message":"Access Deny permission"}
+     *     ),
+     *   ),
+     *   security={{"auth": {}}},
+     * )
+     * Display a listing of the resource.
+     *
+     * @return JsonResponse
+     */
+    public function confirmedInterviewCompanyCancel(InterviewRequest $request, $id)
+    {
+        $note = $request->note?$request->note:null;
+        $result = $this->repository->confirmedInterviewCompanyCancel($id, $note);
+        if ($result['status'] == 'success') {
+            return $this->responseJson(200, null, trans('api.interview.hr.comfim.cancel'));
+        } else {
+            return $this->responseJsonError(HTTP_UNPROCESSABLE_ENTITY, $result['message'], $result['message']);
+        }
     }
 }

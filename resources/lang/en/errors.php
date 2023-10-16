@@ -14,5 +14,7 @@ return [
     'user_not_found' => 'user not found',
     'lang_not_found' => 'language not found',
     'user_has_exist' => 'The account already exists in the system',
-    'id_not_found' => 'id not found'
+    'id_not_found' => 'id not found',
+    'hrs.error_file_import.format' => 'The format of the import file is incorrect.',
+    'hrs.error_file_import.extension' => 'The file format is incorrect.'
 ];

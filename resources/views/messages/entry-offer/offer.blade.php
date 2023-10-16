@@ -11,15 +11,15 @@
 
     <div class="distribute_msg-line" ></div>
     <div class="distribute-msg-frame__inputs-datas">
-        <h6 class="my-4">{{ $data['email'] }} &nbsp;&nbsp;様</h6>
+        <h6 class="my-4">{{ $data['permission'] }}様</h6>
         <div>人材にオファーが実行されました。</div>
         <div>
-            <a href="{{ url('offer/list') }}">こちら</a>よりエントリーの内容を確認し、承認または却下を行ってください。
+            マッチング管理よりオファーの内容を確認し、承認または却下を行ってください。
         </div>
     </div>
     <div class="distribute-msg-frame__inputs-datas px-5">
         <h5 class="mt-4 font-weight-medium">
-            オファー求人情報
+            求人情報
         </h5>
         <table role="table" aria-busy="false" aria-colcount="2" class="table b-table table-bordered">
             <thead role="rowgroup" class="">
@@ -34,14 +34,18 @@
             </thead>
             <tbody role="rowgroup">
             <tr role="row" class="">
-                <td aria-colindex="1" role="cell" class="">{{ @$data['job'] }}</td>
+                @if(in_array($data['type'],[HR,HR_MANAGER]))
+                    <td aria-colindex="1" role="cell" class=""><a href="{{ url('job-search/detail/'.@$data['job_id']) }}">{{ @$data['job'] }}</a></td>
+                @else
+                    <td aria-colindex="1" role="cell" class=""><a href="{{ url('job/detail/'.@$data['job_id']) }}">{{ @$data['job'] }}</a></td>
+                @endif
                 <td aria-colindex="2" role="cell" class="">{{ @$data['company'] }}</td>
             </tr>
             </tbody>
         </table>
     </div>
     <div class="distribute-msg-frame__inputs-datas px-5">
-        <h5 class="mt-4 font-weight-medium">オファー人材</h5>
+        <h5 class="mt-4 font-weight-medium">人材情報</h5>
         <table role="table" aria-busy="false" aria-colcount="1" class="table b-table table-bordered">
             <thead role="rowgroup" class="">
             <tr role="row" class="">
@@ -52,10 +56,9 @@
             </thead>
             <tbody role="rowgroup">
             <tr role="row" class="">
-                <td aria-colindex="1" role="cell" class="">{{ @$data['full_name'] }} {{ @$data['full_name_ja'] }}</td>
+                <td aria-colindex="1" role="cell" class=""><a href="{{ url('hr/detail/'.@$data['hrs_id']) }}">{{ @$data['full_name'] }} {{ @$data['full_name_ja'] }}</a></td>
             </tr>
             </tbody>
         </table>
     </div>
 </div>
-

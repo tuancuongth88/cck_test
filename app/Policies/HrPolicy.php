@@ -27,4 +27,16 @@ class HrPolicy
         }
         return false;
     }
+
+    public function show(User $user, HR $hr)
+    {
+        if ($user->type == \HR){
+            if ($user->id == $hr->user_id){
+                return true;
+            }
+            return false;
+        }
+        return true;
+    }
+
 }

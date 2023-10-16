@@ -7,14 +7,15 @@
         </h3>
         <div style="padding-left: 60px">
             <p>
-                {{ $data['email'] }}　様
+                {{ @$data['permission'] }}様
             </p>
             <p>
                 人材団体の新規アカウント申請がありました。<br>
-                <a href="{{ url('hr-organization/list') }}">こちら</a>より人材団体の審査を行ってください。
+                人材団体一覧より人材団体の審査を行ってください。
             </p>
         </div>
     </div>
 </div>
 </body>
 </html>
+

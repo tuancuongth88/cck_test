@@ -19,13 +19,15 @@ use App\Http\Resources\HRResource;
 use Carbon\Carbon;
 use Helper\Common;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class HRController extends Controller
 {
 
-     /**
+    /**
      * var Repository
      */
     protected $repository;
@@ -81,6 +83,13 @@ class HRController extends Controller
      *   ),
      *   @OA\Parameter(
      *     name="hr_org_id",
+     *     in="query",
+     *     @OA\Schema(
+     *      type="integer",
+     *     ),
+     *   ),
+     *  @OA\Parameter(
+     *     name="country_id",
      *     in="query",
      *     @OA\Schema(
      *      type="integer",
@@ -186,6 +195,22 @@ class HRController extends Controller
      *     ),
      *   ),
      *   @OA\Parameter(
+     *     name="display",
+     *     in="query",
+     *     description="home,entry",
+     *     @OA\Schema(
+     *      type="string",
+     *     ),
+     *   ),
+     *   @OA\Parameter(
+     *     name="work_id",
+     *     in="query",
+     *     description="id work entry",
+     *     @OA\Schema(
+     *      type="string",
+     *     ),
+     *   ),
+     *   @OA\Parameter(
      *     name="search",
      *     in="query",
      *     @OA\Schema(
@@ -240,7 +265,7 @@ class HRController extends Controller
         try {
             return $this->repository->create($request->all());
         } catch (\Exception $e) {
-             return $this->responseJsonEx($e);
+            return $this->responseJsonEx($e);
         }
     }
 
@@ -283,12 +308,15 @@ class HRController extends Controller
     public function show($id)
     {
         try {
-            $item = $this->repository->with(['entries', 'offers', 'interviews', 'results', 'fileCV', 'fileJob'])->find($id);
-            $item['is_favorite'] = UserFavorite::isFavorite($item->id, FAVORITE_TYPE_HRS);
-            $item->load('mainJobs');
+            $item = $this->repository->find($id);
+            if (!$item) {
+                return $this->responseJsonError(CODE_NO_ACCESS, trans('messages.data_does_not_exist'), null, null);
+            }
+            $this->authorize('show', $item);
             return $this->responseJson(CODE_SUCCESS, new BaseResource($item));
         } catch (\Exception $e) {
-             return $this->responseJsonEx($e);
+            Log::error($e);
+            return $this->responseJsonError($e->getCode(), $e->getMessage());
         }
     }
 
@@ -381,11 +409,20 @@ class HRController extends Controller
      */
     public function update(HRRequest $request, $id)
     {
-        $attributes = $request->except([]);
-        $item = $this->repository->find($id);
-        $this->authorize('update', $item);
-        $data = $this->repository->update($attributes, $id);
-        return $this->responseJson(200, new BaseResource($data));
+        try {
+            $attributes = $request->except([]);
+            $item = $this->repository->find($id);
+            $this->authorize('update', $item);
+            $data = $this->repository->update($attributes, $id);
+            if ($data['status'] != 'success') {
+                return $this->responseJsonError($data['code'], $data['message'], $data['message']);
+            }
+            return $this->responseJson($data['code'], $data['data'], $data['message']);
+        }catch (\Exception $exception){
+            Log::error($exception);
+            return $this->responseJsonError($exception->getCode(), $exception->getMessage());
+        }
+
     }
 
     /**
@@ -417,7 +454,7 @@ class HRController extends Controller
      *                   {
      *                       "name": "File 2",
      *                       "file_id": "2",
- *                            "file_path": "20230620/8bb8841e588d38a7d2052a7e8337ffddcck.pdf",
+     *                            "file_path": "20230620/8bb8841e588d38a7d2052a7e8337ffddcck.pdf",
      *                   },
      *               },
      *           },
@@ -452,11 +489,17 @@ class HRController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function updateFileHR(HRRequest $request, $id){
-        $item = $this->repository->find($id);
-        $this->authorize('updateFileHR', $item);
-        $data = $this->repository->updateFileHR($request->toArray(), $id);
-        return $this->responseJson(200, new BaseResource($data));
+    public function updateFileHR(HRRequest $request, $id)
+    {
+        try {
+            $item = $this->repository->find($id);
+            $this->authorize('updateFileHR', $item);
+            $data = $this->repository->updateFileHR($request->toArray(), $id);
+            return $this->responseJson(200, new BaseResource($data));
+        }catch (\Exception $exception){
+            Log::error($exception);
+            return $this->responseJsonError($exception->getCode(), $exception->getMessage());
+        }
     }
 
     /**
@@ -494,8 +537,8 @@ class HRController extends Controller
     }
 
     /**
-     * @OA\Post(
-     *   path="/api/hr/download",
+     * @OA\Get(
+     *   path="/api/hr/download/{user_id}",
      *   tags={"HR"},
      *   summary="Download File HR",
      *   operationId="hr_download_file",
@@ -506,6 +549,14 @@ class HRController extends Controller
      *      mediaType="application/json",
      *      example={"code":200,"data":{{"id": 1,"name": "..........."}}}
      *     )
+     *   ),
+     *    @OA\Parameter(
+     *      name="user_id",
+     *      in="path",
+     *      required=true,
+     *     @OA\Schema(
+     *      type="string",
+     *     ),
      *   ),
      *   @OA\Parameter(
      *     name="field",
@@ -654,7 +705,7 @@ class HRController extends Controller
      *     description="Login false",
      *     @OA\MediaType(
      *      mediaType="application/json",
-     *      example={"code":401,"message":"Username or password invalid"}
+     *        example={"code":403,"message":"Access Deny permission"}
      *     )
      *   ),
      *   security={{"auth": {}}},
@@ -663,9 +714,13 @@ class HRController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function download(HRRequest $request)
+    public function download(HRRequest $request, $userId)
     {
-        return $this->repository->list($request, true, true);
+        $result = $this->repository->downloadFile($request, $userId);
+        if($result == false) {
+            return $this->responseJsonError(Response::HTTP_FORBIDDEN, trans('messages.mes.permission'));
+        }
+        return $this->responseJson(Response::HTTP_OK, null, null);
     }
 
     /**
@@ -677,6 +732,7 @@ class HRController extends Controller
      *   @OA\Parameter(
      *     name="file_id",
      *     in="query",
+     *     required=true,
      *     @OA\Schema(
      *      type="integer",
      *     ),
@@ -710,7 +766,7 @@ class HRController extends Controller
             if ($data === false) {
                 return $this->responseJsonError(Response::HTTP_UNPROCESSABLE_ENTITY, trans('errors.something_error'));
             }
-            if(isset($data['error_file'])) {
+            if (isset($data['error_file'])) {
                 return $this->responseJsonError(Response::HTTP_UNPROCESSABLE_ENTITY, $data['error_file']);
             }
             return $this->responseJson(Response::HTTP_OK, $data);
@@ -728,6 +784,7 @@ class HRController extends Controller
      *   @OA\Parameter(
      *     name="file_id",
      *     in="query",
+     *     required=true,
      *     @OA\Schema(
      *      type="integer",
      *     ),
@@ -758,7 +815,7 @@ class HRController extends Controller
     {
         try {
             $result = $this->repository->importCSV($request);
-            if ($result){
+            if ($result) {
                 return $this->responseJson(Response::HTTP_OK, $result, trans('messages.mes.import_success'));
             }
             return $this->responseJsonError(Response::HTTP_UNPROCESSABLE_ENTITY, trans('errors.something_error'));
@@ -766,6 +823,7 @@ class HRController extends Controller
             return $this->responseJsonEx($e);
         }
     }
+
     /**
      * @OA\Post(
      *   path="/api/hr/hide",
@@ -801,11 +859,12 @@ class HRController extends Controller
      */
     public function hide(HRRequest $request)
     {
+
         $result = $this->repository->hide($request);
-        if ($result){
+        if ($result['status'] == 'success') {
             return $this->responseJson(200, null, trans('messages.mes.delete_success'));
-        }else{
-            return $this->responseJsonError(HTTP_UNPROCESSABLE_ENTITY, trans('messages.mes.delete_error'),'messages.mes.delete_error');
+        } else {
+            return $this->responseJsonError($result['code'], $result['message'], $result['message']);
         }
     }
 }

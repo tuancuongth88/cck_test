@@ -49,6 +49,16 @@ class RemindInterViewJob extends RemindJob
         $subject = $this->getSubject(self::TYPE_NOTIFY_REMIND_ACCOUNT);
         $content = $this->getContent($type);
         $getData = self::getData($type);
+        $typesText = [
+            5 => 'interview_date_confirm_offer',
+            6 => 'interview_date_confirm_entry',
+            7 => 'answer_interview_adjustment_availability',
+            8 => 'answer_interview_adjustment_availability',
+            9 => 'issue_interview_URL',
+            10 => 'judge_pass_fail_interview',
+            11 => 'determine_acceptance_of_official_offer',
+            12 => 'set_hire_date_for_official_offer',
+        ];
         $role = 0;
         if (in_array($type, [5, 6, 8, 10])){
             $role = COMPANY_MANAGER;
@@ -63,17 +73,26 @@ class RemindInterViewJob extends RemindJob
             $users = User::query()->whereIn(User::TYPE, [$role, SUPER_ADMIN])
                 ->orWhere('id', $user->id)->get();
             foreach ($users as $user) {
+                $data['permission'] = User::getPermissionName($user);
+                $data['type_noti'] = NOTI_TYPE_REMIND_INTERVIEW;
+                $data['type_interview'] = $typesText[$type];
+                $data['type'] = $user->type;
                 $data['entry_code'] = @$value->code;
                 $data['email'] = @$user->mail_address;
                 $data['job'] = @$value->work->title;
-                $data['company'] = $role == COMPANY_MANAGER ? @$value->work->company->company_name_jp : $value->hr->hrOrg->corporate_name_ja;
+                $data['company'] = @$value->work->company->company_name;
                 $data['full_name_ja'] = @$value->hr->full_name_ja;
+                $data['full_name'] = @$value->hr->full_name;
                 $data['date'] = Carbon::now()->format('Y/m/d');
-                $data['content'] = $content;
+//                $data['content'] = $content;
                 $data['status'] = $value->status;
                 $data['interview_or_group_interview'] = $value->type == INTERVIEW_TYPE_GROUP ? '集団面接' :'個別面接';
+                $data['interview_type'] = $value->type;
                 $data['interview_date'] = $value->interview_date;
-                $this->send($user, $data, $partView['web'], $subject, $partView['email']);
+                $data['job_id'] = @$value->work_id;
+                $data['company_id'] = @$value->work->company->id;
+                $data['hrs_id'] = @$value->hr_id;
+                $this->send($user, $data);
             }
         }
     }

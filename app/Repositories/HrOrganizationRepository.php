@@ -12,6 +12,8 @@ use App\Repositories\Contracts\HrOrganizationRepositoryInterface;
 use Helper\Common;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 
@@ -37,25 +39,21 @@ class HrOrganizationRepository extends BaseRepository implements HrOrganizationR
 
     public function create(array $attributes)
     {
-        if($attributes['is_create']) {
-            $attributes['status'] = EXAMINATION_PENDING;
-            $data = parent::create($attributes);
-            UploadFile::query()
-                ->where('id',$attributes['certificate_file_id'])
-                ->update(['file_model' => HrOrganization::class]);
-
-            $user = User::where('type', SUPER_ADMIN)
-                ->orwhere('type', HR_MANAGER)
-                ->get();
-
-            $notify = [
-                'type' => TYPE_NOTIFY['register_hr'],
-                'content' => trans('messages.notify_register_account_hr')
-            ];
-            RemindAccountJob::dispatch(HR, HR::class);
-            return $data;
+        try {
+            if($attributes['is_create']) {
+                $attributes['status'] = EXAMINATION_PENDING;
+                $data = parent::create($attributes);
+                UploadFile::query()
+                    ->where('id',$attributes['certificate_file_id'])
+                    ->update(['file_model' => HrOrganization::class]);
+                RemindAccountJob::dispatch(HR_MANAGER, HrOrganization::class, $data->id);
+                return $data;
+            }
+        }catch (\Exception $exception)
+        {
+            Log::error($exception);
+            return false;
         }
-        return;
     }
 
     public function getAll($request)
@@ -69,6 +67,18 @@ class HrOrganizationRepository extends BaseRepository implements HrOrganizationR
         $data = Common::pagination($request, $data);
 
         return $data;
+    }
+
+    public function getAllName()
+    {
+        if(Auth::user()->type == \HR) {
+            return $this->model->where('status', CONFIRM)
+                ->where(HrOrganization::USER_ID, Auth::id())
+                ->get();
+        }
+
+        return $this->model->where('status', CONFIRM)
+            ->get();
     }
 
     public function getDetail($id)

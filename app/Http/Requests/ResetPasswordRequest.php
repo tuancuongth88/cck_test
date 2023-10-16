@@ -31,13 +31,13 @@ class ResetPasswordRequest extends FormRequest
         switch (Route::getCurrentRoute()->getActionMethod()) {
             case 'forgetPassword':
                 return [
-                    "mail_address" => "email|required"
+                    "mail_address" => "email|required|exists:users,mail_address"
                 ];
             case 'resetPassword':
                 return [
                     "token" => ['required', new CheckTokenRule()],
                     "mail_address" => 'required|email|exists:users,mail_address',
-                    "new_password" => ['required', 'size:12', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]+$/',
+                    "new_password" => ['required', 'size:12', 'regex:/^(?=.*[A-Z])(?=.*\d).{12,}$/',
                         function ($attribute, $value, $fail) {
                             $user = User::query()->where(User::MAIL_ADDRESS, $this->input('mail_address'))->first();
                             if($user) {
@@ -59,7 +59,8 @@ class ResetPasswordRequest extends FormRequest
     public function messages()
     {
         return [
-            'new_password.*' => trans('validation.password-valid')
+            'new_password.*' => trans('validation.password-valid'),
+            'mail_address.exists' => trans('errors.email_not_exist')
         ];
     }
 }

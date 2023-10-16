@@ -14,11 +14,12 @@ use App\Repositories\Contracts\WorkRepositoryInterface;
 use App\Http\Resources\BaseResource;
 use App\Http\Resources\WorkResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class WorkController extends Controller
 {
 
-     /**
+    /**
      * var Repository
      */
     protected $repository;
@@ -72,10 +73,11 @@ class WorkController extends Controller
      *     ),
      *   ),
      *   @OA\Parameter(
-     *     name="city_id",
+     *     name="city_id[]",
      *     in="query",
      *     @OA\Schema(
-     *      type="integer",
+     *      type="array",
+     *      items={"type":"integer", "enum":{1, 2, 3, 4, 5, 6}}
      *     ),
      *   ),
      *   @OA\Parameter(
@@ -111,6 +113,22 @@ class WorkController extends Controller
      *     name="key_search",
      *     in="query",
      *     description="search: title, company_name",
+     *     @OA\Schema(
+     *      type="string",
+     *     ),
+     *   ),
+     *   @OA\Parameter(
+     *     name="display",
+     *     in="query",
+     *     description="home,offer,entry",
+     *     @OA\Schema(
+     *      type="string",
+     *     ),
+     *   ),
+     *   @OA\Parameter(
+     *     name="hrs_id",
+     *     in="query",
+     *     description="id hrs offer",
      *     @OA\Schema(
      *      type="string",
      *     ),
@@ -195,7 +213,7 @@ class WorkController extends Controller
             $data = $this->repository->create($request->all());
             return $this->responseJson(CODE_SUCCESS, new WorkResource($data));
         } catch (\Exception $e) {
-             return $this->responseJsonEx($e);
+            return $this->responseJsonEx($e);
         }
     }
 
@@ -238,10 +256,14 @@ class WorkController extends Controller
     public function show($id)
     {
         try {
-            $department = $this->repository->with(['languageRequirements', 'passion'])->find($id);
-            return $this->responseJson(CODE_SUCCESS, new BaseResource($department));
+            $this->authorize('show', Work::find($id));
+            $work = $this->repository->detail($id);
+            if ($work['status'] != 'success') {
+                   return $this->responseJsonError($work['code'],$work['message'],$work['message']);
+            }
+            return $this->responseJson(CODE_SUCCESS, new BaseResource($work));
         } catch (\Exception $e) {
-             return $this->responseJsonEx($e);
+            return $this->responseJsonError($e->getCode(), $e->getMessage());
         }
     }
 
@@ -360,7 +382,7 @@ class WorkController extends Controller
      *             @OA\Property(
      *              property="status",
      *              format="interge",
-     *              enum={"",1,2,3},
+     *              enum={1,2},
      *              description="choose status: 1: Recruiting, 2: Paused, 3: Out of Recruitment period",
      *             ),
      *           ),
@@ -383,8 +405,11 @@ class WorkController extends Controller
     {
         try {
             $work = $this->repository->updateStatusWork($request, $id);
-            return $this->responseJson(CODE_SUCCESS, new BaseResource($work), trans('messages.mes.update_success'));
-        }catch (\Exception $e){
+            if ($work){
+                return $this->responseJson(CODE_SUCCESS, new BaseResource($work), trans('messages.mes.update_success'));
+            }
+            return $this->responseJsonError(HTTP_UNPROCESSABLE_ENTITY, trans('api.work.update.status'));
+        } catch (\Exception $e) {
             return $this->responseJsonEx($e);
         }
     }

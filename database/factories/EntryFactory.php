@@ -38,6 +38,7 @@ class EntryFactory extends Factory
         $hr_id = HR::factory()->create()->id;
         HRMainJobCareer::factory()->create([HRMainJobCareer::HRS_ID =>$hr_id]);
         return [
+            Entry::ENTRY_CODE => rand(10000000, 99999999),
             Entry::HR_ID => $hr_id,
             Entry::WORK_ID => $work_id,
             Entry::REMARKS => $this->faker->text(30),

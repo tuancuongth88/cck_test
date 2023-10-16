@@ -16,7 +16,7 @@ export const ChangeNewPasswordPut = async(params) => {
 };
 
 // Reset Password
-// Bước 1: POST /api/auth/forget-password
+// Bước 1
 export const ResetPassSendEmailPost = async(params) => {
   return await axios.post('auth/forget-password', params);
 };

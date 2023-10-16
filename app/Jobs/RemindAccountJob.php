@@ -13,16 +13,18 @@ class RemindAccountJob extends RemindJob
 
     protected $type;
     protected $model;
+    protected $id;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($type, $model)
+    public function __construct($type, $model, $id = null)
     {
         $this->type = $type;
         $this->model = $model;
+        $this->id = $id;
     }
 
     /**
@@ -33,21 +35,34 @@ class RemindAccountJob extends RemindJob
     public function handle()
     {
         try {
-            $object = $this->model::query()
-                ->where('status', EXAMINATION_PENDING)
-                ->whereDate('updated_at', '<=', Carbon::now()->subDay(5))
-                ->get();
-            if (count($object)) {
+            $subject = '';
+            if ($this->id){
+                $object = $this->model::query()->find($this->id);
+                if ($this->type == COMPANY_MANAGER){
+                    $subject  = trans('messages.account_subject_examination_email_company');
+                }else{
+                    $subject = trans('messages.account_subject_examination_email_hro');
+                }
+            }else{
+                $object = $this->model::query()
+                    ->where('status', EXAMINATION_PENDING)
+                    ->whereDate('updated_at', '<=', Carbon::now()->subDay(5))
+                    ->first();
+                if ($this->type == COMPANY_MANAGER){
+                    $subject  = trans('messages.account_subject_not_update_status_email_company');
+                }else{
+                    $subject = trans('messages.account_subject_not_update_status_email_hro');
+                }
+            }
+            if ($object) {
                 $users = User::query()->whereIn('type', [SUPER_ADMIN, $this->type])->get();
                 foreach ($users as $user){
+                    $data['permission'] = User::getPermissionName($user);
+                    $data['type_noti'] = NOTI_TYPE_ACCOUNT;
+                    $data['type'] = $user->type;
                     $data['email'] = $user->mail_address;
                     $data['date'] = Carbon::now()->format('Y/m/d');
-                    $data['contentHTML'] = $this->getView($data, $this->getPartView());
-                    $data['subject'] = trans('messages.account_subject_examination_email',
-                        ['type' => $this->type == COMPANY ? trans('messages.account_type_company'):
-                            trans('messages.account_type_hr')]);
-                    $data['viewEmail'] = $this->type == COMPANY ? 'email.account-examination.company': 'email.account-examination.hr';
-                    $this->send($user, $data, $this->getPartView(), $data['subject'], $data['viewEmail']);
+                    $this->send($user, $data);
                 }
             }
         }catch (\Exception $exception){
@@ -56,10 +71,10 @@ class RemindAccountJob extends RemindJob
     }
 
     public function getPartView(){
-        if ($this->type == COMPANY){
-            return'messages.account-examination.company';
+        if ($this->type == COMPANY_MANAGER){
+            return trans('messages.account-examination.company');
         }else{
-            return'messages.account-examination.hr';
+            return trans('messages.account-examination.hr');
         }
     }
 }

@@ -52,7 +52,6 @@ class Entry extends Model
     public function files()
     {
         return $this->hasMany(UploadFile::class, UploadFile::FILE_ITEM_ID, 'id')
-            ->where('file_model', 'entry')
             ->whereNotNull('item_id');
     }
 

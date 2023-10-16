@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Country;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -21,5 +22,6 @@ class DatabaseSeeder extends Seeder
         $this->call(JobSeeder::class);
         $this->call(LanguageRequirementSeed::class);
         $this->call(PassionSeed::class);
+        $this->call(CountrySeed::class);
     }
 }

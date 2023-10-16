@@ -43,6 +43,9 @@ class NotificationOfferJob extends RemindJob
         $hrOrg = $this->offer->hr->hrOrg;
         try {
             switch ($this->status) {
+                case OFFER_STATUS_REQUESTING :
+                    $this->sendNotificationOfferStatusRequesting($company, $hrOrg, $this->offer, $this->status, $this->note);
+                    break;
                 case OFFER_STATUS_DECLINE :
                     $this->sendNotificationOfferStatusDecline($company, $hrOrg, $this->offer, $this->status, $this->note);
                     break;
@@ -59,60 +62,68 @@ class NotificationOfferJob extends RemindJob
     //send noti HR change status TYPE_NOTIFY_offer_DECLINE = 3
     private function sendNotificationOfferStatusDecline($company, $hrOrg, $offer, $status, $note)
     {
-        $partView = $this->partViewRemind(18);
-        $subject = $this->getSubject(self::TYPE_NOTIFY_REMIND_ACCOUNT);
-        $title = 'オファー承認可否が設定されました';
-        $role = 0;
-        $users = User::query()->whereHas('company', function ($q) use ($company) {
-            $q->where('id', $company->id);
+        $users = User::query()->where(function ($query) use ($company, $hrOrg) {
+            $query->whereIn('type', [SUPER_ADMIN, COMPANY_MANAGER, HR_MANAGER])
+                ->orWhereHas('company', function ($q) use ($company) {
+                    $q->where('id', $company->id);
+                })
+                ->orWhereHas('hrOrganization', function ($q) use ($hrOrg) {
+                    $q->where('id', $hrOrg->id);
+                });
         })->get();
         foreach ($users as $user) {
-            $data['title'] = $title;
-            $data['text'] = $note;
-            $data['company'] = $user->company->company_name_jp;
-            $data['content'] = self::getContent(17);
-            $data['offer_code'] = $offer->offer_code;
-            $data['job'] = $offer->work->title;
-            $data['full_name_ja'] = $offer->hr->full_name_ja;
-            $data['date'] = Carbon::now()->format('Y/m/d');
-            $data['nameTable1'] = 'オファー求人情報';
-            $data['nameTable2'] = 'オファー承認可否';
-            $data['status'] = OFFER_STATUS_TEXTS[$offer->status];
-            $this->send($user, $data, $partView['web'], $subject, '', self::TYPE_NOTIFY_OFFER_DECLINE);
+            $this->sendNotification($user, $company, $hrOrg, $offer, self::TYPE_NOTIFY_OFFER_DECLINE);
         }
     }
 
     //send noti HR change status TYPE_NOTIFY_offer_REJECTION = 4
     private function sendNotificationOfferStatusConfirm($company, $hrOrg, $offer, $status, $note)
     {
-        $partView = $this->partViewRemind(19);
-        $subject = $this->getSubject(self::TYPE_NOTIFY_REMIND_ACCOUNT);
-        $title = 'オファー承認可否が設定されました';
-        $role = 0;
-        $users = User::query()->whereHas('company', function ($q) use ($company) {
-            $q->where('id', $company->id);
+        $users = User::query()->where(function ($query) use ($company, $hrOrg) {
+            $query->whereIn('type', [SUPER_ADMIN, COMPANY_MANAGER, HR_MANAGER])
+                ->orWhereHas('company', function ($q) use ($company) {
+                    $q->where('id', $company->id);
+                })
+                ->orWhereHas('hrOrganization', function ($q) use ($hrOrg) {
+                    $q->where('id', $hrOrg->id);
+                });
         })->get();
         foreach ($users as $user) {
-            $data['title'] = $title;
-            $data['text'] = $note;
-            $data['company'] = $user->company->company_name_jp;;
-            $data['content'] = self::getContent(18 );
-            $data['offer_code'] = $offer->offer_code;
-            $data['job'] = $offer->work->title;
-            $data['full_name_ja'] = $offer->hr->full_name_ja;
-            $data['nameTable1'] = 'オファー求人情報';
-            $data['nameTable2'] = 'オファー承認可否';
-            $data['status'] = OFFER_STATUS_TEXTS[$offer->status];
-            $data['date'] = Carbon::now()->format('Y/m/d');
-            $this->send($user, $data, $partView['web'], $subject, '', self::TYPE_NOTIFY_OFFER_CONFIRM);
+            $this->sendNotification($user, $company, $hrOrg, $offer, self::TYPE_NOTIFY_OFFER_CONFIRM);
         }
     }
-    private function getListNameJa($data)
+
+    private function sendNotificationOfferStatusRequesting($company, $hrOrg, $offer, $status, $note)
     {
-        $listName = [];
-        foreach ($data as $value) {
-            $listName[] = $value->hr->full_name_ja;
+        $users = User::query()->where(function ($query) use ($company, $hrOrg) {
+            $query->whereIn('type', [SUPER_ADMIN, COMPANY_MANAGER, HR_MANAGER])
+                ->orWhereHas('company', function ($q) use ($company) {
+                    $q->where('id', $company->id);
+                })
+                ->orWhereHas('hrOrganization', function ($q) use ($hrOrg) {
+                    $q->where('id', $hrOrg->id);
+                });
+        })->get();
+        foreach ($users as $user) {
+            $this->sendNotification($user, $company, $hrOrg, $offer, self::TYPE_NOTIFY_OFFER_CONFIRM);
         }
-        return $listName;
+    }
+    private function sendNotification($user, $company, $offer, $typeNoti, $listNameJa = [])
+    {
+        $data['permission'] = User::getPermissionName($user);
+        $data['type'] = $user->type;
+        $data['type_noti'] = NOTI_TYPE_OFFER;
+        $data['company'] = $company->company_name;
+        $data['entry_code'] = null;
+        $data['job'] = $offer->work->title;
+        $data['full_name_ja'] = $offer->hr->full_name_ja;
+        $data['full_name'] = $offer->hr->full_name;
+        $data['date'] = Carbon::now()->format('Y/m/d');
+        $data['dataNameHr'] = $listNameJa;
+        $data['status'] = OFFER_STATUS_TEXTS[$offer->status];
+        $data['job_id'] = $offer->work_id;
+        $data['company_id'] = $company->id;
+        $data['hrs_id'] = $offer->hr_id;
+        $this->send($user, $data, null, null, null, $typeNoti);
     }
 }

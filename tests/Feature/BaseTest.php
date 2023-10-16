@@ -66,7 +66,7 @@ class BaseTest extends TestCase
         if ($type == COMPANY) {
             $this->company = Company::firstOrCreate(
                 [Company::USER_ID => $user_login->id],
-                Company::factory()->make()->toArray()
+                Company::factory()->make([Company::USER_ID => $user_login->id])->toArray()
             );
         }
 
@@ -74,14 +74,17 @@ class BaseTest extends TestCase
             $hrOrg = HrOrganization::firstOrCreate(
                 [HrOrganization::USER_ID => $user_login->id],
                 HrOrganization::factory()->make()->toArray())->id;
-
             $this->hr = HR::firstOrCreate(
                 [
                     HR::HR_ORGANIZATION_ID => $hrOrg,
                     HR::USER_ID => $user_login->id,
                     HR::CREATED_BY => $user_login->id
                 ],
-                HR::factory()->make()->toArray()
+                HR::factory()->make([
+                    HR::HR_ORGANIZATION_ID => $hrOrg,
+                    HR::USER_ID => $user_login->id,
+                    HR::CREATED_BY => $user_login->id
+                ])->toArray()
             );
         }
 

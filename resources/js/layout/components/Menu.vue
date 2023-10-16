@@ -8,7 +8,7 @@
     <template v-for="(itemRouter, indexRouter) in router">
       <template v-if="itemRouter.meta.role.includes(permissionCheck)">
         <!-- Sysadmin -->
-        <template v-if="permissionCheck == 1">
+        <template v-if="permissionCheck == ROLE.TYPE_SUPER_ADMIN">
           <!-- Check dropdown tab -->
           <li
             v-if="
@@ -17,10 +17,16 @@
             "
             :key="indexRouter"
           >
-            <a href="#" class="link-dropdown">
+            <a
+              href="#"
+              class="link-dropdown"
+              :class="[
+                itemRouter.name === 'CompanyManagement' ? 'dusk-company' : '',
+              ]"
+            >
               <span>{{ $t(itemRouter.meta.title) }}</span>
               <ul class="dropdown-list">
-                <li class="dropdown-item">
+                <li class="dropdown-item" @click="handleClickToNewTab">
                   <router-link
                     :to="
                       itemRouter.name === 'HrOrganization'
@@ -35,14 +41,19 @@
                     }}
                   </router-link>
                 </li>
-                <li class="dropdown-item">
+                <li class="dropdown-item" @click="handleClickToNewTab">
                   <router-link
                     :to="itemRouter.name === 'HrOrganization' ? '/hr' : '/job'"
+                    :class="[
+                      itemRouter.name === 'HrOrganization'
+                        ? 'dusk-hr'
+                        : 'dusk-job',
+                    ]"
                   >
                     {{
                       itemRouter.name === 'HrOrganization'
                         ? $t('ROUTER_HR_LIST')
-                        : '求人一覧(企業用)'
+                        : $t('ROUTER_JOB_OFFER_LIST_COMPANY')
                     }}
                   </router-link>
                 </li>
@@ -50,6 +61,7 @@
                 <li
                   v-if="itemRouter.name === 'CompanyManagement'"
                   class="dropdown-item"
+                  @click="handleClickToNewTab"
                 >
                   <router-link
                     :to="
@@ -58,7 +70,7 @@
                         : ''
                     "
                   >
-                    {{ '求人一覧(人材用)' }}
+                    {{ $t('ROUTER_JOB_OFFER_LIST_HR') }}
                   </router-link>
                 </li>
               </ul>
@@ -70,6 +82,7 @@
                 itemRouter.name === 'MatchingManagement'
             "
             :key="indexRouter"
+            @click="handleClickToNewTab"
           >
             <router-link :key="indexRouter" :to="itemRouter.path">
               {{ $t(itemRouter.meta.title) }}
@@ -78,19 +91,28 @@
         </template>
 
         <!-- Company manager -->
-        <template v-if="permissionCheck == 2">
+        <template v-if="permissionCheck == ROLE.TYPE_COMPANY_ADMIN">
           <!-- Check dropdown tab -->
           <li v-if="itemRouter.name === 'CompanyManagement'" :key="indexRouter">
             <a href="#" class="link-dropdown">
-              <span>{{ $t(itemRouter.meta.title) }}</span>
+              <span
+                :class="[
+                  itemRouter.name === 'CompanyManagement' ? 'dusk-company' : '',
+                ]"
+              >{{ $t(itemRouter.meta.title) }}
+              </span>
               <ul class="dropdown-list">
                 <li class="dropdown-item">
-                  <router-link :to="'/company'">
+                  <router-link :to="'/company'" @click="handleClickToNewTab">
                     {{ $t('TAB_COMPANY_LIST') }}
                   </router-link>
                 </li>
                 <li class="dropdown-item">
-                  <router-link :to="'/job'">
+                  <router-link
+                    :to="'/job'"
+                    class="dusk-job"
+                    @click="handleClickToNewTab"
+                  >
                     {{ $t('TAB_JOB_LIST') }}
                   </router-link>
                 </li>
@@ -103,12 +125,17 @@
                 itemRouter.name === 'MatchingManagement'
             "
             :key="indexRouter"
+            @click="handleClickToNewTab"
           >
             <router-link :key="indexRouter" :to="itemRouter.path">
               {{ $t(itemRouter.meta.title) }}
             </router-link>
           </li>
-          <li v-else-if="itemRouter.name === 'HrSearch'" :key="indexRouter">
+          <li
+            v-else-if="itemRouter.name === 'HrSearch'"
+            :key="indexRouter"
+            @click="handleClickToNewTab"
+          >
             <router-link :key="indexRouter" :to="itemRouter.path">
               {{ $t(itemRouter.meta.title) }}
             </router-link>
@@ -116,18 +143,18 @@
         </template>
 
         <!-- Hr manager -->
-        <template v-if="permissionCheck == 3">
+        <template v-if="permissionCheck == ROLE.TYPE_HR_MANAGER">
           <!-- Check dropdown tab -->
           <li v-if="itemRouter.name === 'HrOrganization'" :key="indexRouter">
             <a href="#" class="link-dropdown">
               <span>{{ $t(itemRouter.meta.title) }}</span>
               <ul class="dropdown-list">
-                <li class="dropdown-item">
+                <li class="dropdown-item" @click="handleClickToNewTab">
                   <router-link :to="'/hr-organization'">
                     {{ $t('ROUTER_HR_ORGANIZATION_LIST') }}
                   </router-link>
                 </li>
-                <li class="dropdown-item">
+                <li class="dropdown-item" @click="handleClickToNewTab">
                   <router-link :to="'/hr'">
                     {{ $t('ROUTER_HR_LIST') }}
                   </router-link>
@@ -141,12 +168,18 @@
                 itemRouter.name === 'MatchingManagement'
             "
             :key="indexRouter"
+            @click="handleClickToNewTab"
           >
             <router-link :key="indexRouter" :to="itemRouter.path">
               {{ $t(itemRouter.meta.title) }}
             </router-link>
           </li>
-          <li v-else-if="itemRouter.name === 'JobSearch'" :key="indexRouter">
+          <li
+            v-else-if="itemRouter.name === 'JobSearch'"
+            :key="indexRouter"
+            :class="[itemRouter.name === 'JobSearch' ? 'dusk-company' : '']"
+            @click="handleClickToNewTab"
+          >
             <router-link :key="indexRouter" :to="itemRouter.path">
               {{ $t(itemRouter.meta.title) }}
             </router-link>
@@ -154,18 +187,26 @@
         </template>
 
         <!-- Company -->
-        <template v-if="permissionCheck == 4">
-          <li :key="indexRouter">
-            <router-link :key="indexRouter" :to="itemRouter.path">
+        <template v-if="permissionCheck == ROLE.TYPE_COMPANY">
+          <li :key="indexRouter" @click="handleClickToNewTab">
+            <router-link
+              :key="indexRouter"
+              :to="itemRouter.path"
+              :class="[itemRouter.name === 'JobManagement' ? 'dusk-job' : '']"
+            >
               {{ $t(itemRouter.meta.title) }}
             </router-link>
           </li>
         </template>
 
         <!-- HR -->
-        <template v-if="permissionCheck == 5">
-          <li :key="indexRouter">
-            <router-link :key="indexRouter" :to="itemRouter.path">
+        <template v-if="permissionCheck == ROLE.TYPE_HR">
+          <li :key="indexRouter" @click="handleClickToNewTab">
+            <router-link
+              :key="indexRouter"
+              :to="itemRouter.path"
+              :class="[itemRouter.name === 'JobSearch' ? 'dusk-company' : '']"
+            >
               {{ $t(itemRouter.meta.title) }}
             </router-link>
           </li>
@@ -176,8 +217,14 @@
 </template>
 
 <script>
+import ROLE from '@/const/role.js';
 export default {
   name: 'Menu',
+  data() {
+    return {
+      ROLE: ROLE,
+    };
+  },
   computed: {
     router() {
       return this.$store.getters.permissionRoutes.filter(
@@ -202,6 +249,14 @@ export default {
     //     (item) => item.hidden !== true
     //   );
     // },
+  },
+
+  methods: {
+    async handleClickToNewTab() {
+      await this.$store.dispatch('hrSearchQuery/setSearchParams', null);
+      await this.$store.dispatch('jobSearch/setJobSearchData', null);
+      this.$store.dispatch('app/setRedirectToModalSelectJobsToOffer', false);
+    },
   },
 };
 </script>

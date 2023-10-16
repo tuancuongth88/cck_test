@@ -22,20 +22,17 @@ use App\Repositories\Contracts\ResultRepositoryInterface;
 use App\Repositories\Contracts\OfferRepositoryInterface;
 use App\Repositories\Contracts\InterviewRepositoryInterface;
 use App\Repositories\Contracts\InterviewInfoRepositoryInterface;
+use App\Repositories\Contracts\PlanRepositoryInterface;
 use App\Repositories\UserRepository;
 use Illuminate\Support\ServiceProvider;
 use Repository\BaseRepository;
 use Repository\AuthRepository;
 use Repository\CityRepository;
 use Repository\CompanyRepository;
-use Repository\EtcMasterRepository;
-use Repository\DegitachoMasterRepository;
 use Repository\HrOrganizationRepository;
 use Repository\JobTypeRepository;
 use Repository\NotificationRepository;
 use Repository\UploadFileRepository;
-use Repository\VehicleMasterRepository;
-use Repository\MasterManagementRepository;
 use Repository\JobInfoRepository;
 use Repository\UserFavoriteRepository;
 use Repository\WorkRepository;
@@ -45,6 +42,7 @@ use Repository\ResultRepository;
 use Repository\OfferRepository;
 use Repository\InterviewRepository;
 use Repository\InterviewInfoRepository;
+use Repository\PlanRepository;
 
 use Laravel\Dusk\DuskServiceProvider;
 
@@ -75,6 +73,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(InterviewRepositoryInterface::class, InterviewRepository::class);
         $this->app->bind(InterviewInfoRepositoryInterface::class, InterviewInfoRepository::class);
         $this->app->bind(NotificationRepositoryInterface::class, NotificationRepository::class);
+//        $this->app->bind(CountryRepositoryInterface::class, CountryRepository::class);
+//        $this->app->bind(PlanRepositoryInterface::class, PlanRepository::class);
 
         //Customer
         if ($this->app->environment('local', 'testing')) {

@@ -34,7 +34,7 @@ class ChangePasswordRequest extends FormRequest
                 ];
             case 'changePassword':
                 return [
-                    "new_password" => ['required', 'size:12', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]+$/',
+                    "new_password" => ['required', 'size:12', 'regex:/^(?=.*[A-Z])(?=.*\d).{12,}$/',
                         function ($attribute, $value, $fail) {
                             $oldPass = Auth::user()->password;
                             if(Hash::check($value, $oldPass)) {

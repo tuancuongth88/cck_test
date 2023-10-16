@@ -1,0 +1,519 @@
+<?php
+
+namespace App\Jobs;
+
+use App\Models\Interview;
+use App\Models\Result;
+use App\Models\User;
+use Carbon\Carbon;
+use Helper\Common;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Log;
+use function Clue\StreamFilter\fun;
+
+class NotificationInterviewJob extends RemindJob
+{
+
+    protected $interview;
+    protected $statusAdjustment;
+    protected $statusSelection;
+    protected $dataNameHr;
+
+    /**
+     * Create a new job instance.
+     *
+     * @return void
+     */
+    public function __construct($interview, $statusAdjustment = null, $statusSelection = null, $dataNameHr = null)
+    {
+        $this->interview = $interview;
+        $this->statusSelection = $statusSelection;
+        $this->statusAdjustment = $statusAdjustment;
+        $this->dataNameHr = $dataNameHr;
+    }
+
+    /**
+     *
+     */
+    public function handle()
+    {
+        $company = $this->interview->work->company;
+        $hrOrg = $this->interview->hr->hrOrg;
+        $interview = $this->interview->refresh();
+        //send noti cho từng trạng thái trong interview
+        try {
+            if ($this->statusAdjustment) {
+                switch ($this->statusAdjustment) {
+                    case INTERVIEW_STATUS_INTERVIEW_ADJUSTMENT_BEFORE_ADJUSTMENT;
+                        break;
+//                        return $this->sendNotificationInterviewAdjustmentBeforeadJustment($company, $hrOrg, $this->interview, $this->statusAdjustment);
+                    case INTERVIEW_STATUS_INTERVIEW_ADJUSTMENT_ADJUSTING :
+                        return $this->sendNotificationInterviewAdjustmentAdjusting($company, $hrOrg, $this->interview, $this->statusAdjustment, null, $this->dataNameHr);
+                    case INTERVIEW_STATUS_INTERVIEW_ADJUSTMENT_URL_SETTING :
+                        return $this->sendNotificationInterviewAdjustmentUrlSetting($company, $hrOrg, $this->interview, $this->statusAdjustment);
+                    case INTERVIEW_STATUS_INTERVIEW_ADJUSTMENT_ADJUSTED :
+                        return $this->sendNotificationInterviewAdjustmentAdjusted($company, $hrOrg, $this->interview, $this->statusAdjustment);
+                    case 'hr_reject' :
+                        return $this->sendNotificationInterviewHrReject($company, $hrOrg, $this->interview, $this->statusAdjustment);
+                }
+            }
+            if ($this->statusSelection) {
+                switch ($this->statusSelection) {
+                    case INTERVIEW_STATUS_SELECTION_DOC_PASS;
+                        break;
+                    case INTERVIEW_STATUS_SELECTION_OFFER_CONFIRM;
+                        break;
+                    case INTERVIEW_STATUS_SELECTION_FIRST_PASS :
+                        return $this->sendNotificationInterviewPass($company, $hrOrg, $this->interview, $this->statusAdjustment);
+                    case INTERVIEW_STATUS_SELECTION_SECOND_PASS :
+                        return $this->sendNotificationInterviewPass($company, $hrOrg, $this->interview, $this->statusAdjustment);
+                    case INTERVIEW_STATUS_SELECTION_THIRD_PASS :
+                        return $this->sendNotificationInterviewPass($company, $hrOrg, $this->interview, $this->statusAdjustment);
+                    case INTERVIEW_STATUS_SELECTION_FOURTH_PASS :
+                        return $this->sendNotificationInterviewPass($company, $hrOrg, $this->interview, $this->statusAdjustment);
+                    case INTERVIEW_STATUS_SELECTION_FIFTH_PASS;
+                        break;
+                    case INTERVIEW_STATUS_SELECTION_INTERVIEW_CANCEL :
+                        return $this->sendNotificationInterviewCancel($company, $hrOrg, $this->interview, $this->statusAdjustment);
+                    case INTERVIEW_STATUS_SELECTION_INTERVIEW_DECLINE :
+                        return $this->sendNotificationInterviewDecline($company, $hrOrg, $this->interview, $this->statusAdjustment);
+                    case 'offer' :
+                        return $this->sendNotificationInterviewOffer($company, $hrOrg, $this->interview, $this->statusAdjustment);
+                    case 'no_pass' :
+                        return $this->sendNotificationInterviewNoPass($company, $hrOrg, $this->interview, $this->statusAdjustment);
+                }
+            }
+        } catch (\Exception $exception) {
+            Log::error($exception);
+        }
+    }
+
+    // Noti khi xếp xong lịch
+    private function sendNotificationInterviewAdjustmentAdjusting($company, $hrOrg, $interview, $status, $note = null, $dataNameHr = null)
+    {
+        $partView = $this->partViewRemind(20);
+        $subject = '面接候補日が設定されました';
+        $title = '面接候補日が設定されました';
+        $role = 0;
+//        $listNameJa = $this->getListNameJa('f');
+        $users = User::query()->where(function ($query) use ($hrOrg, $company) {
+            $query->whereIn('type', [SUPER_ADMIN, COMPANY_MANAGER, HR_MANAGER])
+                ->orWhereHas('hrOrganization', function ($q) use ($hrOrg) {
+                    $q->where('id', $hrOrg->id);
+                })
+                ->orWhereHas('company', function ($q) use ($company) {
+                    $q->where('id', $company->id);
+                });
+        })->get();
+        foreach ($users as $user) {
+            $data['permission'] = User::getPermissionName($user);
+            $data['type'] = $user->type;
+            $data['title'] = $title;
+            $data['text'] = $note;
+            $data['company'] = $company->company_name;
+            $data['content'] = self::getContent(20);
+            $data['entry_code'] = $interview->code ? $interview->code : '';
+            $data['job'] = $interview->work->title;
+            $data['full_name_ja'] = $interview->hr->full_name_ja;
+            $data['full_name'] = $interview->hr->full_name;
+            $data['date'] = Carbon::now()->format('Y/m/d');
+            $data['dataNameHr'] = $dataNameHr;
+//            $data['nameTable1'] = 'オファー求人情報';
+//            $data['nameTable2'] = 'オファー承認可否';
+//            $data['data'] = $listNameJa;
+            $data['status'] = STATUS_ADJUSTINGS[$interview->status_interview_adjustment];
+            $data['job_id'] = $interview->work_id;
+            $data['company_id'] = $company->id;
+            $data['hrs_id'] = $interview->hr_id;
+            $this->send($user, $data, $partView['web'], $subject, '', self::TYPE_NOTIFY_INTERVIEW_ADJUSTMENT_ADJUSTING);
+        }
+    }
+
+    // gửi noti cho HR_manage and admin để nhờ tạo lịch  , Đồng thời bắn noti cho company xác đã chọn lịch
+    private function sendNotificationInterviewAdjustmentUrlSetting($company, $hrOrg, $interview, $status, $note = null)
+    {
+        $this->sendNotificationInterviewAdjustmentUrlSettingForManager($company, $hrOrg, $interview, $status, $note = null);
+        $this->sendNotificationInterviewAdjustmentUrlSettingForCompany($company, $hrOrg, $interview, $status, $note = null);
+
+    }
+
+    // gui noti nho hr_manage tao lich
+    private function sendNotificationInterviewAdjustmentUrlSettingForManager($company, $hrOrg, $interview, $status, $note = null)
+    {
+        $partView = $this->partViewRemind(23);
+        $subject = 'Zoom URL発行依頼のお知らせ';
+        $title = 'Zoom URL発行依頼のお知らせ';
+        $role = 0;
+        $convertDateInterview = $this->getDataDateInterview($interview);
+        $users = User::query()->whereIn('type', [SUPER_ADMIN, HR_MANAGER])->get();
+        foreach ($users as $user) {
+            $data['permission'] = User::getPermissionName($user);
+            $data['type'] = $user->type;
+            $data['title'] = $title;
+            $data['text'] = $note;
+            $data['company'] = $company->company_name;
+            $data['content'] = self::getContent(23);
+            $data['entry_code'] = $interview->code ? $interview->code : '';
+            $data['job'] = $interview->work->title;
+            $data['full_name_ja'] = $interview->hr->full_name_ja;
+            $data['full_name'] = $interview->hr->full_name;
+            $data['date'] = Carbon::now()->format('Y/m/d');
+//            $data['nameTable1'] = 'オファー求人情報';
+//            $data['nameTable2'] = 'オファー承認可否';
+            $data['status'] = $convertDateInterview ? $convertDateInterview : STATUS_SELECTIONS[$interview->status_selection];
+            $data['interview_date'] = $convertDateInterview ? $convertDateInterview : STATUS_SELECTIONS[$interview->status_selection];
+            $data['job_id'] = $interview->work_id;
+            $data['company_id'] = $company->id;
+            $data['hrs_id'] = $interview->hr_id;
+            $this->send($user, $data, $partView['web'], $subject, '', self::TYPE_NOTIFY_INTERVIEW_URL_SETTING_MANAGER);
+        }
+    }
+
+    // gui thong bao cho company
+    private function sendNotificationInterviewAdjustmentUrlSettingForCompany($company, $hrOrg, $interview, $status, $note = null)
+    {
+        $partView = $this->partViewRemind(25);
+        $subject = '面接日が決定しました';
+        $title = '面接日が決定しました';
+        $role = 0;
+        $convertDateInterview = $this->getDataDateInterview($interview);
+        $users = User::query()->where(function ($query) use ($company, $hrOrg) {
+            $query->whereIn('type', [SUPER_ADMIN, COMPANY_MANAGER, HR_MANAGER])
+                ->orWhereHas('company', function ($q) use ($company) {
+                    $q->where('id', $company->id);
+                })
+                ->orWhereHas('hrOrganization', function ($q) use ($hrOrg) {
+                    $q->where('id', $hrOrg->id);
+                });
+        })->get();
+        foreach ($users as $user) {
+            $data['permission'] = User::getPermissionName($user);
+            $data['type'] = $user->type;
+            $data['title'] = $title;
+            $data['text'] = $note;
+            $data['company'] = $company->company_name;
+            $data['content'] = self::getContent(25);
+            $data['entry_code'] = $interview->code ? $interview->code : '';
+            $data['job'] = $interview->work->title;
+            $data['full_name_ja'] = $interview->hr->full_name_ja;
+            $data['full_name'] = $interview->hr->full_name;
+            $data['date'] = Carbon::now()->format('Y/m/d');
+//            $data['nameTable1'] = 'オファー求人情報';
+//            $data['nameTable2'] = 'オファー承認可否';
+            $data['status'] = $convertDateInterview ? $convertDateInterview : STATUS_SELECTIONS[$interview->status_selection];
+            $data['interview_date'] = $convertDateInterview ? $convertDateInterview : STATUS_SELECTIONS[$interview->status_selection];
+            $data['job_id'] = $interview->work_id;
+            $data['company_id'] = $company->id;
+            $data['hrs_id'] = $interview->hr_id;
+            $this->send($user, $data, $partView['web'], $subject, '', self::TYPE_NOTIFY_INTERVIEW_URL_SETTING_COMPANY);
+        }
+
+    }
+
+    // Company cancel interview
+    private function sendNotificationInterviewCancel($company, $hrOrg, $interview, $status, $note = null)
+    {
+        $partView = $this->partViewRemind(30);
+        $subject = '面接中止が設定されました';
+        $title = '面接中止が設定されました';
+        $role = 0;
+        $convertDateInterview = $this->getDataDateInterview($interview, true);
+        $users = User::query()->where(function ($query) use ($hrOrg, $company) {
+            $query->whereIn('type', [SUPER_ADMIN, COMPANY_MANAGER, HR_MANAGER])
+                ->orWhereHas('hrOrganization', function ($q) use ($hrOrg) {
+                    $q->where('id', $hrOrg->id);
+                })
+                ->orWhereHas('company', function ($q) use ($company) {
+                    $q->where('id', $company->id);
+                });
+        })->get();
+        foreach ($users as $user) {
+            $data['permission'] = User::getPermissionName($user);
+            $data['type'] = $user->type;
+            $data['title'] = $title;
+            $data['text'] = $note;
+            $data['company'] = $company->company_name;
+            $data['content'] = self::getContent(30);
+            $data['entry_code'] = $interview->code ? $interview->code : '';
+            $data['job'] = $interview->work->title;
+            $data['full_name_ja'] = $interview->hr->full_name_ja;
+            $data['full_name'] = $interview->hr->full_name;
+            $data['date'] = Carbon::now()->format('Y/m/d');
+//            $data['nameTable1'] = 'オファー求人情報';
+//            $data['nameTable2'] = 'オファー承認可否';
+            $data['status'] = $convertDateInterview ? $convertDateInterview : STATUS_SELECTIONS[$interview->status_selection];
+            $data['interview_date'] = $convertDateInterview ?: '-';
+            $data['job_id'] = $interview->work_id;
+            $data['company_id'] = $company->id;
+            $data['hrs_id'] = $interview->hr_id;
+            $this->send($user, $data, $partView['web'], $subject, '', self::TYPE_NOTIFY_INTERVIEW_CANCEL);
+        }
+    }
+
+    // Company cancel
+    private function sendNotificationInterviewDecline($company, $hrOrg, $interview, $status, $note = null)
+    {
+        $partView = $this->partViewRemind(22);
+        $subject = '面接辞退が設定されました';
+        $title = '面接辞退が設定されました';
+        $role = 0;
+        $convertDateInterview = $this->getDataDateInterview($interview, true);
+        $users = User::query()->where(function ($query) use ($company, $hrOrg) {
+            $query->whereIn('type', [SUPER_ADMIN, COMPANY_MANAGER, HR_MANAGER])
+                ->orWhereHas('company', function ($q) use ($company) {
+                    $q->where('id', $company->id);
+                })
+                ->orWhereHas('hrOrganization', function ($q) use ($hrOrg) {
+                    $q->where('id', $hrOrg->id);
+                });
+        })->get();
+        foreach ($users as $user) {
+            $data['permission'] = User::getPermissionName($user);
+            $data['type'] = $user->type;
+            $data['title'] = $title;
+            $data['text'] = $note;
+            $data['company'] = $company->company_name;
+            $data['content'] = self::getContent(22);
+            $data['entry_code'] = $interview->code ? $interview->code : '';
+            $data['job'] = $interview->work->title;
+            $data['full_name_ja'] = $interview->hr->full_name_ja;
+            $data['full_name'] = $interview->hr->full_name;
+            $data['date'] = Carbon::now()->format('Y/m/d');
+
+            $data['status'] = $convertDateInterview ?: STATUS_SELECTIONS[$interview->status_selection];
+            $data['interview_date'] = $convertDateInterview ?: '-';
+            $data['job_id'] = $interview->work_id;
+            $data['company_id'] = $company->id;
+            $data['hrs_id'] = $interview->hr_id;
+            $this->send($user, $data, $partView['web'], $subject, '', self::TYPE_NOTIFY_INTERVIEW_DECLINE);
+        }
+    }
+
+    private function sendNotificationInterviewAdjustmentAdjusted($company, $hrOrg, $interview, $status, $note = null)
+    {
+        $partView = $this->partViewRemind(24);
+        $subject = 'Zoom URLの発行が完了しました';
+        $title = 'Zoom URLの発行が完了しました';
+        $role = 0;
+        $convertDateInterview = $this->getDataDateInterview($interview);
+        $users = User::query()->where(function ($query) use ($company, $hrOrg) {
+            $query->whereIn('type', [SUPER_ADMIN, COMPANY_MANAGER, HR_MANAGER])
+                ->orWhereHas('company', function ($q) use ($company) {
+                    $q->where('id', $company->id);
+                })
+                ->orWhereHas('hrOrganization', function ($q) use ($hrOrg) {
+                    $q->where('id', $hrOrg->id);
+                });
+        })->get();
+        foreach ($users as $user) {
+            $data['permission'] = User::getPermissionName($user);
+            $data['type'] = $user->type;
+            $data['title'] = $title;
+            $data['text'] = $note;
+            $data['company'] = $company->company_name;
+            $data['content'] = self::getContent(24);
+            $data['entry_code'] = $interview->code ? $interview->code : '';
+            $data['job'] = $interview->work->title;
+            $data['full_name_ja'] = $interview->hr->full_name_ja;
+            $data['full_name'] = $interview->hr->full_name;
+            $data['date'] = Carbon::now()->format('Y/m/d');
+//            $data['nameTable1'] = 'オファー求人情報';
+//            $data['nameTable2'] = 'オファー承認可否';
+            $data['status'] = $convertDateInterview ? $convertDateInterview : STATUS_SELECTIONS[$interview->status_selection];
+            $data['interview_date'] = $convertDateInterview ? $convertDateInterview : STATUS_SELECTIONS[$interview->status_selection];
+            $data['job_id'] = $interview->work_id;
+            $data['company_id'] = $company->id;
+            $data['hrs_id'] = $interview->hr_id;
+            $this->send($user, $data, $partView['web'], $subject, '', self::TYPE_NOTIFY_INTERVIEW_ADJUSTMENT_ADJUSTED);
+        }
+    }
+
+    // pass các vòng
+    private function sendNotificationInterviewPass($company, $hrOrg, $interview, $status, $note = null)
+    {
+        $partView = $this->partViewRemind(26);
+        $subject = '面接結果が設定されました';
+        $title = '面接結果が設定されました';
+        $role = 0;
+        $convertDateInterview = $this->getDataDateInterview($interview);
+        $users = User::query()->where(function ($query) use ($company, $hrOrg) {
+            $query->whereIn('type', [SUPER_ADMIN, COMPANY_MANAGER, HR_MANAGER])
+                ->orWhereHas('hrOrganization', function ($q) use ($hrOrg) {
+                    $q->where('id', $hrOrg->id);
+                })
+                ->orWhereHas('company', function ($q) use ($company) {
+                    $q->where('id', $company->id);
+                });
+        })->get();
+        foreach ($users as $user) {
+            $data['permission'] = User::getPermissionName($user);
+            $data['type'] = $user->type;
+            $data['title'] = $title;
+            $data['text'] = $note;
+            $data['company'] = $company->company_name;
+            $data['content'] = self::getContent(26);
+            $data['entry_code'] = $interview->code ? $interview->code : '';
+            $data['job'] = $interview->work->title;
+            $data['full_name_ja'] = $interview->hr->full_name_ja;
+            $data['full_name'] = $interview->hr->full_name;
+            $data['date'] = Carbon::now()->format('Y/m/d');
+//            $data['nameTable1'] = 'オファー求人情報';
+//            $data['nameTable2'] = 'オファー承認可否';
+            $data['status'] = STATUS_SELECTIONS[$interview->status_selection];
+            $data['interview_date'] = $convertDateInterview ? $convertDateInterview : STATUS_SELECTIONS[$interview->status_selection];
+            $data['job_id'] = $interview->work_id;
+            $data['company_id'] = $company->id;
+            $data['hrs_id'] = $interview->hr_id;
+            $this->send($user, $data, $partView['web'], $subject, '', self::TYPE_NOTIFY_INTERVIEW_PASS);
+        }
+    }
+
+    // offer
+    private function sendNotificationInterviewOffer($company, $hrOrg, $interview, $status, $note = null)
+    {
+        $partView = $this->partViewRemind(27);
+        $subject = '面接結果が設定されました';
+        $title = '面接結果が設定されました';
+        $role = 0;
+        $convertDateInterview = $this->getDataDateInterview($interview);
+        $users = User::query()->where(function ($query) use ($company, $hrOrg) {
+            $query->whereIn('type', [SUPER_ADMIN, COMPANY_MANAGER, HR_MANAGER])
+                ->orWhereHas('hrOrganization', function ($q) use ($hrOrg) {
+                    $q->where('id', $hrOrg->id);
+                })
+                ->orWhereHas('company', function ($q) use ($company) {
+                    $q->where('id', $company->id);
+                });
+        })->get();
+        foreach ($users as $user) {
+            $data['permission'] = User::getPermissionName($user);
+            $data['type'] = $user->type;
+            $data['title'] = $title;
+            $data['text'] = $note;
+            $data['company'] = $company->company_name;
+            $data['content'] = self::getContent(27);
+            $data['entry_code'] = $interview->code ? $interview->code : '';
+            $data['job'] = $interview->work->title;
+            $data['full_name_ja'] = $interview->hr->full_name_ja;
+            $data['full_name'] = $interview->hr->full_name;
+            $data['date'] = Carbon::now()->format('Y/m/d');
+//            $data['nameTable1'] = 'オファー求人情報';
+//            $data['nameTable2'] = 'オファー承認可否';
+            $data['status'] = INTERVIEW_INFO_STATUS_TEXT_JA[INTERVIEW_INFO_STATUS_COMPANY_OFFER];
+            $data['interview_date'] = $convertDateInterview ? $convertDateInterview : STATUS_SELECTIONS[$interview->status_selection];
+            $data['job_id'] = $interview->work_id;
+            $data['company_id'] = $company->id;
+            $data['hrs_id'] = $interview->hr_id;
+            $this->send($user, $data, $partView['web'], $subject, '', self::TYPE_NOTIFY_INTERVIEW_OFFER);
+        }
+    }
+
+    // no pass
+    private function sendNotificationInterviewNoPass($company, $hrOrg, $interview, $status, $note = null)
+    {
+        $partView = $this->partViewRemind(28);
+        $subject = '面接結果が設定されました';
+        $title = '面接結果が設定されました';
+        $role = 0;
+        $convertDateInterview = $this->getDataDateInterview($interview);
+        $users = User::query()->where(function ($query) use ($company, $hrOrg) {
+            $query->whereIn('type', [SUPER_ADMIN, COMPANY_MANAGER, HR_MANAGER])
+                ->orWhereHas('hrOrganization', function ($q) use ($hrOrg) {
+                    $q->where('id', $hrOrg->id);
+                })->orWhereHas('company', function ($q) use ($company) {
+                    $q->where('id', $company->id);
+                });
+        })->get();
+        foreach ($users as $user) {
+            $data['permission'] = User::getPermissionName($user);
+            $data['type'] = $user->type;
+            $data['title'] = $title;
+            $data['text'] = $note;
+            $data['company'] = $company->company_name;
+            $data['content'] = self::getContent(28);
+            $data['entry_code'] = $interview->code ? $interview->code : '';
+            $data['job'] = $interview->work->title;
+            $data['full_name_ja'] = $interview->hr->full_name_ja;
+            $data['full_name'] = $interview->hr->full_name;
+            $data['date'] = Carbon::now()->format('Y/m/d');
+//            $data['nameTable1'] = 'オファー求人情報';
+//            $data['nameTable2'] = 'オファー承認可否';
+            $data['status'] = INTERVIEW_INFO_STATUS_TEXT_JA[INTERVIEW_INFO_STATUS_COMPANY_NO_PASS];;
+            $data['interview_date'] = $convertDateInterview ? $convertDateInterview : STATUS_SELECTIONS[$interview->status_selection];
+            $data['job_id'] = $interview->work_id;
+            $data['company_id'] = $company->id;
+            $data['hrs_id'] = $interview->hr_id;
+            $this->send($user, $data, $partView['web'], $subject, '', self::TYPE_NOTIFY_INTERVIEW_NO_PASS);
+        }
+    }
+
+    // no pass
+    private function sendNotificationInterviewHrReject($company, $hrOrg, $interview, $status, $note = null)
+    {
+        $partView = $this->partViewRemind(28);
+        $subject = '面接日再調整依頼が実行されました';
+        $title = '面接日再調整依頼が実行されました';
+        $role = 0;
+        $convertDateInterview = $this->getDataDateInterview($interview);
+        $users = User::query()->where(function ($query) use ($company, $hrOrg) {
+            $query->whereIn('type', [SUPER_ADMIN, COMPANY_MANAGER, HR_MANAGER])
+                ->orWhereHas('company', function ($q) use ($company) {
+                    $q->where('id', $company->id);
+                })
+                ->orWhereHas('hrOrganization', function ($q) use ($hrOrg) {
+                    $q->where('id', $hrOrg->id);
+                });
+        })->get();
+        foreach ($users as $user) {
+            $data['permission'] = User::getPermissionName($user);
+            $data['type'] = $user->type;
+            $data['title'] = $title;
+            $data['text'] = $note;
+            $data['company'] = $company->company_name;
+            $data['content'] = self::getContent(28);
+            $data['entry_code'] = $interview->code ? $interview->code : '';
+            $data['job'] = $interview->work->title;
+            $data['full_name_ja'] = $interview->hr->full_name_ja;
+            $data['full_name'] = $interview->hr->full_name;
+            $data['date'] = Carbon::now()->format('Y/m/d');
+//            $data['nameTable1'] = 'オファー求人情報';
+//            $data['nameTable2'] = 'オファー承認可否';
+            $data['status'] = STATUS_SELECTIONS[$interview->status_selection];
+            $data['interview_date'] = 'いずれの日も不可、再調整 ';
+            $data['job_id'] = $interview->work_id;
+            $data['company_id'] = $company->id;
+            $data['hrs_id'] = $interview->hr_id;
+            $this->send($user, $data, $partView['web'], $subject, '', self::TYPE_NOTIFY_INTERVIEW_HR_REJECT);
+        }
+    }
+
+    //xác nhận lại với sếp ngày 31/7/2023 Thay đổi nội dung ngày cho giống với chi tiết lịch phỏng vấn
+    private function getDataDateInterview($interview, $flag = false)
+    {
+        $stringDateNotiIntervew = null;
+        $dataCalendarConvert = Common::getInterviewInfo($interview->id);
+        if (count($dataCalendarConvert) == 0) return $stringDateNotiIntervew;
+        $dataCalendarEnd = end($dataCalendarConvert);
+        if ($flag) {
+            if (in_array($dataCalendarEnd['status'], [INTERVIEW_INFO_STATUS_TEMPORARY, INTERVIEW_INFO_STATUS_COMPANY_PASS, INTERVIEW_INFO_STATUS_COMPANY_NO_PASS, INTERVIEW_INFO_STATUS_COMPANY_OFFER])) {
+                return $stringDateNotiIntervew;
+            }
+        }
+//        $getTimeFollowJA = Common::getTimeFollowJA($dataCalendarEnd['date'], $dataCalendarEnd['start_time'], $dataCalendarEnd['end_time'], $dataCalendarEnd['expected_time'], $dataCalendarEnd['at_time'], $dataCalendarEnd['weekdays']);
+        $getTimeFollowJA = $dataCalendarEnd['timeJa'];
+        return $getTimeFollowJA;
+    }
+
+    private function getListNameJa($data)
+    {
+        $listName = [];
+        foreach ($data as $value) {
+            $listName[] = [
+                'hrs_id' => $value->hr->id,
+                'full_name_ja' => $value->hr->full_name_ja,
+                'full_name' => $value->hr->full_name,
+            ];
+        }
+        return $listName;
+    }
+}

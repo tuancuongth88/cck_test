@@ -37,7 +37,7 @@ export default {
           this.$i18n.locale = lang;
           MakeToast({
             variant: 'success',
-            title: 'Success',
+            title: this.$t('SUCCESS'),
             content: 'Change language successfully',
           });
         })

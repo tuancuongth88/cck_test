@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Company;
+use App\Models\Entry;
 use App\Models\HR;
 use App\Models\HRMainJobCareer;
 use App\Models\Interview;
@@ -23,22 +24,15 @@ class InterviewFactory extends Factory
      */
     public function definition()
     {
-        $user_company = User::query()->where(User::TYPE, \COMPANY)->first();
-        Company::firstOrCreate(
-            [Company::USER_ID => $user_company->id],
-            Company::factory()->make()->toArray()
-        );
-
-        $work = Work::factory()->create([
-            Work::STATUS => WORK_STATUS_RECRUITING,
-            Work::TITLE => $this->faker->title,
-            Work::COMPANY_ID => Company::query()->first()->id,
-            Work::USER_ID => $user_company->id]);
-        $hr_id = HR::factory()->create()->id;
-        HRMainJobCareer::factory()->count(2)->create([HRMainJobCareer::HRS_ID => $hr_id]);
+        $entry = Entry::factory()->create();
         return [
-            Interview::HR_ID => $hr_id,
-            Interview::WORK_ID => $work->id,
+            Interview::HR_ID => $entry->hr->id,
+            Interview::WORK_ID => $entry->work->id,
+            Interview::INTERVIEW_CODE => $entry->code,
+            Interview::TYPE => INTERVIEW_TYPE_PRIVATE,
+            Interview::STATUS_SELECTION => INTERVIEW_STATUS_SELECTION_DOC_PASS,
+            Interview::INTERVIEW_ADJUSTMENT => INTERVIEW_STATUS_INTERVIEW_ADJUSTMENT_BEFORE_ADJUSTMENT,
+            Interview::DISPLAY => 'on'
         ];
     }
 }

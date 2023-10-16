@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
 <body>
-    <p>Click the following link to reset your password:</p>
+    <p>パスワードをリセットするには、次のリンクをクリックしてください。</p>
     <p><a href="{{ $url }}">URL</a></p>
-    <p>If you did not request a password reset, no further action is required.</p>
+    <p>もしお心当たりのない場合、本メールは破棄して頂けるようお願いいたします。</p>
 </body>
 </html>

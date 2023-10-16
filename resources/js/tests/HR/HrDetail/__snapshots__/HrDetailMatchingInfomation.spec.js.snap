@@ -1,0 +1,140 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TEST SCREEN HR Detail Basic Infomation Test 3: test render content data Entry Application History 1`] = `
+<div class="hr-detail-matching-situation-tab">
+  <div class="hr-detail-list-status-process">
+    <div class="hr-detail-list-status-process-item border-t border-l border-r">
+      <div class="hr-detail-list-status-process-item--head border-b"><span class="label-entry-applycation">HR_LIST.ENTRY_APPLICATION</span></div>
+      <div class="hr-detail-list-status-process--content">
+        <div class="hr-detail-list-status">
+          <div class="hr-detail-list-status-item">
+            <div>
+              <div class="hr-detail-list-status-item__status">
+                <div class="hr-status-block grey-frame"><span class="one-line-paragraph status-entry">他社内定</span></div>
+              </div>
+              <div class="hr-detail-list-status-item__candidate-info"><span class="one-line-paragraph entry-title-company">php/City Computer Co., Ltd.</span></div>
+            </div>
+            <div>
+              <div class="hr-detail-list-status-item__entry-date">
+                <div class="label-entry-date">HR_LIST.ENTRY_DATE：</div> <span class="one-line-paragraph entry-date"></span>
+              </div>
+            </div>
+          </div>
+          <div class="hr-detail-list-status-item">
+            <div>
+              <div class="hr-detail-list-status-item__status">
+                <div class="hr-status-block grey-frame"><span class="one-line-paragraph status-entry">申請中</span></div>
+              </div>
+              <div class="hr-detail-list-status-item__candidate-info"><span class="one-line-paragraph entry-title-company">php/City Computer Co., Ltd.</span></div>
+            </div>
+            <div>
+              <div class="hr-detail-list-status-item__entry-date">
+                <div class="label-entry-date">HR_LIST.ENTRY_DATE：</div> <span class="one-line-paragraph entry-date"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="hr-detail-list-status-process-item border-t border-l border-r">
+      <div class="hr-detail-list-status-process-item--head border-b"><span class="label-offer-received">HR_LIST.OFFER_RECEIVED</span></div>
+      <div class="hr-detail-list-status-process--content">
+        <div class="hr-detail-list-status">
+          <div class="hr-detail-list-status-item">
+            <div>
+              <div class="hr-detail-list-status-item__status">
+                <div class="hr-status-block red-frame"><span class="one-line-paragraph offer-status">辞退</span></div>
+              </div>
+              <div class="hr-detail-list-status-item__candidate-info"><span class="one-line-paragraph offer-title-company">php/City Computer Co., Ltd.</span></div>
+            </div>
+            <div>
+              <div class="hr-detail-list-status-item__entry-date">
+                <div class="label-offer-date">HR_LIST.ENTRY_DATE：</div> <span class="one-line-paragraph offer-date"></span>
+              </div>
+            </div>
+          </div>
+          <div class="hr-detail-list-status-item">
+            <div>
+              <div class="hr-detail-list-status-item__status">
+                <div class="hr-status-block grey-frame"><span class="one-line-paragraph offer-status">申請中</span></div>
+              </div>
+              <div class="hr-detail-list-status-item__candidate-info"><span class="one-line-paragraph offer-title-company">Tuyên php/City Computer Co., Ltd.</span></div>
+            </div>
+            <div>
+              <div class="hr-detail-list-status-item__entry-date">
+                <div class="label-offer-date">HR_LIST.ENTRY_DATE：</div> <span class="one-line-paragraph offer-date"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="hr-detail-list-status-process-item border-t border-l border-r">
+      <div class="hr-detail-list-status-process-item--head border-b"><span class="label-arr-interview">HR_LIST.ARRINTERVIEW</span></div>
+      <div class="hr-detail-list-status-process--content">
+        <div class="hr-detail-list-status">
+          <div class="hr-detail-list-status-item">
+            <div>
+              <div class="hr-detail-list-status-item__status">
+                <div class="hr-status-block blue-frame"><span class="one-line-paragraph interview-status">オファー承認</span></div>
+              </div>
+              <div class="hr-detail-list-status-item__candidate-info"><span class="one-line-paragraph interview-title-company">php/City Computer Co., Ltd.</span></div>
+            </div>
+            <div>
+              <div class="hr-detail-list-status-item__entry-date">
+                <div class="label-interview-date">HR_LIST.ENTRY_DATE：</div> <span class="one-line-paragraph interview-date"></span>
+              </div>
+            </div>
+          </div>
+          <div class="hr-detail-list-status-item">
+            <div>
+              <div class="hr-detail-list-status-item__status">
+                <div class="hr-status-block blue-frame"><span class="one-line-paragraph interview-status">オファー承認</span></div>
+              </div>
+              <div class="hr-detail-list-status-item__candidate-info"><span class="one-line-paragraph interview-title-company">Tuyên php/City Computer Co., Ltd.</span></div>
+            </div>
+            <div>
+              <div class="hr-detail-list-status-item__entry-date">
+                <div class="label-interview-date">HR_LIST.ENTRY_DATE：</div> <span class="one-line-paragraph interview-date"></span>
+              </div>
+            </div>
+          </div>
+          <div class="hr-detail-list-status-item">
+            <div>
+              <div class="hr-detail-list-status-item__status">
+                <div class="hr-status-block blue-frame"><span class="one-line-paragraph interview-status">書類通過</span></div>
+              </div>
+              <div class="hr-detail-list-status-item__candidate-info"><span class="one-line-paragraph interview-title-company">php/City Computer Co., Ltd.</span></div>
+            </div>
+            <div>
+              <div class="hr-detail-list-status-item__entry-date">
+                <div class="label-interview-date">HR_LIST.ENTRY_DATE：</div> <span class="one-line-paragraph interview-date"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="hr-detail-list-status-process-item border-t border-l border-r border-b">
+      <div class="hr-detail-list-status-process-item--head border-b"><span class="label-result">HR_LIST.RESULT</span></div>
+      <div class="hr-detail-list-status-process--content">
+        <div class="hr-detail-list-status">
+          <div class="hr-detail-list-status-item">
+            <div>
+              <div class="hr-detail-list-status-item__status">
+                <div class="hr-status-block blue-frame"><span class="one-line-paragraph result-status">内定承諾</span></div>
+              </div>
+              <div class="hr-detail-list-status-item__candidate-info"><span class="one-line-paragraph result-title-company">php/City Computer Co., Ltd.</span></div>
+            </div>
+            <div>
+              <div class="hr-detail-list-status-item__entry-date">
+                <div class="label-result-date">HR_LIST.ENTRY_DATE：</div> <span class="one-line-paragraph result-date"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

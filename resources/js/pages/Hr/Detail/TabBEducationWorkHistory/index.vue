@@ -1,6 +1,6 @@
 <!-- 2EducationWorkHistory Detail -->
 <template>
-  <div :key="`edu-work-his-${reRender}`" class="hr-content-tab">
+  <div :key="`edu-work-his-${reRender}`" class="hr-content-tab hr-education-work-history">
     <div class="hr-content-tab-wrap">
 
       <!-- 1 最終学歴 - Final Education -->
@@ -9,7 +9,7 @@
           id="hr-type-edit"
           class="hr-content-tab-item__title d-flex justify-start align-start"
         >
-          <span>{{ $t('HR_LIST_FORM.FINAL_EDUCATION') }}</span>
+          <span class="label-final-edication">{{ $t('HR_LIST_FORM.FINAL_EDUCATION') }}</span>
         </div>
 
         <div class="hr-content-tab__data">
@@ -19,21 +19,21 @@
           >
             <!-- 1.1 年月 Graduation date -->
             <div class="w-100 d-flex justify-space-center align-center">
-              <span style="width: 100%; max-width: 20%" class="'pl-1">{{
+              <span style="width: 100%; max-width: 20%" class="'pl-1 label-graducation-date">{{
                 $t('HR_LIST_FORM.GRADUATION_DATE')
               }}</span>
 
               <div class="d-flex justify-space-between align-center">
-                <span>{{ detailForm.final_education_date }}</span>
+                <span class="content-final-education-date">{{ detailForm.final_education_date }}</span>
               </div>
             </div>
 
             <!-- 1.2 区分 classification / Division -->
             <div class="w-100 d-flex justify-space-center align-center">
-              <span style="width: 100%; max-width: 20%" class="'pl-1">{{
+              <span style="width: 100%; max-width: 20%" class="'pl-1 label-classification">{{
                 $t('HR_LIST_FORM.CLASSIFICATION')
               }}</span>
-              <div class="w-100 d-flex justify-space-between align-center">
+              <div class="w-100 d-flex justify-space-between align-center content-classification">
                 {{
                   detailForm.final_education_classification
                 }}
@@ -41,29 +41,29 @@
             </div>
             <!-- 1.2 学位 - degree (最終学歴（学位）) -->
             <div class="w-100 d-flex justify-space-center align-center">
-              <span style="width: 100%; max-width: 20%" class="'pl-1">{{
+              <span style="width: 100%; max-width: 20%" class="'pl-1 label-degree">{{
                 $t('HR_LIST_FORM.DEGREE')
               }}</span>
-              <div class="w-100 d-flex justify-space-between align-center">
+              <div class="w-100 d-flex justify-space-between align-center content-degree">
                 {{ detailForm.final_education_degree }}
               </div>
             </div>
 
             <!-- 1.3 大分類 - major classification -->
             <div class="w-100 d-flex justify-space-center align-center">
-              <span style="width: 100%; max-width: 20%" class="'pl-1">{{
+              <span style="width: 100%; max-width: 20%" class="'pl-1 label-main-category">{{
                 $t('HR_LIST_FORM.MAIN_CATEGORY')
               }}</span>
-              <div class="w-100 d-flex justify-space-between align-center">
+              <div class="w-100 d-flex justify-space-between align-center content-main-category">
                 {{ detailForm.major_classification }}
               </div>
             </div>
             <!-- 1.5 中分類 -  Middle classification / Medium category-->
             <div class="w-100 d-flex justify-space-center align-center">
-              <span style="width: 100%; max-width: 20%" class="'pl-1">{{
+              <span style="width: 100%; max-width: 20%" class="'pl-1 label-department">{{
                 $t('HR_LIST_FORM.DEPARTMENT')
               }}</span>
-              <div class="w-100 d-flex justify-space-between align-center">
+              <div class="w-100 d-flex justify-space-between align-center content-department">
                 {{ detailForm.middle_classification }}
               </div>
             </div>
@@ -79,7 +79,7 @@
           id="hr-type-edit"
           class="hr-content-tab-item__title d-flex justify-start align-start"
         >
-          <span>{{ $t('HR_LIST_FORM.MAIN_JOB_CAREER_1') }}</span>
+          <span class="label-main-job-career">{{ $t('HR_LIST_FORM.MAIN_JOB_CAREER_1') }}</span>
         </div>
 
         <div class="hr-content-tab__data">
@@ -90,7 +90,7 @@
             <!-- 2.1 年月 Graduation date -> 年月 date -->
             <div class="w-100 d-flex justify-space-center align-center">
               <div class="w-100 d-flex justify-space-between align-center">
-                <span style="width: 100%; max-width: 20%" class="'pl-1">{{
+                <span style="width: 100%; max-width: 20%" class="'pl-1 label-job-career-date">{{
                   $t('HR_LIST_FORM.DATE')
                 }}</span>
 
@@ -102,14 +102,14 @@
                   >
                     <!-- From -->
                     <div class="d-flex justify-start align-center">
-                      <span>{{ detailForm.main_job_1.main_job_career_date_from }}</span>
+                      <span class="content-job-career-from">{{ detailForm.main_job_1.main_job_career_date_from }}</span>
                     </div>
 
                     <span class="approximately">~</span>
 
                     <!-- To -->
                     <div class="d-flex justify-start align-center">
-                      <span>{{ detailForm.main_job_1.main_job_career_date_to }}</span>
+                      <span class="content-job-career-to">{{ detailForm.main_job_1.main_job_career_date_to }}</span>
                     </div>
                   </div>
                   <!-- Time now -->
@@ -120,25 +120,25 @@
             </div>
             <!-- 2.2 所属 department -->
             <div class="w-100 d-flex justify-space-center align-center">
-              <span style="width: 100%; max-width: 20%" class="'pl-1">{{
+              <span style="width: 100%; max-width: 20%" class="'pl-1 label-main-job-department">{{
                 $t('HR_LIST_FORM.DEPARTMENT')
               }}</span>
               <div class="w-100 d-flex justify-space-between align-center">
-                <span>{{ detailForm.main_job_1.department }}</span>
+                <span class="content-main-job-department">{{ detailForm.main_job_1.department }}</span>
               </div>
             </div>
             <!-- 2.3 職名 - Job title -->
             <div class="w-100 d-flex justify-space-center align-center">
-              <span style="width: 100%; max-width: 20%" class="'pl-1">{{
+              <span style="width: 100%; max-width: 20%" class="'pl-1 label-main-job-title">{{
                 $t('HR_LIST_FORM.JOB_TITLE')
               }}</span>
               <div class="w-100 d-flex justify-space-between align-center">
-                <span>{{ detailForm.main_job_1.job_id }}</span>
+                <span class="content-main-job-title">{{ detailForm.main_job_1.job_id }}</span>
               </div>
             </div>
             <!-- 2.4 詳細 - Detail-->
             <div class="w-100 d-flex justify-start align-start">
-              <span style="width: 100%; max-width: 20%" class="'pl-1">{{
+              <span style="width: 100%; max-width: 20%" class="'pl-1 label-main-job-detail">{{
                 $t('HR_LIST_FORM.DETAIL')
               }}</span>
               <div class="w-100 d-flex justify-start align-start">
@@ -149,7 +149,7 @@
                   rows="8"
                   max-rows="28"
                   max-lengh="2000"
-                  class="textarea-type-detail"
+                  class="textarea-type-detail content-main-job-detail"
                   disabled
                 />
                 <!-- {{ educationWorkHistoryInit.main_job_career_1_textarea }} -->
@@ -505,6 +505,8 @@ export default {
       let text_date = '';
       if (date) {
         text_date = moment(date).format('YYYY年MM月');
+      } else {
+        text_date = '現在';
       }
       return text_date;
     },

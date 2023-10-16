@@ -32,6 +32,8 @@ service.interceptors.request.use(
     const token = getToken();
     const hrOrgRegister = router.currentRoute.path === '/human-resourse-register';
     const companyRegister = router.currentRoute.path === '/company-register';
+    const forgetPassword = router.currentRoute.path === '/forget-password';
+    const resetPassword = router.currentRoute.path === '/api/auth/password-reset';
     config.headers['Accept-Language'] = defaultLocale;
 
     if (token) {
@@ -40,6 +42,10 @@ service.interceptors.request.use(
       router.push({ path: '/company-register' });
     } else if (!token && hrOrgRegister) {
       router.push({ path: '/human-resourse-register' });
+    } else if (!token && forgetPassword) {
+      router.push({ path: '/forget-password' });
+    } else if (!token && resetPassword) {
+      router.push({ path: '/api/auth/password-reset' });
     } else {
       router.push({ path: '/login' });
     }
@@ -56,7 +62,7 @@ service.interceptors.response.use(
   error => {
     const status = error.response.status;
     if (error.response.data.code && error.response.data.code === 403) {
-      console.log('Enter error 403');
+      // console.log('Enter error 403');
       EventBus.$emit('responseErrorCode', error.response.data.code);
       // this.$bus.emit('responseErrorCode', error.response.data.code);
     }

@@ -48,8 +48,8 @@ class CompanyRequest extends FormRequest
                 Company::JOB_TITLE => 'required|max:50',
                 Company::FULL_NAME => 'required|max:50',
                 Company::FULL_NAME_FURIGANA => 'required|max:50',
-                Company::REPRESENTATIVE_CONTACT => 'nullable|max:15',
-                Company::ASSIGNEE_CONTACT => 'required|max:15',
+                Company::REPRESENTATIVE_CONTACT => 'nullable',
+                Company::ASSIGNEE_CONTACT => 'required',
                 'is_create' => 'required|in:0,1'
             ];
         }
@@ -70,8 +70,8 @@ class CompanyRequest extends FormRequest
                 Company::JOB_TITLE => 'required|max:50',
                 Company::FULL_NAME => 'required|max:50',
                 Company::FULL_NAME_FURIGANA => 'required|max:50',
-                Company::REPRESENTATIVE_CONTACT => 'nullable|max:15',
-                Company::ASSIGNEE_CONTACT => 'required|max:15',
+                Company::REPRESENTATIVE_CONTACT => 'nullable',
+                Company::ASSIGNEE_CONTACT => 'required',
             ];
         }
     }

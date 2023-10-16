@@ -40,8 +40,9 @@ class RemindEntryJob extends RemindJob
                     ->get();
             }else{
                 $listEntryRemind = Entry::query()
-                    ->where('entries.'.Entry::STATUS, ENTRY_STATUS_REQUESTING)
+                    ->where(Entry::STATUS, ENTRY_STATUS_REQUESTING)
                     ->whereDate(Entry::REQUEST_DATE, '<=', Carbon::now()->subDays(5))
+                    ->where(Entry::DISPLAY, 'on')
                     ->get();
             }
             foreach ($listEntryRemind as $entry)
@@ -50,16 +51,27 @@ class RemindEntryJob extends RemindJob
                 $users = User::query()->whereIn(User::TYPE, [COMPANY_MANAGER, SUPER_ADMIN])
                     ->orWhere('id', $user->id)->get();
                 foreach ($users as $user){
+                    $data['permission'] = User::getPermissionName($user);
+                    $data['type'] = $user->type;
+                    $data['type_noti'] = NOTI_TYPE_REMIND_ENTRY;
                     $data['entry_code']  = @$entry->code;
                     $data['email']  = @$user->mail_address;
                     $data['job']    = @$entry->work->title;
-                    $data['company']= @$entry->work->company->company_name_jp;
+                    $data['company']= @$entry->work->company->company_name;
                     $data['full_name_ja']= @$entry->hr->full_name_ja;
+                    $data['full_name'] = @$entry->hr->full_name;
                     $data['date']= Carbon::now()->format('Y/m/d');
-                    $partViewWeb = 'messages.entry-offer.remind-entry';
-                    $subjectEmail = trans('messages.mes.subject_entry_stagnant_status');
-                    $viewEmail = 'email.entry-offer.remind-entry';
-                    $this->send($user, $data, $partViewWeb, $subjectEmail, $viewEmail);
+//                    $partViewWeb = 'messages.entry-offer.remind-entry';
+//                    $subjectEmail = trans('messages.mes.subject_entry_stagnant_status');
+//                    $viewEmail = 'email.entry-offer.remind-entry';
+                    $data['job_id'] = @$entry->work_id;
+                    $data['company_id'] = @$entry->work->company->id;
+                    $data['hrs_id'] = @$entry->hr_id;
+                    $data['status'] = $entry->status;
+                    $data['request_date'] = $entry->request_date;
+                    $data['remarks'] = $entry->remarks;
+                    $data['note'] = $entry->note;
+                    $this->send($user, $data);
                 }
             }
 

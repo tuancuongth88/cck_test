@@ -34,7 +34,7 @@ class ResultRequest extends FormRequest
      public function getCustomRule(){
         if(Route::getCurrentRoute()->getActionMethod() == 'update'){
             return [
-                'status' => 'required|in:3,4',
+                'status' => 'nullable|numeric|in:1,3,4',
                 'note' => 'nullable|string|max:1000',
                 'hire_date' => 'nullable|date|date_format:Y-m-d',
                 'time' => 'nullable|date|date_format:Ymd',
@@ -43,6 +43,12 @@ class ResultRequest extends FormRequest
         if(Route::getCurrentRoute()->getActionMethod() == 'store'){
             return  [
 
+            ];
+        }
+        if (Route::getCurrentRoute()->getActionMethod() == 'hide'){
+            return [
+                'ids' => ['required','array'],
+                'ids.*' => 'required|exists:results,id',
             ];
         }
         return [];

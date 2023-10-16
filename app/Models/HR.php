@@ -9,6 +9,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Laravel\Scout\Searchable;
 
 /**
  * @OA\Schema(
@@ -27,7 +28,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  *          "final_education_degree",
  *          "major_classification_id",
  *          "middle_classification_id",
- *          "main_jobs",
  *          "mail_address"
  *     },
  *     @OA\Property(
@@ -188,9 +188,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 */
 class HR extends Model
 {
-    use HasFactory;
+    use HasFactory, Searchable;
     use SoftDeletes;
     const COUNTRY_ID = 'country_id';
+    const COUNTRY_NAME = 'country_name';
     const HR_ORGANIZATION_ID = 'hr_organization_id';
     const USER_ID = 'user_id';
     const FULL_NAME = 'full_name';
@@ -229,6 +230,7 @@ class HR extends Model
 
     protected $fillable = [
         self::COUNTRY_ID,
+        self::COUNTRY_NAME,
         self::HR_ORGANIZATION_ID,
         self::USER_ID,
         self::FULL_NAME,
@@ -269,6 +271,28 @@ class HR extends Model
     protected $casts = [
         'data' => 'array'
     ];
+
+    public function toSearchableArray()
+    {
+        return [
+            'full_name' => $this->full_name,
+            'full_name_ja' => $this->full_name_ja,
+            'final_education_date' => $this->final_education_date,
+            'personal_pr_special_notes' => $this->personal_pr_special_notes,
+            'remarks' => $this->remarks,
+            'mobile_phone_number' => $this->mobile_phone_number,
+            'mail_address' => $this->mail_address,
+            'address_city' => $this->address_city,
+            'address_district' => $this->address_district,
+            'address_number' => $this->address_number,
+            'address_other' => $this->address_other,
+            'hometown_city' => $this->hometown_city,
+            'home_town_district' => $this->home_town_district,
+            'home_town_number' => $this->home_town_number,
+            'home_town_other' => $this->home_town_other,
+            'country_name' => $this->country_name,
+        ];
+    }
 
     public function hrOrg()
     {

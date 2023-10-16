@@ -299,7 +299,8 @@
 }
 
 .information-general-select-file {
-	width: 100%;
+	// width: 100%;
+	width: 210px;
 	margin-top: 2.9rem;
 	align-items: center;
 	flex-direction: column;
@@ -316,9 +317,10 @@
   color: #333333;
   margin-top: 10px;
   align-items: center;
-  border: 1px solid #868686;
+  border: 1px solid #aaa !important;
   border-radius: 5px !important;
   background-color: #FFFFFF !important;
+  font-weight: 700;
 
   .file-btn-text {
     font-size: 10px;
@@ -337,7 +339,7 @@
 
   span {
     font-size: 10px;
-    color: red !important;
+    // color: red !important;
   }
 }
 

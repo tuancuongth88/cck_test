@@ -34,7 +34,7 @@ class Kernel extends ConsoleKernel
         // $schedule->command('inspire')->hourly();
 //        $schedule->command('service:update-value-future-date')->daily()->withoutOverlapping();
         $schedule->job(new RemindAccountJob(HR_MANAGER, HrOrganization::class))->weeklyOn(1, '0:00');
-        $schedule->job(new RemindAccountJob(COMPANY, Company::class))->weeklyOn(1, '0:00');
+        $schedule->job(new RemindAccountJob(COMPANY_MANAGER, Company::class))->weeklyOn(1, '0:00');
         $schedule->job(new RemindEntryJob())->weeklyOn(1, '0:00');
         $schedule->job(new RemindInterViewJob())->weeklyOn(1, '0:00');
         $schedule->job(new RemindOfferJob())->weeklyOn(1, '0:00');

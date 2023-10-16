@@ -1,15 +1,17 @@
 <!-- CompanyBasicInfo -->
 <template>
-  <div class="hr-registration-page-autox mt-1">
+  <div id="company-basic-info-page" class="hr-registration-page-autox mt-1">
     <div class="hr-registration-page__form">
-
       <!-- <div>major_classification_id: {{ formData.major_classification_id }}</div><br> -->
       <!-- <div>middle_classification_id: {{ formData.middle_classification_id }}</div><br> -->
       <!-- <button style="position: fixed; background: gray; opacity: 0.1;" class="btn" @click="changeStatus">Change</button> -->
 
       <!-- 1 input 企業名 company name -->
-      <div v-if="type_form === 'edit'" class="row-item border-t border-l border-r">
-        <div class="form-title">
+      <div
+        v-if="type_form === 'edit'"
+        class="row-item border-t border-l border-r"
+      >
+        <div class="form-title d-flex justify-content-between">
           <span>{{ $t('JOB_DETAIL.COMPANY_NAME') }}</span><Require />
         </div>
         <div class="form-inputs border-l">
@@ -18,6 +20,7 @@
           <b-form-input
             v-model="formData.company_name"
             aria-describedby="company_name"
+            dusk="company_name"
             max-lenght="50"
             :name="'company_name'"
             :formatter="format50characters"
@@ -26,13 +29,22 @@
             :class="error.company_name === false ? 'is-invalid' : ''"
             @input="handleChangeForm($event, 'company_name')"
           />
-          <b-form-invalid-feedback id="company_name" :state="error.company_name">
+          <b-form-invalid-feedback
+            id="company_name"
+            :state="error.company_name"
+          >
             {{ $t('VALIDATE.REQUIRED_TEXT') }}
           </b-form-invalid-feedback>
         </div>
       </div>
-      <div v-if="type_form === 'detail'" class="row-item border-t border-l border-r">
-        <div class="form-title" :class="{ 'bg-type-detail' : type_form === 'detail' }">
+      <div
+        v-if="type_form === 'detail'"
+        class="row-item border-t border-l border-r"
+      >
+        <div
+          class="form-title"
+          :class="{ 'bg-type-detail': type_form === 'detail' }"
+        >
           <span>{{ $t('JOB_DETAIL.COMPANY_NAME') }}</span>
         </div>
         <div class="form-inputs border-l">
@@ -41,9 +53,12 @@
           </div>
         </div>
       </div>
-      <!-- 2 input 企業名（ﾌﾘｶﾞﾅ） company name (furigana) -->
-      <div v-if="type_form === 'edit'" class="row-item border-t border-l border-r">
-        <div class="form-title">
+      <!-- 2 input 企業名（フリガナ） company name (furigana) -->
+      <div
+        v-if="type_form === 'edit'"
+        class="row-item border-t border-l border-r"
+      >
+        <div class="form-title d-flex justify-content-between">
           <span>{{ $t('JOB_DETAIL.COMPANY_NAME_FURIGANA') }}</span><Require />
         </div>
         <div class="form-inputs border-l">
@@ -53,6 +68,7 @@
             v-model="formData.company_name_jp"
             aria-describedby="company_name_jp"
             max-lenght="50"
+            :dusk="'company_name_jp'"
             :name="'company_name_jp'"
             :formatter="format50characters"
             :placeholder="''"
@@ -60,13 +76,22 @@
             :class="error.company_name_jp === false ? 'is-invalid' : ''"
             @input="handleChangeForm($event, 'company_name_jp')"
           />
-          <b-form-invalid-feedback id="company_name_jp" :state="error.company_name_jp">
+          <b-form-invalid-feedback
+            id="company_name_jp"
+            :state="error.company_name_jp"
+          >
             {{ $t('VALIDATE.REQUIRED_TEXT') }}
           </b-form-invalid-feedback>
         </div>
       </div>
-      <div v-if="type_form === 'detail'" class="row-item border-t border-l border-r">
-        <div class="form-title" :class="{ 'bg-type-detail' : type_form === 'detail' }">
+      <div
+        v-if="type_form === 'detail'"
+        class="row-item border-t border-l border-r"
+      >
+        <div
+          class="form-title"
+          :class="{ 'bg-type-detail': type_form === 'detail' }"
+        >
           <span>{{ $t('JOB_DETAIL.COMPANY_NAME_FURIGANA') }}</span>
         </div>
         <div class="form-inputs border-l">
@@ -76,8 +101,11 @@
         </div>
       </div>
       <!-- 3 option 業種分野 field / Industry field-->
-      <div v-if="type_form === 'edit'" class="row-item border-t border-l border-r">
-        <div class="form-title align-start">
+      <div
+        v-if="type_form === 'edit'"
+        class="row-item border-t border-l border-r"
+      >
+        <div class="form-title align-start d-flex justify-content-between">
           <span>{{ $t('COMPANY_REGISTER.FIELD') }}</span><Require />
         </div>
         <div class="form-inputs border-l" style="gap: 1rem">
@@ -93,16 +121,26 @@
               <b-form-select
                 v-model="formData.major_classification_id"
                 :options="major_classification_options"
+                dusk="major_classification_options"
                 value-field="id"
                 text-field="name_ja"
-                :class=" error.major_classification_id === false ? 'is-invalid' : '' "
+                :class="
+                  error.major_classification_id === false ? 'is-invalid' : ''
+                "
                 @input="handleChangeForm($event, 'major_classification_id')"
                 @change="
-                  renderChildOption(formData.major_classification_id)
-                  selectRenderText( 'major_classification_id', $event, major_classification_options)
+                  renderChildOption(formData.major_classification_id);
+                  selectRenderText(
+                    'major_classification_id',
+                    $event,
+                    major_classification_options
+                  );
                 "
               />
-              <b-form-invalid-feedback id="major_classification_id" :state="error.major_classification_id">
+              <b-form-invalid-feedback
+                id="major_classification_id"
+                :state="error.major_classification_id"
+              >
                 {{ $t('VALIDATE.REQUIRED_SELECT') }}
               </b-form-invalid-feedback>
             </div>
@@ -119,15 +157,27 @@
               <b-form-select
                 v-model="formData.middle_classification_id"
                 :options="middle_classification_options"
+                dusk="middle_classification_id"
                 value-field="id"
                 text-field="name_ja"
                 :enabled="formData.major_classification_id"
                 :disabled="!formData.major_classification_id"
-                :class=" error.middle_classification_id === false ? 'is-invalid' : '' "
-                @input="handleChangeForm($event, 'middle_classification_id') "
-                @change="selectRenderText( 'middle_classification_id', $event, middle_classification_options)"
+                :class="
+                  error.middle_classification_id === false ? 'is-invalid' : ''
+                "
+                @input="handleChangeForm($event, 'middle_classification_id')"
+                @change="
+                  selectRenderText(
+                    'middle_classification_id',
+                    $event,
+                    middle_classification_options
+                  )
+                "
               />
-              <b-form-invalid-feedback id="middle_classification_id" :state="error.middle_classification_id">
+              <b-form-invalid-feedback
+                id="middle_classification_id"
+                :state="error.middle_classification_id"
+              >
                 {{ $t('VALIDATE.REQUIRED_SELECT') }}
               </b-form-invalid-feedback>
             </div>
@@ -135,8 +185,14 @@
           <!--  -->
         </div>
       </div>
-      <div v-if="type_form === 'detail'" class="row-item border-t border-l border-r">
-        <div class="form-title align-start" :class="{ 'bg-type-detail' : type_form === 'detail' }">
+      <div
+        v-if="type_form === 'detail'"
+        class="row-item border-t border-l border-r"
+      >
+        <div
+          class="form-title align-start"
+          :class="{ 'bg-type-detail': type_form === 'detail' }"
+        >
           <span>{{ $t('COMPANY_REGISTER.FIELD') }}</span>
         </div>
         <div class="form-inputs border-l" style="gap: 1rem">
@@ -174,8 +230,11 @@
       </div>
 
       <!-- 4 input 住所 Address -->
-      <div v-if="type_form === 'edit'" class="row-item border-t border-l border-r">
-        <div class="form-title align-start">
+      <div
+        v-if="type_form === 'edit'"
+        class="row-item border-t border-l border-r"
+      >
+        <div class="form-title align-start d-flex justify-content-between">
           <span>{{ $t('COMPANY_REGISTER.ADDRESS') }}</span><Require />
         </div>
         <div class="form-inputs border-l" style="gap: 1rem">
@@ -193,6 +252,7 @@
                 enabled
                 aria-describedby="post_code"
                 max-lenght="50"
+                dusk="post_code"
                 type="text"
                 :name="'post_code'"
                 :formatter="format7characters"
@@ -220,14 +280,18 @@
                 enabled
                 aria-describedby="prefectures"
                 max-lenght="50"
+                dusk="prefectures"
                 :name="'prefectures'"
                 :formatter="format50characters"
                 :placeholder="''"
                 class="w-100"
-                :class=" error.prefectures === false ? 'is-invalid' : '' "
+                :class="error.prefectures === false ? 'is-invalid' : ''"
                 @input="handleChangeForm($event, 'prefectures')"
               />
-              <b-form-invalid-feedback id="prefectures" :state="error.prefectures">
+              <b-form-invalid-feedback
+                id="prefectures"
+                :state="error.prefectures"
+              >
                 {{ $t('VALIDATE.REQUIRED_TEXT') }}
               </b-form-invalid-feedback>
             </div>
@@ -245,18 +309,20 @@
               <b-form-input
                 v-model="formData.municipality"
                 enabled
+                dusk="municipality"
                 aria-describedby="municipality"
                 max-lenght="50"
                 :name="'municipality'"
                 :formatter="format50characters"
                 :placeholder="''"
                 class="w-100"
-                :class="
-                  error.municipality === false ? 'is-invalid' : ''
-                "
+                :class="error.municipality === false ? 'is-invalid' : ''"
                 @input="handleChangeForm($event, 'municipality')"
               />
-              <b-form-invalid-feedback id="municipality" :state="error.市町村区">
+              <b-form-invalid-feedback
+                id="municipality"
+                :state="error.municipality"
+              >
                 {{ $t('VALIDATE.REQUIRED_TEXT') }}
               </b-form-invalid-feedback>
             </div>
@@ -274,6 +340,7 @@
               <b-form-input
                 v-model="formData.number"
                 enabled
+                dusk="number"
                 aria-describedby="number"
                 max-lenght="50"
                 :name="'number'"
@@ -300,6 +367,7 @@
               <b-form-input
                 v-model="formData.other"
                 enabled
+                dusk="other"
                 aria-describedby="other"
                 max-lenght="50"
                 :name="'other'"
@@ -313,8 +381,14 @@
           <!--  -->
         </div>
       </div>
-      <div v-if="type_form === 'detail'" class="row-item border-t border-l border-r">
-        <div class="form-title align-start" :class="{ 'bg-type-detail' : type_form === 'detail' }">
+      <div
+        v-if="type_form === 'detail'"
+        class="row-item border-t border-l border-r"
+      >
+        <div
+          class="form-title align-start"
+          :class="{ 'bg-type-detail': type_form === 'detail' }"
+        >
           <span>{{ $t('COMPANY_REGISTER.ADDRESS') }}</span>
         </div>
         <div class="form-inputs border-l" style="gap: 1rem">
@@ -395,8 +469,11 @@
       </div>
 
       <!-- 5 option input 電話番号 telephone number -->
-      <div v-if="type_form === 'edit'" class="row-item border-t border-l border-r">
-        <div class="form-title">
+      <div
+        v-if="type_form === 'edit'"
+        class="row-item border-t border-l border-r"
+      >
+        <div class="form-title d-flex justify-content-between">
           <span>{{ $t('COMPANY_REGISTER.TELEPHONE_NUMBER') }}</span><Require />
         </div>
         <div class="form-inputs border-l">
@@ -404,57 +481,56 @@
             <!-- Dropdown -->
             <div class="h-100" style="height: 40px">
               <div
-                :class="error.telephone_number_id === false ? 'option-error' : 'option-validate'"
+                :class="
+                  error.telephone_number_id === false
+                    ? 'option-error'
+                    : 'option-validate'
+                "
               >
                 <div class="option-area-code">
-                  <!-- <b-form-select
-                    v-model="formData.telephone_number_id"
-                    :options="area_code_option"
-                    :class=" error.telephone_number_id === false ? 'is-invalid' : '' "
-                    @input=" handleChangeForm($event, 'telephone_number_id') "
-                    @change="pustAreaCode( 'telephone_number_id', formData.telephone_number_id )"
-                  /> -->
                   <b-dropdown
                     id="telephone_number"
+                    dusk="telephone_number_option1"
                     :text="display_area_code.telephone_number"
                     class="w-100 h-100"
                   >
-                    <!-- <b-dropdown-item
-                      class="w-100 d-flex justify-start align-center "
-                      @click="
-                        pustAreaCode('telephone_number','')
-                        handleChangeFormOption($event, 'telephone_number_id')
-                      "
-                      @change="
-                        handleChangeForm($event, 'telephone_number_id')
-                      "
-                    >
-                      <img style="visibility: hidden;" :src="require(`@/assets/images/icons/flag-84.png`)">
-                    </b-dropdown-item> -->
-                    <!--  -->
+                    <!-- BLANK -->
                     <b-dropdown-item
+                      dusk="telephone_number_vn1"
                       @click="
-                        pustAreaCode('telephone_number','+84')
-                        handleChangeFormOption($event, 'telephone_number_id')
+                        pustAreaCode('telephone_number', '');
+                        handleChangeFormOption($event, 'telephone_number_id');
                       "
-                      @change="
-                        handleChangeForm($event, 'telephone_number_id')
-                      "
+                      @change="handleChangeForm($event, 'telephone_number_id')"
                     >
-                      <img :src="require(`@/assets/images/icons/flag-84.png`)">
+                      <span style="height: 28px" />
+                    </b-dropdown-item>
+                    <!-- VIE -->
+                    <b-dropdown-item
+                      dusk="telephone_number_vn1"
+                      @click="
+                        pustAreaCode('telephone_number', '+84');
+                        handleChangeFormOption($event, 'telephone_number_id');
+                      "
+                      @change="handleChangeForm($event, 'telephone_number_id')"
+                    >
+                      <img
+                        :src="require(`@/assets/images/icons/flag-84.png`)"
+                      >
                       <span>+84</span>
                     </b-dropdown-item>
-                    <!--  -->
+                    <!-- JA -->
                     <b-dropdown-item
+                      dusk="telephone_number_ja1"
                       @click="
-                        pustAreaCode('telephone_number','+81')
-                        handleChangeFormOption($event, 'telephone_number_id')
+                        pustAreaCode('telephone_number', '+81');
+                        handleChangeFormOption($event, 'telephone_number_id');
                       "
-                      @change="
-                        handleChangeForm($event, 'telephone_number_id')
-                      "
+                      @change="handleChangeForm($event, 'telephone_number_id')"
                     >
-                      <img :src="require(`@/assets/images/icons/flag-81.png`)">
+                      <img
+                        :src="require(`@/assets/images/icons/flag-81.png`)"
+                      >
                       <span>+81</span>
                     </b-dropdown-item>
                   </b-dropdown>
@@ -469,7 +545,10 @@
                   >
                 </div>
               </div>
-              <b-form-invalid-feedback id="telephone_number" :state="error.telephone_number_id">
+              <b-form-invalid-feedback
+                id="telephone_number"
+                :state="error.telephone_number_id"
+              >
                 {{ $t('VALIDATE.REQUIRED_SELECT') }}
               </b-form-invalid-feedback>
             </div>
@@ -478,41 +557,57 @@
               <b-form-input
                 v-model="formData.telephone_number"
                 aria-describedby="telephone_number"
-                max-lenght="50"
+                max-lenght="15"
                 type="number"
+                dusk="telephone_number"
                 :name="'telephone_number'"
-                :formatter="format50characters"
+                :formatter="format15characters"
                 :placeholder="$t('COMPANY_REGISTER.PLACEHOLDER')"
                 :class="error.telephone_number === false ? 'is-invalid' : ''"
                 :enabled="display_area_code.telephone_number"
                 :disabled="!display_area_code.telephone_number"
                 @input="handleChangeForm($event, 'telephone_number')"
               />
-              <b-form-invalid-feedback id="telephone_number" :state="error.telephone_number">
+              <b-form-invalid-feedback
+                id="telephone_number"
+                :state="error.telephone_number"
+              >
                 {{ $t('VALIDATE.REQUIRED_TEXT') }}
               </b-form-invalid-feedback>
             </div>
             <!--  -->
           </div>
-
         </div>
       </div>
-      <div v-if="type_form === 'detail'" class="row-item border-t border-l border-r">
-        <div class="form-title" :class="{ 'bg-type-detail' : type_form === 'detail' }">
+      <div
+        v-if="type_form === 'detail'"
+        class="row-item border-t border-l border-r"
+      >
+        <div
+          class="form-title"
+          :class="{ 'bg-type-detail': type_form === 'detail' }"
+        >
           <span>{{ $t('COMPANY_REGISTER.TELEPHONE_NUMBER') }}</span>
         </div>
         <div class="form-inputs border-l">
-          <div class="w-100 d-flex justify-start align-center" style="gap: 0.75rem">
+          <div
+            class="w-100 d-flex justify-start align-center"
+            style="gap: 0.75rem"
+          >
             <div>
-              <span>{{ display_area_code.telephone_number }} {{ formData.telephone_number }}</span>
+              <span>{{ display_area_code.telephone_number }}
+                {{ formData.telephone_number }}</span>
             </div>
           </div>
         </div>
       </div>
 
       <!-- 6 input メールアドレス (ログインID) Email address (login ID) -->
-      <div v-if="type_form === 'edit'" class="row-item border-t border-l border-r">
-        <div class="form-title">
+      <div
+        v-if="type_form === 'edit'"
+        class="row-item border-t border-l border-r"
+      >
+        <div class="form-title d-flex justify-content-between">
           <span>{{ $t('COMPANY_REGISTER.EMAIL_ADDRESS_LOGIN_ID') }}</span><Require />
         </div>
         <div class="form-inputs border-l">
@@ -522,6 +617,7 @@
             v-model="formData.mail_address"
             aria-describedby="mail_address"
             max-lenght="50"
+            dusk="mail_address"
             :name="'mail_address'"
             :formatter="format50characters"
             :placeholder="''"
@@ -529,13 +625,22 @@
             :class="error.mail_address === false ? 'is-invalid' : ''"
             @input="handleChangeForm($event, 'mail_address')"
           />
-          <b-form-invalid-feedback id="mail_address" :state="error.mail_address">
+          <b-form-invalid-feedback
+            id="mail_address"
+            :state="error.mail_address"
+          >
             {{ $t('VALIDATE.REQUIRED_TEXT') }}
           </b-form-invalid-feedback>
         </div>
       </div>
-      <div v-if="type_form === 'detail'" class="row-item border-t border-l border-r">
-        <div class="form-title" :class="{ 'bg-type-detail' : type_form === 'detail' }">
+      <div
+        v-if="type_form === 'detail'"
+        class="row-item border-t border-l border-r"
+      >
+        <div
+          class="form-title"
+          :class="{ 'bg-type-detail': type_form === 'detail' }"
+        >
           <span>{{ $t('COMPANY_REGISTER.EMAIL_ADDRESS_LOGIN_ID') }}</span>
         </div>
         <div class="form-inputs border-l">
@@ -545,8 +650,11 @@
         </div>
       </div>
       <!-- 7 input URL -->
-      <div v-if="type_form === 'edit'" class="row-item border-t border-l border-r">
-        <div class="form-title">
+      <div
+        v-if="type_form === 'edit'"
+        class="row-item border-t border-l border-r"
+      >
+        <div class="form-title d-flex justify-content-between">
           <span style="text-transform: capitalize">URL</span><Require />
         </div>
         <div class="form-inputs border-l">
@@ -556,6 +664,7 @@
             v-model="formData.url"
             aria-describedby="url"
             max-lenght="50"
+            dusk="url"
             :name="'url'"
             :formatter="format50characters"
             :placeholder="''"
@@ -568,8 +677,14 @@
           </b-form-invalid-feedback>
         </div>
       </div>
-      <div v-if="type_form === 'detail'" class="row-item border-t border-l border-r">
-        <div class="form-title" :class="{ 'bg-type-detail' : type_form === 'detail' }">
+      <div
+        v-if="type_form === 'detail'"
+        class="row-item border-t border-l border-r"
+      >
+        <div
+          class="form-title"
+          :class="{ 'bg-type-detail': type_form === 'detail' }"
+        >
           <span style="text-transform: capitalize">URL</span>
         </div>
         <div class="form-inputs border-l">
@@ -580,8 +695,11 @@
       </div>
 
       <!-- 8 input 代表者 representative -->
-      <div v-if="type_form === 'edit'" class="row-item border-t border-l border-r">
-        <div class="form-title align-start">
+      <div
+        v-if="type_form === 'edit'"
+        class="row-item border-t border-l border-r"
+      >
+        <div class="form-title align-start d-flex justify-content-between">
           <span>{{ $t('COMPANY_REGISTER.REPRESENTATIVE') }}</span><Require />
         </div>
         <div class="form-inputs border-l" style="gap: 1rem">
@@ -599,16 +717,15 @@
                 enabled
                 aria-describedby="job_title"
                 max-lenght="50"
+                dusk="job_title"
                 :name="'job_title'"
                 :formatter="format50characters"
                 :placeholder="''"
                 class="w-100"
-                :class="
-                  error.job_title === false ? 'is-invalid' : ''
-                "
+                :class="error.job_title === false ? 'is-invalid' : ''"
                 @input="handleChangeForm($event, 'job_title')"
               />
-              <b-form-invalid-feedback id="job_title" :state="error.市町村区">
+              <b-form-invalid-feedback id="job_title" :state="error.job_title">
                 {{ $t('VALIDATE.REQUIRED_TEXT') }}
               </b-form-invalid-feedback>
             </div>
@@ -627,6 +744,7 @@
                 enabled
                 aria-describedby="full_name"
                 max-lenght="50"
+                dusk="full_name"
                 :name="'full_name'"
                 :formatter="format50characters"
                 :placeholder="''"
@@ -653,6 +771,7 @@
                 enabled
                 aria-describedby="full_name_furigana"
                 max-lenght="50"
+                dusk="full_name_furigana"
                 :name="'full_name_furigana'"
                 :formatter="format50characters"
                 :placeholder="''"
@@ -660,7 +779,10 @@
                 :class="error.full_name_furigana === false ? 'is-invalid' : ''"
                 @input="handleChangeForm($event, 'full_name_furigana')"
               />
-              <b-form-invalid-feedback id="full_name" :state="error.full_name_furigana">
+              <b-form-invalid-feedback
+                id="full_name"
+                :state="error.full_name_furigana"
+              >
                 {{ $t('VALIDATE.REQUIRED_TEXT') }}
               </b-form-invalid-feedback>
             </div>
@@ -668,8 +790,14 @@
           <!--  -->
         </div>
       </div>
-      <div v-if="type_form === 'detail'" class="row-item border-t border-l border-r">
-        <div class="form-title align-start" :class="{ 'bg-type-detail' : type_form === 'detail' }">
+      <div
+        v-if="type_form === 'detail'"
+        class="row-item border-t border-l border-r"
+      >
+        <div
+          class="form-title align-start"
+          :class="{ 'bg-type-detail': type_form === 'detail' }"
+        >
           <span>{{ $t('COMPANY_REGISTER.REPRESENTATIVE') }}</span>
         </div>
         <div class="form-inputs border-l" style="gap: 1rem">
@@ -720,8 +848,11 @@
       </div>
 
       <!-- 9 option input 代表者連絡先 Representative contact -->
-      <div v-if="type_form === 'edit'" class="row-item border-t border-l border-r">
-        <div class="form-title">
+      <div
+        v-if="type_form === 'edit'"
+        class="row-item border-t border-l border-r"
+      >
+        <div class="form-title d-flex justify-content-between">
           <span>{{ $t('COMPANY_REGISTER.REPRESENTATIVE_CONTACT') }}</span><Arbitrarily />
         </div>
         <div class="form-inputs border-l">
@@ -729,32 +860,71 @@
             <!-- Dropdown -->
             <div class="h-100" style="height: 40px">
               <div
-                :class="error.representative_contact_id === false ? 'option-error' : 'option-validate'"
+                :class="
+                  error.representative_contact_id === false
+                    ? 'option-error'
+                    : 'option-validate'
+                "
               >
                 <div class="option-area-code">
                   <b-dropdown
                     id="representative_contact"
+                    dusk="representative_contact_option"
                     :text="display_area_code.representative_contact"
-                    class="w-100  h-100"
+                    class="w-100 h-100"
                   >
-                    <!--  -->
+                    <!-- BLANK -->
                     <b-dropdown-item
+                      dusk="representative_contact_vn"
                       @click="
-                        pustAreaCode('representative_contact','+84')
-                        handleChangeFormOption($event, 'representative_contact_id')"
-                      @change="handleChangeForm($event, 'representative_contact_id')"
+                        pustAreaCode('representative_contact', '');
+                        handleChangeFormOption(
+                          $event,
+                          'representative_contact_id'
+                        );
+                      "
+                      @change="
+                        handleChangeForm($event, 'representative_contact_id')
+                      "
                     >
-                      <img :src="require(`@/assets/images/icons/flag-84.png`)">
+                      <span style="height: 28px" />
+                    </b-dropdown-item>
+                    <!-- VIE -->
+                    <b-dropdown-item
+                      dusk="representative_contact_vn"
+                      @click="
+                        pustAreaCode('representative_contact', '+84');
+                        handleChangeFormOption(
+                          $event,
+                          'representative_contact_id'
+                        );
+                      "
+                      @change="
+                        handleChangeForm($event, 'representative_contact_id')
+                      "
+                    >
+                      <img
+                        :src="require(`@/assets/images/icons/flag-84.png`)"
+                      >
                       <span>+84</span>
                     </b-dropdown-item>
-                    <!--  -->
+                    <!-- JA -->
                     <b-dropdown-item
+                      dusk="representative_contact_ja"
                       @click="
-                        pustAreaCode('representative_contact','+81')
-                        handleChangeFormOption($event, 'representative_contact_id')"
-                      @change="handleChangeForm($event, 'representative_contact_id')"
+                        pustAreaCode('representative_contact', '+81');
+                        handleChangeFormOption(
+                          $event,
+                          'representative_contact_id'
+                        );
+                      "
+                      @change="
+                        handleChangeForm($event, 'representative_contact_id')
+                      "
                     >
-                      <img :src="require(`@/assets/images/icons/flag-81.png`)">
+                      <img
+                        :src="require(`@/assets/images/icons/flag-81.png`)"
+                      >
                       <span>+81</span>
                     </b-dropdown-item>
                   </b-dropdown>
@@ -777,8 +947,9 @@
                 aria-describedby="representative_contact"
                 max-lenght="50"
                 type="number"
+                dusk="'representative_contact'"
                 :name="'representative_contact'"
-                :formatter="format50characters"
+                :formatter="format15characters"
                 :placeholder="$t('COMPANY_REGISTER.PLACEHOLDER')"
                 :enabled="display_area_code.representative_contact"
                 :disabled="!display_area_code.representative_contact"
@@ -787,56 +958,94 @@
             </div>
             <!--  -->
           </div>
-
         </div>
       </div>
-      <div v-if="type_form === 'detail'" class="row-item border-t border-l border-r">
-        <div class="form-title" :class="{ 'bg-type-detail' : type_form === 'detail' }">
+      <div
+        v-if="type_form === 'detail'"
+        class="row-item border-t border-l border-r"
+      >
+        <div
+          class="form-title"
+          :class="{ 'bg-type-detail': type_form === 'detail' }"
+        >
           <span>{{ $t('COMPANY_REGISTER.REPRESENTATIVE_CONTACT') }}</span>
         </div>
         <div class="form-inputs border-l">
-          <div class="w-100 d-flex justify-start align-center" style="gap: 0.75rem">
+          <div
+            class="w-100 d-flex justify-start align-center"
+            style="gap: 0.75rem"
+          >
             <div>
-              <span>{{ display_area_code.representative_contact }} {{ formData.representative_contact }}</span>
+              <span>{{ display_area_code.representative_contact }}
+                {{ formData.representative_contact }}</span>
             </div>
           </div>
         </div>
       </div>
 
       <!-- 10 option input Assignee contact 担当者連絡先 -->
-      <div v-if="type_form === 'edit'" class="row-item border-t border-l border-r border-b">
-        <div class="form-title">
+      <div
+        v-if="type_form === 'edit'"
+        class="row-item border-t border-l border-r border-b"
+      >
+        <div class="form-title d-flex justify-content-between">
           <span>{{ $t('COMPANY_REGISTER.ASSIGNEE_CONTACT') }}</span><Require />
         </div>
         <div class="form-inputs border-l">
           <div class="w-100 d-flex justify-start align-start" style="gap: 1rem">
             <!-- Dropdown -->
             <div class="h-100" style="height: 40px">
-              <div :class="error.assignee_contact_id === false ? 'option-error' : 'option-validate'">
+              <div
+                :class="
+                  error.assignee_contact_id === false
+                    ? 'option-error'
+                    : 'option-validate'
+                "
+              >
                 <div class="option-area-code">
                   <b-dropdown
                     id="assignee_contact"
+                    dusk="assignee_contact_option"
                     :text="display_area_code.assignee_contact"
-                    class="w-100  h-100"
+                    class="w-100 h-100"
                   >
-                    <!--  -->
+                    <!-- BLANK -->
                     <b-dropdown-item
+                      dusk="assignee_contact_vn"
                       @click="
-                        pustAreaCode('assignee_contact','+84')
-                        handleChangeFormOption($event, 'assignee_contact_id')"
+                        pustAreaCode('assignee_contact', '');
+                        handleChangeFormOption($event, 'assignee_contact_id');
+                      "
                       @change="handleChangeForm($event, 'assignee_contact_id')"
                     >
-                      <img :src="require(`@/assets/images/icons/flag-84.png`)">
+                      <span style="height: 28px" />
+                    </b-dropdown-item>
+                    <!-- VIE -->
+                    <b-dropdown-item
+                      dusk="assignee_contact_vn"
+                      @click="
+                        pustAreaCode('assignee_contact', '+84');
+                        handleChangeFormOption($event, 'assignee_contact_id');
+                      "
+                      @change="handleChangeForm($event, 'assignee_contact_id')"
+                    >
+                      <img
+                        :src="require(`@/assets/images/icons/flag-84.png`)"
+                      >
                       <span>+84</span>
                     </b-dropdown-item>
-                    <!--  -->
+                    <!-- JA -->
                     <b-dropdown-item
+                      dusk="assignee_contact_ja"
                       @click="
-                        pustAreaCode('assignee_contact','+81')
-                        handleChangeFormOption($event, 'assignee_contact_id')"
+                        pustAreaCode('assignee_contact', '+81');
+                        handleChangeFormOption($event, 'assignee_contact_id');
+                      "
                       @change="handleChangeForm($event, 'assignee_contact_id')"
                     >
-                      <img :src="require(`@/assets/images/icons/flag-81.png`)">
+                      <img
+                        :src="require(`@/assets/images/icons/flag-81.png`)"
+                      >
                       <span>+81</span>
                     </b-dropdown-item>
                   </b-dropdown>
@@ -851,7 +1060,10 @@
                   >
                 </div>
               </div>
-              <b-form-invalid-feedback id="assignee_contact" :state="error.assignee_contact_id">
+              <b-form-invalid-feedback
+                id="assignee_contact"
+                :state="error.assignee_contact_id"
+              >
                 {{ $t('VALIDATE.REQUIRED_SELECT') }}
               </b-form-invalid-feedback>
             </div>
@@ -862,31 +1074,43 @@
                 aria-describedby="assignee_contact"
                 max-lenght="50"
                 type="number"
+                dusk="assignee_contact"
                 :name="'assignee_contact'"
-                :formatter="format50characters"
+                :formatter="format15characters"
                 :placeholder="$t('COMPANY_REGISTER.PLACEHOLDER')"
                 :class="error.assignee_contact === false ? 'is-invalid' : ''"
                 :enabled="display_area_code.assignee_contact"
                 :disabled="!display_area_code.assignee_contact"
                 @input="handleChangeForm($event, 'assignee_contact')"
               />
-              <b-form-invalid-feedback id="assignee_contact" :state="error.assignee_contact">
+              <b-form-invalid-feedback
+                id="assignee_contact"
+                :state="error.assignee_contact"
+              >
                 {{ $t('VALIDATE.REQUIRED_TEXT') }}
               </b-form-invalid-feedback>
             </div>
-            <!--  -->
           </div>
-
         </div>
       </div>
-      <div v-if="type_form === 'detail'" class="row-item border-t border-l border-r border-b">
-        <div class="form-title" :class="{ 'bg-type-detail' : type_form === 'detail' }">
+      <div
+        v-if="type_form === 'detail'"
+        class="row-item border-t border-l border-r border-b"
+      >
+        <div
+          class="form-title"
+          :class="{ 'bg-type-detail': type_form === 'detail' }"
+        >
           <span>{{ $t('COMPANY_REGISTER.ASSIGNEE_CONTACT') }}</span>
         </div>
         <div class="form-inputs border-l">
-          <div class="w-100 d-flex justify-start align-center" style="gap: 0.75rem">
+          <div
+            class="w-100 d-flex justify-start align-center"
+            style="gap: 0.75rem"
+          >
             <div>
-              <span>{{ display_area_code.assignee_contact }} {{ formData.assignee_contact }}</span>
+              <span>{{ display_area_code.assignee_contact }}
+                {{ formData.assignee_contact }}</span>
             </div>
           </div>
         </div>
@@ -936,7 +1160,6 @@ export default {
     //   type: Object,
     //   required: true,
     // },
-
   },
 
   data() {
@@ -956,8 +1179,24 @@ export default {
 
       // major_classification_options: this.majoOptions,
       // middle_classification_options: this.middleOptions,
-      major_classification_options: [],
-      middle_classification_options: [],
+      major_classification_options: [
+        {
+          id: null,
+          type: null,
+          name_ja: this.$t('VALIDATE.REQUIRED_SELECT'),
+          disabled: true,
+        },
+      ],
+      findItemCount: 0,
+
+      middle_classification_options: [
+        {
+          id: null,
+          type: null,
+          name_ja: this.$t('VALIDATE.REQUIRED_SELECT'),
+          disabled: true,
+        },
+      ],
 
       account_classification_option: account_classification_option,
       error: this.errorCompany,
@@ -999,17 +1238,26 @@ export default {
       }
     },
     format7characters(e) {
-      return String(e).substring(0, 7);
+      const inputValue = String(e).substring(0, 7); // Giới hạn 7 ký tự
+
+      // Loại bỏ các ký tự tiếng Nhật từ giá trị nhập vào
+      const filteredValue = inputValue.replace(/[ぁ-んァ-ン一-龯。]/g, '');
+
+      return filteredValue;
     },
     format50characters(e) {
       return String(e).substring(0, 50);
+    },
+
+    format15characters(e) {
+      return String(e).substring(0, 15);
     },
 
     pustAreaCode(type_select, type_option) {
       this.$emit('pust-area-code', type_select, type_option);
     },
 
-    selectRenderText(type_select, id_select, option_select){
+    selectRenderText(type_select, id_select, option_select) {
       this.$emit('select-render-text', type_select, id_select, option_select);
     },
 
@@ -1038,7 +1286,7 @@ export default {
         const response = await getListMainjob();
         const { data, code, message } = response.data;
         if (code === 200) {
-          data.map(item => {
+          data.map((item) => {
             if (this.formData.major_classification_id === item.id) {
               this.formData.major_classification_text = item.name_ja;
             }
@@ -1046,6 +1294,13 @@ export default {
           this.major_classification_options = []; // Reset arr
           this.major_classification_options = data;
           const id_major = this.formData.major_classification_id;
+
+          this.major_classification_options.unshift({
+            id: null,
+            type: null,
+            name_ja: this.$t('VALIDATE.REQUIRED_SELECT'),
+            disabled: true,
+          });
 
           let middle_option = [];
           for (let i = 0; i < this.major_classification_options.length; i++) {
@@ -1056,7 +1311,7 @@ export default {
           this.middle_classification_options = [];
           this.middle_classification_options = middle_option;
 
-          middle_option.map(item => {
+          middle_option.map((item) => {
             if (this.formData.middle_classification_id === item.id) {
               this.formData.middle_classification_text = item.name_ja;
             }
@@ -1068,22 +1323,43 @@ export default {
             content: message || '',
           });
         }
+
         this.renderChildOption(this.formData.major_classification_id);
         //
-      } catch (erorr) {
-        console.log('erorr', erorr);
+      } catch (error) {
+        console.log(error);
       }
     },
 
     renderChildOption(major_id) {
-      let middle_option = [];
-      for (let i = 0; i < this.major_classification_options.length; i++) {
-        if (this.major_classification_options[i].id === major_id) {
-          middle_option = this.major_classification_options[i].job_info;
+      if (major_id) {
+        const findItem = this.major_classification_options.find(
+          (item) => item.id === major_id
+        );
+
+        //
+        if (findItem) {
+          this.middle_classification_options = [
+            {
+              id: null,
+              type: null,
+              name_ja: this.$t('VALIDATE.REQUIRED_SELECT'),
+              disabled: true,
+            },
+          ];
+        }
+        //
+        if (findItem) {
+          if (this.findItemCount > 0) {
+            this.formData.middle_classification_id = null; //!
+          }
+          this.findItemCount++;
+          findItem.job_info.forEach((item) => {
+            this.middle_classification_options.push(item);
+          });
         }
       }
-      this.middle_classification_options = middle_option;
-      return middle_option;
+      //
     },
     //
   },
@@ -1093,4 +1369,3 @@ export default {
 <style lang="scss" scoped>
 @import '@/pages/RegisterHrOrigin/RegisterHrOrigin.scss';
 </style>
-

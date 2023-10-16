@@ -136,7 +136,6 @@ export default {
     },
     //
     getContentSelect(id) {
-      console.log('getContentSelect', id);
       if (id) {
         return id.content;
       }

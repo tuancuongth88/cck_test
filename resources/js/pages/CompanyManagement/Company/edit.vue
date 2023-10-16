@@ -452,10 +452,7 @@ export default {
     onSubmit(e) {
       e.preventDefault();
       this.checkvalidate();
-      if (this.checkvalidate() === true) {
-        console.log('Vào đây gửi lên formData', this.formData);
-      } else {
-        console.log('Else Vào đây gửi lên formData', this.formData);
+      if (!this.checkvalidate()) {
         e.stopPropagation();
       }
     },

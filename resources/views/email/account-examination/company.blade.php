@@ -7,11 +7,11 @@
         </h3>
         <div style="padding-left: 60px">
             <p>
-                {{ $data['email'] }}　様
+                {{ @$data['permission'] }}様
             </p>
             <p>
                 企業の新規アカウント申請がありました。<br>
-                <a href="{{ url('company/list') }}">こちら</a>より企業の審査を行ってください。
+                企業一覧より企業の審査を行ってください。
             </p>
         </div>
     </div>
@@ -19,3 +19,4 @@
 </body>
 
 </html>
+

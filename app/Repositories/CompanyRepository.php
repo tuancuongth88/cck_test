@@ -41,12 +41,14 @@ class CompanyRepository extends BaseRepository implements CompanyRepositoryInter
         if ($request->has('field') && $request->field) {
             if ($request->field == 'status'){
                 $data = Common::sortArrayText($data, "status", User::listStatus(), $request->sort_by == 'asc');
-            }elseif ($request->field == 'field'){
+            }elseif($request->field == 'field'){
                 $jobType = JobType::query()->where('type',JOB_TYPE)->pluck('name_ja', 'id')->toArray();
                 $data = Common::sortArrayText($data, "major_classification", $jobType, $request->sort_by == 'asc');
             }else{
-                $data = $data->orderBy('id', 'desc');
+                $data = Common::sortBy($request, $data);
             }
+        }else{
+            $data = $data->orderBy('id', 'desc');
         }
         return Common::pagination($request, $data);
     }
@@ -62,23 +64,23 @@ class CompanyRepository extends BaseRepository implements CompanyRepositoryInter
         if($attributes['is_create']) {
             $attributes['status'] = EXAMINATION_PENDING;
             $data = parent::create($attributes);
-            $user = User::where('type', SUPER_ADMIN)
-                ->orwhere('type', COMPANY_MANAGER)
-                ->get();
-
-            $notify = [
-                'type' => TYPE_NOTIFY['register_company'],
-                'content' => trans('messages.notify_register_account_company'),
-            ];
-
-            RemindAccountJob::dispatch(COMPANY, Company::class);
-
-//            $schedule->job(new RemindAccountJob(HR_MANAGER, HrOrganization::class))->weeklyOn(1, '0:00');
-//            $schedule->job(new RemindAccountJob(COMPANY, Company::class))->weeklyOn(1, '0:00');
-//            Notification::send($user, new SendNotification($notify));
-
+            RemindAccountJob::dispatch(COMPANY_MANAGER, Company::class, $data->id);
             return $data;
         }
         return;
+    }
+
+    public function getAllName()
+    {
+        if(Auth::user()->type == \COMPANY) {
+            return $this->model->where('status', CONFIRM)
+                ->whereNotNull('user_id')
+                ->where(Company::USER_ID, Auth::id())
+                ->get();
+        }
+
+        return $this->model->where('status', CONFIRM)
+            ->whereNotNull('user_id')
+            ->get();
     }
 }

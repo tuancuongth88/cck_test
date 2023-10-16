@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
+use Laravel\Scout\Searchable;
+
 /**
  * @OA\Schema(
  *     type="object",
@@ -160,7 +162,7 @@ use Illuminate\Support\Facades\Auth;
 
 class Work extends Model
 {
-    use HasFactory;
+    use HasFactory, Searchable;
     use SoftDeletes;
 
     const USER_ID = 'user_id';
@@ -191,6 +193,8 @@ class Work extends Model
     const PASSIVE_SMOKING = 'passive_smoking';
     const INTERVIEW_FOLLOW = 'interview_follow';
     const STATUS = 'status';
+    const COUNTRY_ID = 'country_id';
+    const COUNTRY_NAME = 'country_name';
     const CREATED_BY = 'created_by';
     const UPDATED_BY = 'updated_by';
 
@@ -225,6 +229,8 @@ class Work extends Model
         self::PASSIVE_SMOKING,
         self::INTERVIEW_FOLLOW,
         self::STATUS,
+        self::COMPANY_ID,
+        self::COUNTRY_NAME,
         self::CREATED_BY,
         self::UPDATED_BY
     ];
@@ -234,6 +240,26 @@ class Work extends Model
     protected $casts = [
         'data' => 'array'
     ];
+
+    public function toSearchableArray()
+    {
+        return [
+            'title' => $this->title,
+            'application_period_from' => $this->application_period_from,
+            'application_period_to' => $this->application_period_to,
+            'job_description' => $this->job_description,
+            'application_condition' => $this->application_condition,
+            'application_requirement' => $this->application_requirement,
+            'other_skill' => $this->other_skill,
+            'preferred_skill' => $this->preferred_skill,
+            'vacation' => $this->vacation,
+            'expected_income' => $this->expected_income,
+            'assumed_annual_income' => $this->assumed_annual_income,
+            'working_palace_detail' => $this->working_palace_detail,
+            'treatment_welfare' => $this->treatment_welfare,
+            'company_pr_appeal' => $this->company_pr_appeal,
+        ];
+    }
 
 
     public function languageRequirements(){

@@ -36,11 +36,54 @@ class UploadFileRequest extends FormRequest
     public function getCustomRule()
     {
         if (Route::getCurrentRoute()->getActionMethod() == 'store') {
-            return [
-                "file" => "required|file|max:3072",
-                'model_file' => 'nullable',
-                'type' => 'nullable|required_if:model_file,entry|in:' . implode(',', ENTRIES_FILE_TYPES)
+            $allowedMimes = [
+                'image/png',
+                'image/jpeg',
+                'audio/mpeg',
+                'video/mpeg',
+                'video/mp4',
+                'video/3gpp',
+                'image/gif',
+                'image/svg+xml',
+                'text/csv',
+                'text/plain',
+                'application/pdf',
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             ];
+            $mimes = [
+                'png','jpeg','mp3','mpeg','mp4','3gp','gif','svg','jpg','csv','txt','pdf','xlsx'
+            ];
+           return [
+               'file' => [
+                'required',
+                'max:3072',
+                function ($attribute, $value, $fail) use ($allowedMimes, $mimes) {
+                    if ($value instanceof \Illuminate\Http\UploadedFile) {
+                        $mime = $value->getMimeType();
+                        $extension = $value->getClientOriginalExtension();
+                        if (!in_array($mime, $allowedMimes) || !in_array($extension, $mimes)) {
+                            $fail(trans('api.uploadFile.size'));
+                        }
+                    }
+                },
+            ],
+           ];
+//            return [
+//                "file" => [
+//                    "required|file|max:3072",
+//                    "mimes:png,jpeg,mp3,mpeg,mp4,3gp,gif,svg,jpg,csv,txt,pdf,xlsx"
+////                    'mimetypes:image/jpeg,image/png',
+//                ],
+//                'model_file' => 'nullable',
+//                'type' => 'nullable|required_if:model_file,entry|in:' . implode(',', ENTRIES_FILE_TYPES)
+//            ];
         }
+    }
+
+    public function messages()
+    {
+        return [
+            'file.max' => trans('api.uploadFile.size'),
+        ];
     }
 }

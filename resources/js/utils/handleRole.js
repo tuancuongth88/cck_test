@@ -90,7 +90,7 @@ export function getCurrentRoutes() {
     return CURRENT_ROUTES;
   }
 
-  return '/vehicle/list';
+  return '/login';
 }
 
 /**

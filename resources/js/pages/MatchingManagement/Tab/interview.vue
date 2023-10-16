@@ -1,5200 +1,223 @@
 <template>
-  <div>
-    <b-table :fields="fieldsInterview" :items="itemsInterview">
-      <template #head(selected)="">
-        <b-form-checkbox
-          v-model="selectAll"
-          @change="onSelectAllCheckboxChange"
-        />
-      </template>
-      <template #cell(selected)="row">
-        <b-form-checkbox
-          v-model="row.item._isSelected"
-          @change="onItemCheckboxChange(row.item)"
-        />
-      </template>
-      <template #cell(full_name)="fullname">
-        <div
-          class="w-100 justify-space-between flex-column"
-          style="align-items: flex-start"
+  <div class="w-100">
+    <div :class="!sidebarExists ? 'over-flow' : ''">
+      <div class="hr-list-table-list__table">
+        <b-table
+          id="interview-table"
+          :fields="fieldsInterview"
+          :items="itemsInterview"
+          hover
+          no-local-sorting
+          show-empty
+          @sort-changed="handleSort"
         >
-          <div
+          <template #empty="">
+            <div class="text-center">
+              {{ $t('TABLE_EMPTY') }}
+            </div>
+          </template>
+          <template #head(selected)="">
+            <b-form-checkbox
+              id="checkbox-interview"
+              v-model="selectAll"
+              @change="onSelectAllCheckboxChange"
+            />
+          </template>
+          <template #head(entry_code)="">
+            <label
+              class="mb-0"
+            >{{ $t('ENTRY_LABEL') }} <br>
+              ID</label>
+          </template>
+          <template #head(status_selection)="">
+            <label
+              class="mb-0"
+            >{{ $t('SELECT_LABEL') }} <br>
+              {{ $t('STATUS_LABEL') }}</label>
+          </template>
+          <template #head(status_interview_adjustment)="">
+            <label
+              class="mb-0"
+            >{{ $t('INTERVIEW_ARRANGEMENT') }} <br>
+              {{ $t('STATUS_LABEL') }}</label>
+          </template>
+          <template #cell(selected)="row">
+            <b-form-checkbox
+              v-model="row.item._isSelected"
+              :disabled="![3, 4].includes(row.item.status_selection)"
+              @change="onItemCheckboxChange(row.item)"
+            />
+          </template>
+          <template #cell(id)="row">
+            <span>{{ row.item.hr_id }}</span>
+          </template>
+          <template #cell(entry_code)="data">
+            <span v-if="!data.item.entry_code"> - </span>
+            <span v-else>
+              {{ data.item.entry_code }}
+            </span>
+          </template>
+          <template #cell(interview_date)="data">
+            <span v-if="[3, 4].includes(data.item.status_interview_adjustment)">
+              {{ data.item.interview_date }}
+            </span>
+            <span v-else> - </span>
+          </template>
+          <template #cell(full_name)="fullname">
+            <b-link
+              :to="`hr/detail/${fullname.item.hr_id}`"
+              class="w-100 justify-space-between flex-column text-dark"
+              style="align-items: flex-start"
+            >
+              <!-- <div
             v-for="(item, index) in fullname.item.full_name"
             :key="index"
             class="w-100 justify-space-between flex-column"
-          >
-            <div class="text-overflow-ellipsis">
-              {{ item.name_vn }}
+          > -->
+              <div class="w-100 justify-space-between flex-column">
+                <div
+                  class="one-line-paragraph"
+                  :style="{ width: `calc(${hrFullNameColWidth} - 1.5rem)` }"
+                  :title="fullname.item.full_name"
+                >
+                  {{ fullname.item.full_name }}
+                </div>
+                <div
+                  class="one-line-paragraph"
+                  :style="{ width: `calc(${hrFullNameColWidth} - 1.5rem)` }"
+                  :title="fullname.item.full_name_ja"
+                >
+                  {{ fullname.item.full_name_ja }}
+                </div>
+              </div>
+            </b-link>
+          </template>
+          <!-- 6 求人名 Job name -->
+          <template #cell(job_name)="row">
+            <div class="w-100 justify-space-between flex-column">
+              <b-link
+                :to="
+                  [
+                    ROLE.TYPE_SUPER_ADMIN,
+                    ROLE.TYPE_COMPANY_ADMIN,
+                    ROLE.TYPE_COMPANY,
+                  ].includes(permissionCheck)
+                    ? `job/detail/${row.item.work_id}`
+                    : `job-search/detail/${row.item.work_id}`
+                "
+                class="w-100 justify-space-between flex-column text-dark"
+              >
+                <div
+                  class="one-line-paragraph"
+                  :style="{ width: `calc(${workTitleColWidth} - 1.5rem)` }"
+                  :title="row.item.job_name"
+                >
+                  {{ row.item.job_name }}
+                </div>
+              </b-link>
             </div>
-            <div class="text-overflow-ellipsis">
-              {{ item.name_jp }}
-            </div>
-          </div>
-        </div>
-      </template>
-      <template #cell(selection_status)="selection_status">
-        <span
+          </template>
+          <template #cell(status_selection)="data">
+            <!-- <span
           v-if="
-            selection_status.value === 'オファー承認' ||
-              selection_status.value === '書類通過' ||
-              selection_status.value === '一次合格' ||
-              selection_status.value === '二次合格' ||
-              selection_status.value === '三次合格' ||
-              selection_status.value === '四次合格' ||
-              selection_status.value === '五次合格'
+            data.item.status_selection_name === 'オファー承認' ||
+              data.item.status_selection_name === '書類通過' ||
+              data.item.status_selection_name === '一次合格' ||
+              data.item.status_selection_name === '二次合格' ||
+              data.item.status_selection_name === '三次合格' ||
+              data.item.status_selection_name === '四次合格' ||
+              data.item.status_selection_name === '五次合格'
           "
           class="btn-status btn-confirm"
-        >
-          {{ selection_status.value }}
-        </span>
-        <span
+        > -->
+            <span
+              v-if="[1, 2, 5, 6, 7, 8, 9].includes(data.item.status_selection)"
+              class="btn-status btn-confirm"
+            >
+              {{ data.item.status_selection_name }}
+            </span>
+            <!-- <span
           v-if="
-            selection_status.value === '面接中止' ||
-              selection_status.value === '面接辞退'
+            data.item.status_selection_name === '面接中止' ||
+              data.item.status_selection_name === '面接辞退'
           "
           class="btn-status btn-decline"
-        >
-          {{ selection_status.value }}
-        </span>
-      </template>
-      <template
-        #cell(interview_adjustment_status)="interview_adjustment_status"
-      >
-        <span class="btn-status btn-pending">
-          {{ interview_adjustment_status.value }}
-        </span>
-      </template>
-      <template #cell(detail)="row">
-        <button class="btn-go-detail" @click="goToDetail(row.item)">
-          <i class="fas fa-eye icon-detail" />
-        </button>
-      </template>
-    </b-table>
-    <!-- offer confirmation + adjust -->
-    <modal-common
-      :refs="'offer-confirmation_adjust'"
-      :size="'lg'"
-      @reset-modal="resetModal"
-    >
-      <div slot="body">
-        <!-- header -->
-        <div class="text-center">
-          <template v-if="step === 1 || step === 2">
-            <h2 class="font-weight-bold">
-              Nguyen Thi Nhi <br>
-              ｸﾞｴﾝ ﾃｨ ﾆｰ
-            </h2>
-            <h5>
-              電気設計エンジニア <br>
-              《オファー》
-            </h5>
-          </template>
-        </div>
-        <!-- body -->
-        <div class="content-detail px-5">
-          <template v-if="step === 1">
-            <b-form @submit="handleNextStep($event)" @reset="onReset($event)">
-              <h4 class="text-center">一次面接</h4>
-              <b-form-group label="面接形式">
-                <b-form-radio-group
-                  v-model="typeStatus"
-                  name="面接形式"
-                  stacked
-                >
-                  <template v-for="option in typeStatusOptions">
-                    <b-form-radio
-                      :key="option.key"
-                      :value="option.key"
-                      :disabled="option.key === 1"
-                    >
-                      {{ option.value }}
-                    </b-form-radio>
-                  </template>
-                </b-form-radio-group>
-              </b-form-group>
-            </b-form>
-            <h6 v-if="typeStatus === 1" class="text-red">
-              この人材は他の3名の人材 Nguyen Trang、Phan Nam、Pham Minh
-              とエントリーしています。
-              集団面接を選択した場合、他のエントリー者にも同じ面接候補日が自動で送信されます。
-            </h6>
-            <b-table
-              class="bg-white"
-              bordered
-              :fields="fieldsModal"
-              :items="itemsModal"
+        > -->
+            <span
+              v-if="[3, 4].includes(data.item.status_selection)"
+              class="btn-status btn-decline"
             >
-              <template #cell(candidate_date)="">
-                <b-form-input type="date" />
-              </template>
-
-              <template #cell(starting_time)="">
-                <div class="d-flex">
-                  <b-form-select :options="clockOptions" class="ml-1 mr-2" />
-                  <b-form-select :options="hourOptions" class="mr-1 ml-2" />
-                </div>
-              </template>
-              <template #cell(expected_time)="">
-                <div class="d-flex align-items-center">
-                  <b-form-select :options="minuteOptions" class="mx-2" />
-                  <span>分</span>
-                </div>
-              </template>
-            </b-table>
+              {{ data.item.status_selection_name }}
+            </span>
           </template>
-
-          <template v-if="step === 2">
-            <b-row>
-              <b-col cols="4">面接形式 </b-col>
-              <b-col cols="8">個人面接</b-col>
-            </b-row>
-            <b-row>
-              <b-col cols="4" class="my-2">面接候補日 </b-col>
-              <b-col cols="8" class="d-flex flex-wrap align-items-center my-2">
-                <div>2023年3月5日（月）午前11時〜午後12時</div>
-                <div>2023年3月5日（月）午後1時〜午後2時</div>
-                <div>2023年3月6日（火）午後1時〜午後2時</div>
-                <div>2023年3月6日（火）午後2時〜午後3時</div>
-                <div>2023年3月7日（水）午前10時〜午前11時</div>
-              </b-col>
-            </b-row>
+          <template #cell(status_interview_adjustment)="data">
+            <span class="btn-status btn-pending">
+              {{ data.item.status_interview_adjustment_name }}
+            </span>
           </template>
-
-          <!-- Button -->
-          <div class="d-flex justify-content-center mt-5">
-            <template v-if="step === 1">
-              <b-button variant="secondary" class="mx-1">
-                <i class="fas fa-solid fa-caret-left fs-16" />
-                <span class="mx-1" @click="handleBack">前の画面に戻る</span>
-              </b-button>
-              <b-button
-                variant="warning"
-                class="text-white mx-1"
-                @click="handleNextStep($event)"
-              >確認画面へ</b-button>
-            </template>
-            <template v-if="step === 2">
-              <b-button variant="secondary" class="mx-1">
-                <i class="fas fa-solid fa-caret-left fs-16" />
-                <span class="mx-1" @click="handleBack">前の画面に戻る</span>
-              </b-button>
-              <b-button variant="warning" class="text-white mx-1" @click="'';">
-                この内容で送信する
-              </b-button>
-            </template>
-          </div>
-        </div>
+          <template #cell(detail)="row">
+            <button class="btn-go-detail" @click="handleGetDetail(row.item)">
+              <i class="fas fa-eye icon-detail" />
+            </button>
+          </template>
+        </b-table>
       </div>
-    </modal-common>
-    <!-- document passing + adjust -->
-    <modal-common
-      :refs="'document-passing_adjust'"
-      :size="'lg'"
-      @reset-modal="resetModal"
-    >
-      <div slot="body">
-        <!-- header -->
-        <div class="text-center">
-          <template v-if="step === 1">
-            <h2 class="font-weight-bold">
-              Nguyen Thi Nhi <br>
-              ｸﾞｴﾝ ﾃｨ ﾆｰ
-            </h2>
-            <h5>
-              電気設計エンジニア <br>
-              《エントリー》
-            </h5>
-          </template>
-          <template v-if="step === 2">
-            <div>
-              <h2 class="font-weight-bold">
-                Nguyen Thi Nhi <br>
-                ｸﾞｴﾝ ﾃｨ ﾆｰ
-              </h2>
-              <h5>
-                電気設計エンジニア <br>
-                《エントリー》
-              </h5>
-            </div>
-            <div>
-              <h2 class="font-weight-bold">
-                Nguyen Trang <br>
-                ｸﾞｴﾝ ﾃｨ ﾆｰ
-              </h2>
-              <h5>
-                電気設計エンジニア <br>
-                《エントリー》
-              </h5>
-            </div>
-            <div>
-              <h2 class="font-weight-bold">
-                Phan Nam <br>
-                ｸﾞｴﾝ ﾃｨ ﾆｰ
-              </h2>
-              <h5>
-                電気設計エンジニア <br>
-                《エントリー》
-              </h5>
-            </div>
-            <div>
-              <h2 class="font-weight-bold">
-                Pham Minh <br>
-                ｸﾞｴﾝ ﾃｨ ﾆｰ
-              </h2>
-              <h5>
-                電気設計エンジニア <br>
-                《エントリー》
-              </h5>
-            </div>
-          </template>
-        </div>
-        <!-- body -->
-        <div class="content-detail px-5">
-          <template v-if="step === 1">
-            <b-form @submit="handleNextStep($event)" @reset="onReset($event)">
-              <h4 class="text-center">一次面接</h4>
-              <b-form-group label="面接形式">
-                <b-form-radio-group
-                  v-model="typeStatus"
-                  name="面接形式"
-                  stacked
-                >
-                  <template v-for="option in typeStatusOptions">
-                    <b-form-radio :key="option.key" :value="option.key">
-                      {{ option.value }}
-                    </b-form-radio>
-                  </template>
-                </b-form-radio-group>
-              </b-form-group>
-            </b-form>
-            <h6 v-if="typeStatus === 1" class="text-red">
-              この人材は他の3名の人材 Nguyen Trang、Phan Nam、Pham Minh
-              とエントリーしています。
-              集団面接を選択した場合、他のエントリー者にも同じ面接候補日が自動で送信されます。
-            </h6>
-            <b-table
-              class="bg-white"
-              bordered
-              :fields="fieldsModal"
-              :items="itemsModal"
-            >
-              <template #cell(candidate_date)="">
-                <b-form-input type="date" />
-              </template>
-
-              <template #cell(starting_time)="">
-                <div class="d-flex">
-                  <b-form-select :options="clockOptions" class="ml-1 mr-2" />
-                  <b-form-select :options="hourOptions" class="mr-1 ml-2" />
-                </div>
-              </template>
-              <template #cell(expected_time)="">
-                <div class="d-flex align-items-center">
-                  <b-form-select :options="minuteOptions" class="mx-2" />
-                  <span>分</span>
-                </div>
-              </template>
-            </b-table>
-          </template>
-
-          <template v-if="step === 2">
-            <b-row>
-              <b-col cols="4">面接形式 </b-col>
-              <b-col cols="8">集団面接</b-col>
-            </b-row>
-            <b-row>
-              <b-col cols="4" class="my-2">面接候補日 </b-col>
-              <b-col cols="8" class="d-flex flex-wrap align-items-center my-2">
-                <div>2023年3月5日（月）午前11時〜午後12時</div>
-                <div>2023年3月5日（月）午後1時〜午後2時</div>
-                <div>2023年3月6日（火）午後1時〜午後2時</div>
-                <div>2023年3月6日（火）午後2時〜午後3時</div>
-                <div>2023年3月7日（水）午前10時〜午前11時</div>
-              </b-col>
-            </b-row>
-          </template>
-
-          <!-- Button -->
-          <div class="d-flex justify-content-center mt-5">
-            <template v-if="step === 1">
-              <b-button variant="secondary" class="mx-1">
-                <i class="fas fa-solid fa-caret-left fs-16" />
-                <span class="mx-1" @click="handleBack">前の画面に戻る</span>
-              </b-button>
-              <b-button
-                variant="warning"
-                class="text-white mx-1"
-                @click="handleNextStep($event)"
-              >確認画面へ</b-button>
-            </template>
-            <template v-if="step === 2">
-              <b-button variant="secondary" class="mx-1">
-                <i class="fas fa-solid fa-caret-left fs-16" />
-                <span class="mx-1" @click="handleBack">前の画面に戻る</span>
-              </b-button>
-              <b-button variant="warning" class="text-white mx-1" @click="'';">
-                この内容で送信する
-              </b-button>
-            </template>
-          </div>
-        </div>
-      </div>
-    </modal-common>
-    <!-- first passing + adjust -->
-    <modal-common
-      :refs="'first-passing_adjust'"
-      :size="'lg'"
-      @reset-modal="resetModal"
-    >
-      <div slot="body">
-        <div class="text-center">
-          <template v-if="step === 1 || step === 2">
-            <h2 class="font-weight-bold">
-              Nguyen Thi Nhi <br>
-              ｸﾞｴﾝ ﾃｨ ﾆｰ
-            </h2>
-            <h5>
-              電気設計エンジニア <br>
-              《エントリー》
-            </h5>
-          </template>
-          <template v-if="step === 3">
-            <div>
-              <h2 class="font-weight-bold">
-                Nguyen Thi Nhi <br>
-                ｸﾞｴﾝ ﾃｨ ﾆｰ
-              </h2>
-              <h5>
-                電気設計エンジニア <br>
-                《エントリー》
-              </h5>
-            </div>
-            <div>
-              <h2 class="font-weight-bold">
-                Nguyen Trang <br>
-                ｸﾞｴﾝ ﾃｨ ﾆｰ
-              </h2>
-              <h5>
-                電気設計エンジニア <br>
-                《エントリー》
-              </h5>
-            </div>
-            <div>
-              <h2 class="font-weight-bold">
-                Phan Nam <br>
-                ｸﾞｴﾝ ﾃｨ ﾆｰ
-              </h2>
-              <h5>
-                電気設計エンジニア <br>
-                《エントリー》
-              </h5>
-            </div>
-            <div>
-              <h2 class="font-weight-bold">
-                Pham Minh <br>
-                ｸﾞｴﾝ ﾃｨ ﾆｰ
-              </h2>
-              <h5>
-                電気設計エンジニア <br>
-                《エントリー》
-              </h5>
-            </div>
-          </template>
-        </div>
-
-        <div class="content-detail px-5">
-          <!-- step 1 step 2 content -->
-          <template v-if="step === 1 || step === 2">
-            <b-form @submit="handleNextStep($event)" @reset="onReset($event)">
-              <h4 class="text-center">二次合格</h4>
-              <b-form-group label="面接形式">
-                <b-form-radio-group
-                  :options="['集団面接', '個人面接']"
-                  name="面接形式"
-                  stacked
-                />
-              </b-form-group>
-              <h6 v-if="step === 2" class="text-red">
-                この人材は他の3名の人材 Nguyen Trang、Phan Nam、Pham Minh
-                とエントリーしています。
-                集団面接を選択した場合、他のエントリー者にも同じ面接候補日が自動で送信されます。
-              </h6>
-              <!-- table -->
-              <b-table
-                class="bg-white"
-                bordered
-                :fields="fieldsModal"
-                :items="itemsModal"
-              >
-                <template #cell(candidate_date)="">
-                  <b-form-input type="date" />
-                </template>
-
-                <template #cell(starting_time)="">
-                  <div class="d-flex">
-                    <b-form-select :options="clockOptions" class="ml-1 mr-2" />
-                    <b-form-select :options="hourOptions" class="mr-1 ml-2" />
-                  </div>
-                </template>
-                <template #cell(expected_time)="">
-                  <div class="d-flex align-items-center">
-                    <b-form-select :options="minuteOptions" class="mx-2" />
-                    <span>分</span>
-                  </div>
-                </template>
-              </b-table>
-            </b-form>
-          </template>
-          <!-- step 3 content -->
-          <template v-if="step === 3">
-            <b-row>
-              <b-col cols="4">面接形式 </b-col>
-              <b-col cols="8">集団面接</b-col>
-            </b-row>
-            <b-row>
-              <b-col cols="4" class="my-2">面接候補日 </b-col>
-              <b-col cols="8" class="d-flex flex-wrap align-items-center my-2">
-                <div>2023年3月5日（月）午前11時〜午後12時</div>
-                <div>2023年3月5日（月）午後1時〜午後2時</div>
-                <div>2023年3月6日（火）午後1時〜午後2時</div>
-                <div>2023年3月6日（火）午後2時〜午後3時</div>
-                <div>2023年3月7日（水）午前10時〜午前11時</div>
-              </b-col>
-            </b-row>
-          </template>
-
-          <!-- Button -->
-          <div class="d-flex justify-content-center mt-5">
-            <template v-if="step === 1">
-              <b-button variant="secondary" class="mx-1">
-                <i class="fas fa-solid fa-caret-left fs-16" />
-                <span class="mx-1" @click="handleBack">前の画面に戻る</span>
-              </b-button>
-              <b-button
-                variant="warning"
-                class="text-white mx-1"
-                @click="handleNextStep($event)"
-              >この内容で送信する</b-button>
-            </template>
-            <template v-if="step === 2">
-              <b-button variant="secondary" class="mx-1">
-                <i class="fas fa-solid fa-caret-left fs-16" />
-                <span class="mx-1" @click="handleBack">前の画面に戻る</span>
-              </b-button>
-              <b-button
-                variant="warning"
-                class="text-white mx-1"
-                @click="handleNextStep($event)"
-              >
-                確認画面へ
-              </b-button>
-            </template>
-            <template v-if="step === 3">
-              <b-button variant="secondary" class="mx-1">
-                <i class="fas fa-solid fa-caret-left fs-16" />
-                <span class="mx-1" @click="handleBack">前の画面に戻る</span>
-              </b-button>
-              <b-button
-                variant="warning"
-                class="text-white mx-1"
-                @click="'';"
-              >この内容で送信する</b-button>
-            </template>
-          </div>
-        </div>
-      </div>
-    </modal-common>
-    <!-- second passing + adjust -->
-    <modal-common
-      :refs="'second-passing_adjust'"
-      :size="'lg'"
-      @reset-modal="resetModal"
-    >
-      <div slot="body">
-        <div class="text-center">
-          <template v-if="step === 1 || step === 2">
-            <h2 class="font-weight-bold">
-              Nguyen Thi Nhi <br>
-              ｸﾞｴﾝ ﾃｨ ﾆｰ
-            </h2>
-            <h5>
-              電気設計エンジニア <br>
-              《エントリー》
-            </h5>
-          </template>
-          <template v-if="step === 3">
-            <div>
-              <h2 class="font-weight-bold">
-                Nguyen Thi Nhi <br>
-                ｸﾞｴﾝ ﾃｨ ﾆｰ
-              </h2>
-              <h5>
-                電気設計エンジニア <br>
-                《エントリー》
-              </h5>
-            </div>
-            <div>
-              <h2 class="font-weight-bold">
-                Nguyen Trang <br>
-                ｸﾞｴﾝ ﾃｨ ﾆｰ
-              </h2>
-              <h5>
-                電気設計エンジニア <br>
-                《エントリー》
-              </h5>
-            </div>
-            <div>
-              <h2 class="font-weight-bold">
-                Phan Nam <br>
-                ｸﾞｴﾝ ﾃｨ ﾆｰ
-              </h2>
-              <h5>
-                電気設計エンジニア <br>
-                《エントリー》
-              </h5>
-            </div>
-            <div>
-              <h2 class="font-weight-bold">
-                Pham Minh <br>
-                ｸﾞｴﾝ ﾃｨ ﾆｰ
-              </h2>
-              <h5>
-                電気設計エンジニア <br>
-                《エントリー》
-              </h5>
-            </div>
-          </template>
-        </div>
-
-        <div class="content-detail px-5">
-          <template v-if="step === 1 || step === 2">
-            <b-form @submit="handleNextStep($event)" @reset="onReset($event)">
-              <h4 class="text-center">三次合格</h4>
-              <b-form-group label="面接形式">
-                <b-form-radio-group
-                  :options="['集団面接', '個人面接']"
-                  name="面接形式"
-                  stacked
-                />
-              </b-form-group>
-              <h6 v-if="step === 2" class="text-red">
-                この人材は他の3名の人材 Nguyen Trang、Phan Nam、Pham Minh
-                とエントリーしています。
-                集団面接を選択した場合、他のエントリー者にも同じ面接候補日が自動で送信されます。
-              </h6>
-              <!-- table -->
-              <b-table
-                class="bg-white"
-                bordered
-                :fields="fieldsModal"
-                :items="itemsModal"
-              >
-                <template #cell(candidate_date)="">
-                  <b-form-input type="date" />
-                </template>
-
-                <template #cell(starting_time)="">
-                  <div class="d-flex">
-                    <b-form-select :options="clockOptions" class="ml-1 mr-2" />
-                    <b-form-select :options="hourOptions" class="mr-1 ml-2" />
-                  </div>
-                </template>
-                <template #cell(expected_time)="">
-                  <div class="d-flex align-items-center">
-                    <b-form-select :options="minuteOptions" class="mx-2" />
-                    <span>分</span>
-                  </div>
-                </template>
-              </b-table>
-            </b-form>
-          </template>
-          <!-- step 3 content -->
-          <template v-if="step === 3">
-            <b-row>
-              <b-col cols="4">面接形式 </b-col>
-              <b-col cols="8">集団面接</b-col>
-            </b-row>
-            <b-row>
-              <b-col cols="4" class="my-2">面接候補日 </b-col>
-              <b-col cols="8" class="d-flex flex-wrap align-items-center my-2">
-                <div>2023年3月5日（月）午前11時〜午後12時</div>
-                <div>2023年3月5日（月）午後1時〜午後2時</div>
-                <div>2023年3月6日（火）午後1時〜午後2時</div>
-                <div>2023年3月6日（火）午後2時〜午後3時</div>
-                <div>2023年3月7日（水）午前10時〜午前11時</div>
-              </b-col>
-            </b-row>
-          </template>
-
-          <!-- Button -->
-          <div class="d-flex justify-content-center mt-5">
-            <template v-if="step === 1">
-              <b-button variant="secondary" class="mx-1">
-                <i class="fas fa-solid fa-caret-left fs-16" />
-                <span class="mx-1" @click="handleBack">前の画面に戻る</span>
-              </b-button>
-              <b-button
-                variant="warning"
-                class="text-white mx-1"
-                @click="handleNextStep($event)"
-              >この内容で送信する</b-button>
-            </template>
-            <template v-if="step === 2">
-              <b-button variant="secondary" class="mx-1">
-                <i class="fas fa-solid fa-caret-left fs-16" />
-                <span class="mx-1" @click="handleBack">前の画面に戻る</span>
-              </b-button>
-              <b-button
-                variant="warning"
-                class="text-white mx-1"
-                @click="handleNextStep($event)"
-              >確認画面へ</b-button>
-            </template>
-            <template v-if="step === 3">
-              <b-button variant="secondary" class="mx-1">
-                <i class="fas fa-solid fa-caret-left fs-16" />
-                <span class="mx-1" @click="handleBack">前の画面に戻る</span>
-              </b-button>
-              <b-button
-                variant="warning"
-                class="text-white mx-1"
-                @click="'';"
-              >この内容で送信する</b-button>
-            </template>
-          </div>
-        </div>
-      </div>
-    </modal-common>
-    <!-- third passing + adjust -->
-    <modal-common
-      :refs="'third-passing_adjust'"
-      :size="'lg'"
-      @reset-modal="resetModal"
-    >
-      <div slot="body">
-        <div v-if="step === 1 || step === 2" class="text-center">
-          <h2 class="font-weight-bold">
-            Nguyen Thi Nhi <br>
-            ｸﾞｴﾝ ﾃｨ ﾆｰ
-          </h2>
-          <h5>
-            電気設計エンジニア <br>
-            《エントリー》
-          </h5>
-        </div>
-
-        <div v-if="step === 3" class="text-center">
-          <div>
-            <h2 class="font-weight-bold">
-              Nguyen Thi Nhi <br>
-              ｸﾞｴﾝ ﾃｨ ﾆｰ
-            </h2>
-            <h5>
-              電気設計エンジニア <br>
-              《エントリー》
-            </h5>
-          </div>
-          <div>
-            <h2 class="font-weight-bold">
-              Nguyen Trang <br>
-              ｸﾞｴﾝ ﾃｨ ﾆｰ
-            </h2>
-            <h5>
-              電気設計エンジニア <br>
-              《エントリー》
-            </h5>
-          </div>
-          <div>
-            <h2 class="font-weight-bold">
-              Phan Nam <br>
-              ｸﾞｴﾝ ﾃｨ ﾆｰ
-            </h2>
-            <h5>
-              電気設計エンジニア <br>
-              《エントリー》
-            </h5>
-          </div>
-          <div>
-            <h2 class="font-weight-bold">
-              Pham Minh <br>
-              ｸﾞｴﾝ ﾃｨ ﾆｰ
-            </h2>
-            <h5>
-              電気設計エンジニア <br>
-              《エントリー》
-            </h5>
-          </div>
-        </div>
-
-        <div class="content-detail px-5">
-          <b-form @submit="handleNextStep($event)" @reset="onReset($event)">
-            <h4 class="text-center">四次合格</h4>
-            <b-form-group v-if="step === 1 || step === 2" label="面接形式">
-              <b-form-radio-group
-                :options="['集団面接', '個人面接']"
-                name="面接形式"
-                stacked
-              />
-            </b-form-group>
-            <h6 v-if="step === 2" class="text-red">
-              この人材は他の3名の人材 Nguyen Trang、Phan Nam、Pham Minh
-              とエントリーしています。
-              集団面接を選択した場合、他のエントリー者にも同じ面接候補日が自動で送信されます。
-            </h6>
-            <!-- table -->
-            <b-table
-              v-if="step === 2 || step === 1"
-              class="bg-white"
-              bordered
-              :fields="fieldsModal"
-              :items="itemsModal"
-            >
-              <template #cell(candidate_date)="">
-                <b-form-input type="date" />
-              </template>
-
-              <template #cell(starting_time)="">
-                <div class="d-flex">
-                  <b-form-select :options="clockOptions" class="ml-1 mr-2" />
-                  <b-form-select :options="hourOptions" class="mr-1 ml-2" />
-                </div>
-              </template>
-              <template #cell(expected_time)="">
-                <div class="d-flex align-items-center">
-                  <b-form-select :options="minuteOptions" class="mx-2" />
-                  <span>分</span>
-                </div>
-              </template>
-            </b-table>
-
-            <!-- step 3 content -->
-            <div v-if="step === 3">
-              <b-row>
-                <b-col cols="4">面接形式 </b-col>
-                <b-col cols="8">集団面接</b-col>
-              </b-row>
-              <b-row>
-                <b-col cols="4" class="my-2">面接候補日 </b-col>
-                <b-col
-                  cols="8"
-                  class="d-flex flex-wrap align-items-center my-2"
-                >
-                  <div>2023年3月5日（月）午前11時〜午後12時</div>
-                  <div>2023年3月5日（月）午後1時〜午後2時</div>
-                  <div>2023年3月6日（火）午後1時〜午後2時</div>
-                  <div>2023年3月6日（火）午後2時〜午後3時</div>
-                  <div>2023年3月7日（水）午前10時〜午前11時</div>
-                </b-col>
-              </b-row>
-            </div>
-
-            <!-- Button -->
-            <div v-if="step === 1" class="d-flex justify-content-center mt-5">
-              <b-button variant="secondary" class="mx-1">
-                <i class="fas fa-solid fa-caret-left fs-16" />
-                <span class="mx-1" @click="handleBack">前の画面に戻る</span>
-              </b-button>
-              <b-button
-                variant="warning"
-                class="text-white mx-1"
-                @click="handleNextStep($event)"
-              >この内容で送信する</b-button>
-            </div>
-            <div v-if="step === 2" class="d-flex justify-content-center mt-5">
-              <b-button variant="secondary" class="mx-1">
-                <i class="fas fa-solid fa-caret-left fs-16" />
-                <span class="mx-1" @click="handleBack">前の画面に戻る</span>
-              </b-button>
-              <b-button
-                variant="warning"
-                class="text-white mx-1"
-                @click="handleNextStep($event)"
-              >確認画面へ</b-button>
-            </div>
-            <div v-if="step === 3" class="d-flex justify-content-center mt-5">
-              <b-button variant="secondary" class="mx-1">
-                <i class="fas fa-solid fa-caret-left fs-16" />
-                <span class="mx-1" @click="handleBack">前の画面に戻る</span>
-              </b-button>
-              <b-button
-                variant="warning"
-                class="text-white mx-1"
-                @click="'';"
-              >この内容で送信する</b-button>
-            </div>
-          </b-form>
-        </div>
-      </div>
-    </modal-common>
-    <!-- fourth passing + adjust -->
-    <modal-common
-      :refs="'fourth-passing_adjust'"
-      :size="'lg'"
-      @reset-modal="resetModal"
-    >
-      <div slot="body">
-        <div class="text-center">
-          <template v-if="step === 1 || step === 2">
-            <h2 class="font-weight-bold">
-              Nguyen Thi Nhi <br>
-              ｸﾞｴﾝ ﾃｨ ﾆｰ
-            </h2>
-            <h5>
-              電気設計エンジニア <br>
-              《エントリー》
-            </h5>
-          </template>
-          <template v-if="step === 3">
-            <div>
-              <h2 class="font-weight-bold">
-                Nguyen Thi Nhi <br>
-                ｸﾞｴﾝ ﾃｨ ﾆｰ
-              </h2>
-              <h5>
-                電気設計エンジニア <br>
-                《エントリー》
-              </h5>
-            </div>
-            <div>
-              <h2 class="font-weight-bold">
-                Nguyen Trang <br>
-                ｸﾞｴﾝ ﾃｨ ﾆｰ
-              </h2>
-              <h5>
-                電気設計エンジニア <br>
-                《エントリー》
-              </h5>
-            </div>
-            <div>
-              <h2 class="font-weight-bold">
-                Phan Nam <br>
-                ｸﾞｴﾝ ﾃｨ ﾆｰ
-              </h2>
-              <h5>
-                電気設計エンジニア <br>
-                《エントリー》
-              </h5>
-            </div>
-            <div>
-              <h2 class="font-weight-bold">
-                Pham Minh <br>
-                ｸﾞｴﾝ ﾃｨ ﾆｰ
-              </h2>
-              <h5>
-                電気設計エンジニア <br>
-                《エントリー》
-              </h5>
-            </div>
-          </template>
-        </div>
-
-        <div class="content-detail px-5">
-          <template v-if="step === 1 || step === 2">
-            <b-form @submit="handleNextStep($event)" @reset="onReset($event)">
-              <h4 class="text-center">五次合格</h4>
-              <b-form-group label="面接形式">
-                <b-form-radio-group
-                  :options="['集団面接', '個人面接']"
-                  name="面接形式"
-                  stacked
-                />
-              </b-form-group>
-              <h6 v-if="step === 2" class="text-red">
-                この人材は他の3名の人材 Nguyen Trang、Phan Nam、Pham Minh
-                とエントリーしています。
-                集団面接を選択した場合、他のエントリー者にも同じ面接候補日が自動で送信されます。
-              </h6>
-              <!-- table -->
-              <b-table
-                class="bg-white"
-                bordered
-                :fields="fieldsModal"
-                :items="itemsModal"
-              >
-                <template #cell(candidate_date)="">
-                  <b-form-input type="date" />
-                </template>
-
-                <template #cell(starting_time)="">
-                  <div class="d-flex">
-                    <b-form-select :options="clockOptions" class="ml-1 mr-2" />
-                    <b-form-select :options="hourOptions" class="mr-1 ml-2" />
-                  </div>
-                </template>
-                <template #cell(expected_time)="">
-                  <div class="d-flex align-items-center">
-                    <b-form-select :options="minuteOptions" class="mx-2" />
-                    <span>分</span>
-                  </div>
-                </template>
-              </b-table>
-            </b-form>
-          </template>
-          <!-- step 3 content -->
-          <template v-if="step === 3">
-            <b-row>
-              <b-col cols="4">面接形式 </b-col>
-              <b-col cols="8">集団面接</b-col>
-            </b-row>
-            <b-row>
-              <b-col cols="4" class="my-2">面接候補日 </b-col>
-              <b-col cols="8" class="d-flex flex-wrap align-items-center my-2">
-                <div>2023年3月5日（月）午前11時〜午後12時</div>
-                <div>2023年3月5日（月）午後1時〜午後2時</div>
-                <div>2023年3月6日（火）午後1時〜午後2時</div>
-                <div>2023年3月6日（火）午後2時〜午後3時</div>
-                <div>2023年3月7日（水）午前10時〜午前11時</div>
-              </b-col>
-            </b-row>
-          </template>
-
-          <!-- Button -->
-          <div v-if="step === 1" class="d-flex justify-content-center mt-5">
-            <template v-if="step === 1">
-              <b-button variant="secondary" class="mx-1">
-                <i class="fas fa-solid fa-caret-left fs-16" />
-                <span class="mx-1" @click="handleBack">前の画面に戻る</span>
-              </b-button>
-              <b-button
-                variant="warning"
-                class="text-white mx-1"
-                @click="handleNextStep($event)"
-              >この内容で送信する</b-button>
-            </template>
-            <template v-if="step === 2">
-              <b-button variant="secondary" class="mx-1">
-                <i class="fas fa-solid fa-caret-left fs-16" />
-                <span class="mx-1" @click="handleBack">前の画面に戻る</span>
-              </b-button>
-              <b-button
-                variant="warning"
-                class="text-white mx-1"
-                @click="handleNextStep($event)"
-              >確認画面へ</b-button>
-            </template>
-            <template v-if="step === 3">
-              <b-button variant="secondary" class="mx-1">
-                <i class="fas fa-solid fa-caret-left fs-16" />
-                <span class="mx-1" @click="handleBack">前の画面に戻る</span>
-              </b-button>
-              <b-button
-                variant="warning"
-                class="text-white mx-1"
-                @click="'';"
-              >この内容で送信する</b-button>
-            </template>
-          </div>
-        </div>
-      </div>
-    </modal-common>
-    <!-- fifth passing + adjust -->
-    <modal-common
-      :refs="'fifth-passing_adjust'"
-      :size="'lg'"
-      @reset-modal="resetModal"
-    >
-      <div slot="body">
-        <div class="text-center">
-          <template v-if="step === 1 || step === 2">
-            <h2 class="font-weight-bold">
-              Nguyen Thi Nhi <br>
-              ｸﾞｴﾝ ﾃｨ ﾆｰ
-            </h2>
-            <h5>
-              電気設計エンジニア <br>
-              《エントリー》
-            </h5>
-          </template>
-          <template v-if="step === 3">
-            <div>
-              <h2 class="font-weight-bold">
-                Nguyen Thi Nhi <br>
-                ｸﾞｴﾝ ﾃｨ ﾆｰ
-              </h2>
-              <h5>
-                電気設計エンジニア <br>
-                《エントリー》
-              </h5>
-            </div>
-            <div>
-              <h2 class="font-weight-bold">
-                Nguyen Trang <br>
-                ｸﾞｴﾝ ﾃｨ ﾆｰ
-              </h2>
-              <h5>
-                電気設計エンジニア <br>
-                《エントリー》
-              </h5>
-            </div>
-            <div>
-              <h2 class="font-weight-bold">
-                Phan Nam <br>
-                ｸﾞｴﾝ ﾃｨ ﾆｰ
-              </h2>
-              <h5>
-                電気設計エンジニア <br>
-                《エントリー》
-              </h5>
-            </div>
-            <div>
-              <h2 class="font-weight-bold">
-                Pham Minh <br>
-                ｸﾞｴﾝ ﾃｨ ﾆｰ
-              </h2>
-              <h5>
-                電気設計エンジニア <br>
-                《エントリー》
-              </h5>
-            </div>
-          </template>
-        </div>
-
-        <div class="content-detail px-5">
-          <template v-if="step === 1 || step === 2">
-            <b-form @submit="handleNextStep($event)" @reset="onReset($event)">
-              <h4 class="text-center">最終面接</h4>
-              <b-form-group label="面接形式">
-                <b-form-radio-group
-                  :options="['集団面接', '個人面接']"
-                  name="面接形式"
-                  stacked
-                />
-              </b-form-group>
-              <h6 v-if="step === 2" class="text-red">
-                この人材は他の3名の人材 Nguyen Trang、Phan Nam、Pham Minh
-                とエントリーしています。
-                集団面接を選択した場合、他のエントリー者にも同じ面接候補日が自動で送信されます。
-              </h6>
-              <!-- table -->
-              <b-table
-                class="bg-white"
-                bordered
-                :fields="fieldsModal"
-                :items="itemsModal"
-              >
-                <template #cell(candidate_date)="">
-                  <b-form-input type="date" />
-                </template>
-
-                <template #cell(starting_time)="">
-                  <div class="d-flex">
-                    <b-form-select :options="clockOptions" class="ml-1 mr-2" />
-                    <b-form-select :options="hourOptions" class="mr-1 ml-2" />
-                  </div>
-                </template>
-                <template #cell(expected_time)="">
-                  <div class="d-flex align-items-center">
-                    <b-form-select :options="minuteOptions" class="mx-2" />
-                    <span>分</span>
-                  </div>
-                </template>
-              </b-table>
-            </b-form>
-          </template>
-          <!-- step 3 content -->
-          <template v-if="step === 3">
-            <b-row>
-              <b-col cols="4">面接形式 </b-col>
-              <b-col cols="8">集団面接</b-col>
-            </b-row>
-            <b-row>
-              <b-col cols="4" class="my-2">面接候補日 </b-col>
-              <b-col cols="8" class="d-flex flex-wrap align-items-center my-2">
-                <div>2023年3月5日（月）午前11時〜午後12時</div>
-                <div>2023年3月5日（月）午後1時〜午後2時</div>
-                <div>2023年3月6日（火）午後1時〜午後2時</div>
-                <div>2023年3月6日（火）午後2時〜午後3時</div>
-                <div>2023年3月7日（水）午前10時〜午前11時</div>
-              </b-col>
-            </b-row>
-          </template>
-
-          <!-- Button -->
-          <div v-if="step === 1" class="d-flex justify-content-center mt-5">
-            <template v-if="step === 1">
-              <b-button variant="secondary" class="mx-1">
-                <i class="fas fa-solid fa-caret-left fs-16" />
-                <span class="mx-1" @click="handleBack">前の画面に戻る</span>
-              </b-button>
-              <b-button
-                variant="warning"
-                class="text-white mx-1"
-                @click="handleNextStep($event)"
-              >この内容で送信する</b-button>
-            </template>
-            <template v-if="step === 2">
-              <b-button variant="secondary" class="mx-1">
-                <i class="fas fa-solid fa-caret-left fs-16" />
-                <span class="mx-1" @click="handleBack">前の画面に戻る</span>
-              </b-button>
-              <b-button
-                variant="warning"
-                class="text-white mx-1"
-                @click="handleNextStep($event)"
-              >確認画面へ</b-button>
-            </template>
-            <template v-if="step === 3">
-              <b-button variant="secondary" class="mx-1">
-                <i class="fas fa-solid fa-caret-left fs-16" />
-                <span class="mx-1" @click="handleBack">前の画面に戻る</span>
-              </b-button>
-              <b-button
-                variant="warning"
-                class="text-white mx-1"
-                @click="'';"
-              >この内容で送信する</b-button>
-            </template>
-          </div>
-        </div>
-      </div>
-    </modal-common>
-    <!-- cancel + adjust -->
-    <modal-common
-      :refs="'cancel_adjust'"
-      :size="'lg'"
-      @reset-modal="resetModal"
-    >
-      <div slot="body">
-        <h3 class="font-weight-bold text-center">
-          Nguyen Thi Nhi <br>
-          ｸﾞｴﾝ ﾃｨ ﾆｰ
-        </h3>
-        <div class="text-center mt-4">
-          電気設計エンジニア
-          <br>
-          《エントリー》
-        </div>
-        <div class="content-detail">
-          <h3 class="text-center text-red p-5">面接中止</h3>
-        </div>
-        <!--  -->
-        <div class="content-detail px-5">
-          <b-form>
-            <h4 class="text-center">一次面接</h4>
-            <b-form-group label="面接形式">
-              <b-form-radio-group v-model="typeStatus" name="面接形式" stacked>
-                <template v-for="option in typeStatusOptions">
-                  <b-form-radio :key="option.key" :value="option.key" disabled>
-                    {{ option.value }}
-                  </b-form-radio>
-                </template>
-              </b-form-radio-group>
-            </b-form-group>
-          </b-form>
-          <!-- <h6 v-if="typeStatus === 1" class="text-red">
-              この人材は他の3名の人材 Nguyen Trang、Phan Nam、Pham Minh
-              とエントリーしています。
-              集団面接を選択した場合、他のエントリー者にも同じ面接候補日が自動で送信されます。
-            </h6> -->
-          <b-table
-            class="bg-white"
-            bordered
-            :fields="fieldsModal"
-            :items="itemsModal"
-          >
-            <template #cell(candidate_date)="">
-              <b-form-input type="date" disabled />
-            </template>
-
-            <template #cell(starting_time)="">
-              <div class="d-flex">
-                <b-form-select
-                  :options="clockOptions"
-                  disabled
-                  class="ml-1 mr-2"
-                />
-                <b-form-select
-                  :options="hourOptions"
-                  disabled
-                  class="mr-1 ml-2"
-                />
-              </div>
-            </template>
-            <template #cell(expected_time)="">
-              <div class="d-flex align-items-center">
-                <b-form-select :options="minuteOptions" disabled class="mx-2" />
-                <span>分</span>
-              </div>
-            </template>
-          </b-table>
-
-          <!-- Button -->
-          <div class="d-flex justify-content-center mt-5">
-            <template v-if="step === 1">
-              <b-button variant="secondary" class="mx-1" disabled>
-                <i class="fas fa-solid fa-caret-left fs-16" />
-                <span class="mx-1">前の画面に戻る</span>
-              </b-button>
-              <b-button
-                variant="secondary"
-                class="text-white mx-1"
-                disabled
-              >確認画面へ</b-button>
-            </template>
-          </div>
-        </div>
-      </div>
-    </modal-common>
-    <!-- reject + adjust -->
-    <modal-common
-      :refs="'reject_adjust'"
-      :size="'lg'"
-      @reset-modal="resetModal"
-    >
-      <div slot="body">
-        <h3 class="font-weight-bold text-center">
-          Nguyen Thi Nhi <br>
-          ｸﾞｴﾝ ﾃｨ ﾆｰ
-        </h3>
-        <div class="text-center mt-4">
-          電気設計エンジニア
-          <br>
-          《エントリー》
-        </div>
-        <div class="content-detail">
-          <h3 class="text-center text-red p-5">面接辞退</h3>
-        </div>
-        <!--  -->
-        <div class="content-detail px-5">
-          <b-form>
-            <h4 class="text-center">一次面接</h4>
-            <b-form-group label="面接形式">
-              <b-form-radio-group v-model="typeStatus" name="面接形式" stacked>
-                <template v-for="option in typeStatusOptions">
-                  <b-form-radio :key="option.key" :value="option.key" disabled>
-                    {{ option.value }}
-                  </b-form-radio>
-                </template>
-              </b-form-radio-group>
-            </b-form-group>
-          </b-form>
-          <!-- <h6 v-if="typeStatus === 1" class="text-red">
-              この人材は他の3名の人材 Nguyen Trang、Phan Nam、Pham Minh
-              とエントリーしています。
-              集団面接を選択した場合、他のエントリー者にも同じ面接候補日が自動で送信されます。
-            </h6> -->
-          <b-table
-            class="bg-white"
-            bordered
-            :fields="fieldsModal"
-            :items="itemsModal"
-          >
-            <template #cell(candidate_date)="">
-              <b-form-input type="date" disabled />
-            </template>
-
-            <template #cell(starting_time)="">
-              <div class="d-flex">
-                <b-form-select
-                  :options="clockOptions"
-                  disabled
-                  class="ml-1 mr-2"
-                />
-                <b-form-select
-                  :options="hourOptions"
-                  disabled
-                  class="mr-1 ml-2"
-                />
-              </div>
-            </template>
-            <template #cell(expected_time)="">
-              <div class="d-flex align-items-center">
-                <b-form-select :options="minuteOptions" disabled class="mx-2" />
-                <span>分</span>
-              </div>
-            </template>
-          </b-table>
-
-          <!-- Button -->
-          <div class="d-flex justify-content-center mt-5">
-            <template v-if="step === 1">
-              <b-button variant="secondary" class="mx-1" disabled>
-                <i class="fas fa-solid fa-caret-left fs-16" />
-                <span class="mx-1">前の画面に戻る</span>
-              </b-button>
-              <b-button
-                variant="secondary"
-                class="text-white mx-1"
-                disabled
-              >確認画面へ</b-button>
-            </template>
-          </div>
-        </div>
-      </div>
-    </modal-common>
-
-    <!-- offer confirmation + adjusting -->
-    <modal-common
-      :refs="'offer-confirmation_adjusting'"
-      :size="'lg'"
-      @reset-modal="resetModal"
-    >
-      <div slot="body">
-        <div slot="body">
-          <div
-            v-if="step === 1 || step === 2 || step === 3"
-            class="text-center"
-          >
-            <h2 class="font-weight-bold">
-              Nguyen Thi Nhi <br>
-              ｸﾞｴﾝ ﾃｨ ﾆｰ
-            </h2>
-            <h5>
-              電気設計エンジニア <br>
-              《オファー》
-            </h5>
-          </div>
-
-          <div class="content-detail px-4">
-            <h4 class="text-center">一次面接</h4>
-            <b-form v-if="step === 1 || step === 2" ref="form">
-              <b-form-group
-                id="input-group-1"
-                :label="$t('INTERVIEW_FORMAT')"
-                label-for="input-1"
-              >
-                <span class="ml-4">
-                  {{ '個人面接' }}
-                </span>
-              </b-form-group>
-              <b-form-group
-                id="input-group-1"
-                :label="$t('INTERVIEW_CANDIDATE_DATE')"
-                label-for="input-1"
-                class="mt-5"
-              >
-                <b-form-select
-                  :options="[
-                    '2023年3月1日（水）午後2時〜午後3時',
-                    '2023年3月1日（水）午後2時〜午後3時',
-                    '2023年3月2日（木）午後1時〜午後2時',
-                    '2023年3月2日（木）午後2時〜午後3時',
-                    '2023年3月2日（木）午後4時〜午後5時',
-                    'いずれの日時も不可、再調整',
-                  ]"
-                />
-              </b-form-group>
-              <!-- <h6 v-if="step === 2" class="text-red">
-                この人材は他の3名の人材 Nguyen Trang、Phan Nam、Pham Minh
-                と集団面接の設定がされています。面接候補日を設定した場合、残りのエントリー者にも同じ日程が自動で設定されます。
-              </h6> -->
-            </b-form>
-            <div v-if="step === 3">
-              <b-row>
-                <b-col cols="4">面接形式 </b-col>
-                <b-col cols="8">個人面接</b-col>
-              </b-row>
-              <b-row>
-                <b-col cols="4" class="my-2">面接候補日 </b-col>
-                <b-col
-                  cols="8"
-                  class="d-flex flex-wrap align-items-center my-2"
-                >
-                  <div>2023年3月1日（水）午後2時〜午後3時</div>
-                </b-col>
-              </b-row>
-            </div>
-            <!-- Button -->
-            <div class="d-flex flex-column align-items-center mt-5">
-              <b-button
-                v-if="step === 1 || step === 2"
-                variant="warning"
-                class="my-1 text-white w-137"
-                @click="handleNextStep"
-              >
-                確認画面へ</b-button>
-              <b-button
-                v-if="step === 1"
-                variant="danger"
-                class="text-white my-1 w-137"
-              >面接辞退</b-button>
-
-              <div v-if="step === 3" class="d-flex justify-content-center mt-5">
-                <b-button variant="secondary" class="mx-1">
-                  <i class="fas fa-solid fa-caret-left fs-16" />
-                  <span class="mx-1" @click="handleBack">前の画面に戻る</span>
-                </b-button>
-                <b-button
-                  variant="warning"
-                  class="text-white mx-1"
-                  @click="'';"
-                >この内容で送信する</b-button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </modal-common>
-    <!-- document passing + adjusting -->
-    <modal-common
-      :refs="'document-passing_adjusting'"
-      :size="'lg'"
-      @reset-modal="resetModal"
-    >
-      <div slot="body">
-        <div slot="body">
-          <div v-if="step === 1 || step === 2" class="text-center">
-            <h2 class="font-weight-bold">
-              Nguyen Thi Nhi <br>
-              ｸﾞｴﾝ ﾃｨ ﾆｰ
-            </h2>
-            <h5>
-              電気設計エンジニア <br>
-              《エントリー》
-            </h5>
-          </div>
-
-          <div v-if="step === 3" class="text-center">
-            <div>
-              <h2 class="font-weight-bold">
-                Nguyen Thi Nhi <br>
-                ｸﾞｴﾝ ﾃｨ ﾆｰ
-              </h2>
-              <h5>
-                電気設計エンジニア <br>
-                《エントリー》
-              </h5>
-            </div>
-            <div>
-              <h2 class="font-weight-bold">
-                Nguyen Trang <br>
-                ｸﾞｴﾝ ﾃｨ ﾆｰ
-              </h2>
-              <h5>
-                電気設計エンジニア <br>
-                《エントリー》
-              </h5>
-            </div>
-            <div>
-              <h2 class="font-weight-bold">
-                Phan Nam <br>
-                ｸﾞｴﾝ ﾃｨ ﾆｰ
-              </h2>
-              <h5>
-                電気設計エンジニア <br>
-                《エントリー》
-              </h5>
-            </div>
-            <div>
-              <h2 class="font-weight-bold">
-                Pham Minh <br>
-                ｸﾞｴﾝ ﾃｨ ﾆｰ
-              </h2>
-              <h5>
-                電気設計エンジニア <br>
-                《エントリー》
-              </h5>
-            </div>
-          </div>
-
-          <div class="content-detail px-4">
-            <h4 class="text-center">一次面接</h4>
-            <b-form v-if="step === 1 || step === 2" ref="form">
-              <b-form-group
-                id="input-group-1"
-                :label="$t('INTERVIEW_FORMAT')"
-                label-for="input-1"
-              >
-                <span class="ml-4">
-                  {{ $t('INTERVIEW_GROUP') }}
-                </span>
-              </b-form-group>
-              <b-form-group
-                id="input-group-1"
-                :label="$t('INTERVIEW_CANDIDATE_DATE')"
-                label-for="input-1"
-                class="mt-5"
-              >
-                <b-form-select
-                  :options="[
-                    '2023年3月1日（水）午後2時〜午後3時',
-                    '2023年3月1日（水）午後2時〜午後3時',
-                    '2023年3月2日（木）午後1時〜午後2時',
-                    '2023年3月2日（木）午後2時〜午後3時',
-                    '2023年3月2日（木）午後4時〜午後5時',
-                    'いずれの日時も不可、再調整',
-                  ]"
-                />
-              </b-form-group>
-              <h6 v-if="step === 2" class="text-red">
-                この人材は他の3名の人材 Nguyen Trang、Phan Nam、Pham Minh
-                と集団面接の設定がされています。面接候補日を設定した場合、残りのエントリー者にも同じ日程が自動で設定されます。
-              </h6>
-            </b-form>
-            <div v-if="step === 3">
-              <b-row>
-                <b-col cols="4">面接形式 </b-col>
-                <b-col cols="8">集団面接</b-col>
-              </b-row>
-              <b-row>
-                <b-col cols="4" class="my-2">面接候補日 </b-col>
-                <b-col
-                  cols="8"
-                  class="d-flex flex-wrap align-items-center my-2"
-                >
-                  <div>2023年3月1日（水）午後2時〜午後3時</div>
-                </b-col>
-              </b-row>
-            </div>
-            <!-- Button -->
-            <div class="d-flex flex-column align-items-center mt-5">
-              <b-button
-                v-if="step === 1 || step === 2"
-                variant="warning"
-                class="my-1 text-white w-137"
-                @click="handleNextStep"
-              >
-                確認画面へ</b-button>
-              <b-button
-                v-if="step === 1"
-                variant="danger"
-                class="text-white my-1 w-137"
-              >面接辞退</b-button>
-
-              <div v-if="step === 3" class="d-flex justify-content-center mt-5">
-                <b-button variant="secondary" class="mx-1">
-                  <i class="fas fa-solid fa-caret-left fs-16" />
-                  <span class="mx-1" @click="handleBack">前の画面に戻る</span>
-                </b-button>
-                <b-button
-                  variant="warning"
-                  class="text-white mx-1"
-                  @click="'';"
-                >この内容で送信する</b-button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </modal-common>
-    <!-- first passing + adjusting -->
-    <modal-common
-      :refs="'first-passing_adjusting'"
-      :size="'lg'"
-      @reset-modal="resetModal"
-    >
-      <div slot="body">
-        <div slot="body">
-          <div v-if="step === 1 || step === 2" class="text-center">
-            <h2 class="font-weight-bold">
-              Nguyen Thi Nhi <br>
-              ｸﾞｴﾝ ﾃｨ ﾆｰ
-            </h2>
-            <h5>
-              電気設計エンジニア <br>
-              《オファー》
-            </h5>
-          </div>
-
-          <div v-if="step === 3" class="text-center">
-            <div>
-              <h2 class="font-weight-bold">
-                Nguyen Thi Nhi <br>
-                ｸﾞｴﾝ ﾃｨ ﾆｰ
-              </h2>
-              <h5>
-                電気設計エンジニア <br>
-                《オファー》
-              </h5>
-            </div>
-            <div>
-              <h2 class="font-weight-bold">
-                Nguyen Trang <br>
-                ｸﾞｴﾝ ﾃｨ ﾆｰ
-              </h2>
-              <h5>
-                電気設計エンジニア <br>
-                《オファー》
-              </h5>
-            </div>
-            <div>
-              <h2 class="font-weight-bold">
-                Phan Nam <br>
-                ｸﾞｴﾝ ﾃｨ ﾆｰ
-              </h2>
-              <h5>
-                電気設計エンジニア <br>
-                《オファー》
-              </h5>
-            </div>
-            <div>
-              <h2 class="font-weight-bold">
-                Pham Minh <br>
-                ｸﾞｴﾝ ﾃｨ ﾆｰ
-              </h2>
-              <h5>
-                電気設計エンジニア <br>
-                《オファー》
-              </h5>
-            </div>
-          </div>
-
-          <div class="content-detail px-4">
-            <h4 class="text-center">二次面接</h4>
-            <b-form v-if="step === 1 || step === 2" ref="form">
-              <b-form-group
-                id="input-group-1"
-                :label="$t('INTERVIEW_FORMAT')"
-                label-for="input-1"
-              >
-                <span class="ml-4">
-                  {{ $t('INTERVIEW_GROUP') }}
-                </span>
-              </b-form-group>
-              <b-form-group
-                id="input-group-1"
-                :label="$t('INTERVIEW_CANDIDATE_DATE')"
-                label-for="input-1"
-                class="mt-5"
-              >
-                <b-form-select
-                  :options="[
-                    '2023年3月1日（水）午後2時〜午後3時',
-                    '2023年3月1日（水）午後2時〜午後3時',
-                    '2023年3月2日（木）午後1時〜午後2時',
-                    '2023年3月2日（木）午後2時〜午後3時',
-                    '2023年3月2日（木）午後4時〜午後5時',
-                    'いずれの日時も不可、再調整',
-                  ]"
-                />
-              </b-form-group>
-              <h6 v-if="step === 2" class="text-red">
-                この人材は他の3名の人材 Nguyen Trang、Phan Nam、Pham Minh
-                と集団面接の設定がされています。面接候補日を設定した場合、残りのエントリー者にも同じ日程が自動で設定されます。
-              </h6>
-            </b-form>
-            <div v-if="step === 3">
-              <b-row>
-                <b-col cols="4">面接形式 </b-col>
-                <b-col cols="8">集団面接</b-col>
-              </b-row>
-              <b-row>
-                <b-col cols="4" class="my-2">面接候補日 </b-col>
-                <b-col
-                  cols="8"
-                  class="d-flex flex-wrap align-items-center my-2"
-                >
-                  <div>2023年3月1日（水）午後2時〜午後3時</div>
-                </b-col>
-              </b-row>
-            </div>
-            <!-- Button -->
-            <div class="d-flex flex-column align-items-center mt-5">
-              <b-button
-                v-if="step === 1 || step === 2"
-                variant="warning"
-                class="my-1 text-white w-137"
-                @click="handleNextStep"
-              >
-                確認画面へ</b-button>
-              <b-button
-                v-if="step === 1"
-                variant="danger"
-                class="text-white my-1 w-137"
-              >面接辞退</b-button>
-
-              <div v-if="step === 3" class="d-flex justify-content-center mt-5">
-                <b-button variant="secondary" class="mx-1">
-                  <i class="fas fa-solid fa-caret-left fs-16" />
-                  <span class="mx-1" @click="handleBack">前の画面に戻る</span>
-                </b-button>
-                <b-button
-                  variant="warning"
-                  class="text-white mx-1"
-                  @click="'';"
-                >この内容で送信する</b-button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </modal-common>
-    <!-- second passing + adjusting -->
-    <modal-common
-      :refs="'second-passing_adjusting'"
-      :size="'lg'"
-      @reset-modal="resetModal"
-    >
-      <div slot="body">
-        <div slot="body">
-          <div v-if="step === 1 || step === 2" class="text-center">
-            <h2 class="font-weight-bold">
-              Nguyen Thi Nhi <br>
-              ｸﾞｴﾝ ﾃｨ ﾆｰ
-            </h2>
-            <h5>
-              電気設計エンジニア <br>
-              《エントリー》
-            </h5>
-          </div>
-
-          <div v-if="step === 3" class="text-center">
-            <div>
-              <h2 class="font-weight-bold">
-                Nguyen Thi Nhi <br>
-                ｸﾞｴﾝ ﾃｨ ﾆｰ
-              </h2>
-              <h5>
-                電気設計エンジニア <br>
-                《エントリー》
-              </h5>
-            </div>
-            <div>
-              <h2 class="font-weight-bold">
-                Nguyen Trang <br>
-                ｸﾞｴﾝ ﾃｨ ﾆｰ
-              </h2>
-              <h5>
-                電気設計エンジニア <br>
-                《エントリー》
-              </h5>
-            </div>
-            <div>
-              <h2 class="font-weight-bold">
-                Phan Nam <br>
-                ｸﾞｴﾝ ﾃｨ ﾆｰ
-              </h2>
-              <h5>
-                電気設計エンジニア <br>
-                《エントリー》
-              </h5>
-            </div>
-            <div>
-              <h2 class="font-weight-bold">
-                Pham Minh <br>
-                ｸﾞｴﾝ ﾃｨ ﾆｰ
-              </h2>
-              <h5>
-                電気設計エンジニア <br>
-                《エントリー》
-              </h5>
-            </div>
-          </div>
-
-          <div class="content-detail px-4">
-            <h4 class="text-center">三次面接</h4>
-            <b-form v-if="step === 1 || step === 2" ref="form">
-              <b-form-group
-                id="input-group-1"
-                :label="$t('INTERVIEW_FORMAT')"
-                label-for="input-1"
-              >
-                <span class="ml-4">
-                  {{ $t('INTERVIEW_GROUP') }}
-                </span>
-              </b-form-group>
-              <b-form-group
-                id="input-group-1"
-                :label="$t('INTERVIEW_CANDIDATE_DATE')"
-                label-for="input-1"
-                class="mt-5"
-              >
-                <b-form-select
-                  :options="[
-                    '2023年3月1日（水）午後2時〜午後3時',
-                    '2023年3月1日（水）午後2時〜午後3時',
-                    '2023年3月2日（木）午後1時〜午後2時',
-                    '2023年3月2日（木）午後2時〜午後3時',
-                    '2023年3月2日（木）午後4時〜午後5時',
-                    'いずれの日時も不可、再調整',
-                  ]"
-                />
-              </b-form-group>
-              <h6 v-if="step === 2" class="text-red">
-                この人材は他の3名の人材 Nguyen Trang、Phan Nam、Pham Minh
-                と集団面接の設定がされています。面接候補日を設定した場合、残りのエントリー者にも同じ日程が自動で設定されます。
-              </h6>
-            </b-form>
-            <div v-if="step === 3">
-              <b-row>
-                <b-col cols="4">面接形式 </b-col>
-                <b-col cols="8">集団面接</b-col>
-              </b-row>
-              <b-row>
-                <b-col cols="4" class="my-2">面接候補日 </b-col>
-                <b-col
-                  cols="8"
-                  class="d-flex flex-wrap align-items-center my-2"
-                >
-                  <div>2023年3月1日（水）午後2時〜午後3時</div>
-                </b-col>
-              </b-row>
-            </div>
-            <!-- Button -->
-            <div class="d-flex flex-column align-items-center mt-5">
-              <b-button
-                v-if="step === 1 || step === 2"
-                variant="warning"
-                class="my-1 text-white w-137"
-                @click="handleNextStep"
-              >
-                確認画面へ</b-button>
-              <b-button
-                v-if="step === 1"
-                variant="danger"
-                class="text-white my-1 w-137"
-              >面接辞退</b-button>
-
-              <div v-if="step === 3" class="d-flex justify-content-center mt-5">
-                <b-button variant="secondary" class="mx-1">
-                  <i class="fas fa-solid fa-caret-left fs-16" />
-                  <span class="mx-1" @click="handleBack">前の画面に戻る</span>
-                </b-button>
-                <b-button
-                  variant="warning"
-                  class="text-white mx-1"
-                  @click="'';"
-                >この内容で送信する</b-button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </modal-common>
-    <!-- third passing + adjusting -->
-    <modal-common
-      :refs="'third-passing_adjusting'"
-      :size="'lg'"
-      @reset-modal="resetModal"
-    >
-      <div slot="body">
-        <div slot="body">
-          <div v-if="step === 1 || step === 2" class="text-center">
-            <h2 class="font-weight-bold">
-              Nguyen Thi Nhi <br>
-              ｸﾞｴﾝ ﾃｨ ﾆｰ
-            </h2>
-            <h5>
-              電気設計エンジニア <br>
-              《オファー》
-            </h5>
-          </div>
-
-          <div v-if="step === 3" class="text-center">
-            <div>
-              <h2 class="font-weight-bold">
-                Nguyen Thi Nhi <br>
-                ｸﾞｴﾝ ﾃｨ ﾆｰ
-              </h2>
-              <h5>
-                電気設計エンジニア <br>
-                《オファー》
-              </h5>
-            </div>
-            <div>
-              <h2 class="font-weight-bold">
-                Nguyen Trang <br>
-                ｸﾞｴﾝ ﾃｨ ﾆｰ
-              </h2>
-              <h5>
-                電気設計エンジニア <br>
-                《オファー》
-              </h5>
-            </div>
-            <div>
-              <h2 class="font-weight-bold">
-                Phan Nam <br>
-                ｸﾞｴﾝ ﾃｨ ﾆｰ
-              </h2>
-              <h5>
-                電気設計エンジニア <br>
-                《オファー》
-              </h5>
-            </div>
-            <div>
-              <h2 class="font-weight-bold">
-                Pham Minh <br>
-                ｸﾞｴﾝ ﾃｨ ﾆｰ
-              </h2>
-              <h5>
-                電気設計エンジニア <br>
-                《オファー》
-              </h5>
-            </div>
-          </div>
-
-          <div class="content-detail px-4">
-            <h4 class="text-center">四次面接</h4>
-            <b-form v-if="step === 1 || step === 2" ref="form">
-              <b-form-group
-                id="input-group-1"
-                :label="$t('INTERVIEW_FORMAT')"
-                label-for="input-1"
-              >
-                <span class="ml-4">
-                  {{ $t('INTERVIEW_GROUP') }}
-                </span>
-              </b-form-group>
-              <b-form-group
-                id="input-group-1"
-                :label="$t('INTERVIEW_CANDIDATE_DATE')"
-                label-for="input-1"
-                class="mt-5"
-              >
-                <b-form-select
-                  :options="[
-                    '2023年3月1日（水）午後2時〜午後3時',
-                    '2023年3月1日（水）午後2時〜午後3時',
-                    '2023年3月2日（木）午後1時〜午後2時',
-                    '2023年3月2日（木）午後2時〜午後3時',
-                    '2023年3月2日（木）午後4時〜午後5時',
-                    'いずれの日時も不可、再調整',
-                  ]"
-                />
-              </b-form-group>
-              <h6 v-if="step === 2" class="text-red">
-                この人材は他の3名の人材 Nguyen Trang、Phan Nam、Pham Minh
-                と集団面接の設定がされています。面接候補日を設定した場合、残りのエントリー者にも同じ日程が自動で設定されます。
-              </h6>
-            </b-form>
-            <div v-if="step === 3">
-              <b-row>
-                <b-col cols="4">面接形式 </b-col>
-                <b-col cols="8">集団面接</b-col>
-              </b-row>
-              <b-row>
-                <b-col cols="4" class="my-2">面接候補日 </b-col>
-                <b-col
-                  cols="8"
-                  class="d-flex flex-wrap align-items-center my-2"
-                >
-                  <div>2023年3月1日（水）午後2時〜午後3時</div>
-                </b-col>
-              </b-row>
-            </div>
-            <!-- Button -->
-            <div class="d-flex flex-column align-items-center mt-5">
-              <b-button
-                v-if="step === 1 || step === 2"
-                variant="warning"
-                class="my-1 text-white w-137"
-                @click="handleNextStep"
-              >
-                確認画面へ</b-button>
-              <b-button
-                v-if="step === 1"
-                variant="danger"
-                class="text-white my-1 w-137"
-              >面接辞退</b-button>
-
-              <div v-if="step === 3" class="d-flex justify-content-center mt-5">
-                <b-button variant="secondary" class="mx-1">
-                  <i class="fas fa-solid fa-caret-left fs-16" />
-                  <span class="mx-1" @click="handleBack">前の画面に戻る</span>
-                </b-button>
-                <b-button
-                  variant="warning"
-                  class="text-white mx-1"
-                  @click="'';"
-                >この内容で送信する</b-button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </modal-common>
-    <!-- fourth passing + adjusting -->
-    <modal-common
-      :refs="'fourth-passing_adjusting'"
-      :size="'lg'"
-      @reset-modal="resetModal"
-    >
-      <div slot="body">
-        <div slot="body">
-          <div v-if="step === 1 || step === 2" class="text-center">
-            <h2 class="font-weight-bold">
-              Nguyen Thi Nhi <br>
-              ｸﾞｴﾝ ﾃｨ ﾆｰ
-            </h2>
-            <h5>
-              電気設計エンジニア <br>
-              《エントリー》
-            </h5>
-          </div>
-
-          <div v-if="step === 3" class="text-center">
-            <div>
-              <h2 class="font-weight-bold">
-                Nguyen Thi Nhi <br>
-                ｸﾞｴﾝ ﾃｨ ﾆｰ
-              </h2>
-              <h5>
-                電気設計エンジニア <br>
-                《エントリー》
-              </h5>
-            </div>
-            <div>
-              <h2 class="font-weight-bold">
-                Nguyen Trang <br>
-                ｸﾞｴﾝ ﾃｨ ﾆｰ
-              </h2>
-              <h5>
-                電気設計エンジニア <br>
-                《エントリー》
-              </h5>
-            </div>
-            <div>
-              <h2 class="font-weight-bold">
-                Phan Nam <br>
-                ｸﾞｴﾝ ﾃｨ ﾆｰ
-              </h2>
-              <h5>
-                電気設計エンジニア <br>
-                《エントリー》
-              </h5>
-            </div>
-            <div>
-              <h2 class="font-weight-bold">
-                Pham Minh <br>
-                ｸﾞｴﾝ ﾃｨ ﾆｰ
-              </h2>
-              <h5>
-                電気設計エンジニア <br>
-                《エントリー》
-              </h5>
-            </div>
-          </div>
-
-          <div class="content-detail px-4">
-            <h4 class="text-center">四次面接</h4>
-            <b-form v-if="step === 1 || step === 2" ref="form">
-              <b-form-group
-                id="input-group-1"
-                :label="$t('INTERVIEW_FORMAT')"
-                label-for="input-1"
-              >
-                <span class="ml-4">
-                  {{ $t('INTERVIEW_GROUP') }}
-                </span>
-              </b-form-group>
-              <b-form-group
-                id="input-group-1"
-                :label="$t('INTERVIEW_CANDIDATE_DATE')"
-                label-for="input-1"
-                class="mt-5"
-              >
-                <b-form-select
-                  :options="[
-                    '2023年3月1日（水）午後2時〜午後3時',
-                    '2023年3月1日（水）午後2時〜午後3時',
-                    '2023年3月2日（木）午後1時〜午後2時',
-                    '2023年3月2日（木）午後2時〜午後3時',
-                    '2023年3月2日（木）午後4時〜午後5時',
-                    'いずれの日時も不可、再調整',
-                  ]"
-                />
-              </b-form-group>
-              <h6 v-if="step === 2" class="text-red">
-                この人材は他の3名の人材 Nguyen Trang、Phan Nam、Pham Minh
-                と集団面接の設定がされています。面接候補日を設定した場合、残りのエントリー者にも同じ日程が自動で設定されます。
-              </h6>
-            </b-form>
-            <div v-if="step === 3">
-              <b-row>
-                <b-col cols="4">面接形式 </b-col>
-                <b-col cols="8">集団面接</b-col>
-              </b-row>
-              <b-row>
-                <b-col cols="4" class="my-2">面接候補日 </b-col>
-                <b-col
-                  cols="8"
-                  class="d-flex flex-wrap align-items-center my-2"
-                >
-                  <div>2023年3月1日（水）午後2時〜午後3時</div>
-                </b-col>
-              </b-row>
-            </div>
-            <!-- Button -->
-            <div class="d-flex flex-column align-items-center mt-5">
-              <b-button
-                v-if="step === 1 || step === 2"
-                variant="warning"
-                class="my-1 text-white w-137"
-                @click="handleNextStep"
-              >
-                確認画面へ</b-button>
-              <b-button
-                v-if="step === 1"
-                variant="danger"
-                class="text-white my-1 w-137"
-              >面接辞退</b-button>
-
-              <div v-if="step === 3" class="d-flex justify-content-center mt-5">
-                <b-button variant="secondary" class="mx-1">
-                  <i class="fas fa-solid fa-caret-left fs-16" />
-                  <span class="mx-1" @click="handleBack">前の画面に戻る</span>
-                </b-button>
-                <b-button
-                  variant="warning"
-                  class="text-white mx-1"
-                  @click="'';"
-                >この内容で送信する</b-button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </modal-common>
-    <!-- fifth passing + adjusting -->
-    <modal-common
-      :refs="'fifth-passing_adjusting'"
-      :size="'lg'"
-      @reset-modal="resetModal"
-    >
-      <div slot="body">
-        <div slot="body">
-          <div v-if="step === 1 || step === 2" class="text-center">
-            <h2 class="font-weight-bold">
-              Nguyen Thi Nhi <br>
-              ｸﾞｴﾝ ﾃｨ ﾆｰ
-            </h2>
-            <h5>
-              電気設計エンジニア <br>
-              《エントリー》
-            </h5>
-          </div>
-
-          <div v-if="step === 3" class="text-center">
-            <div>
-              <h2 class="font-weight-bold">
-                Nguyen Thi Nhi <br>
-                ｸﾞｴﾝ ﾃｨ ﾆｰ
-              </h2>
-              <h5>
-                電気設計エンジニア <br>
-                《エントリー》
-              </h5>
-            </div>
-            <div>
-              <h2 class="font-weight-bold">
-                Nguyen Trang <br>
-                ｸﾞｴﾝ ﾃｨ ﾆｰ
-              </h2>
-              <h5>
-                電気設計エンジニア <br>
-                《エントリー》
-              </h5>
-            </div>
-            <div>
-              <h2 class="font-weight-bold">
-                Phan Nam <br>
-                ｸﾞｴﾝ ﾃｨ ﾆｰ
-              </h2>
-              <h5>
-                電気設計エンジニア <br>
-                《エントリー》
-              </h5>
-            </div>
-            <div>
-              <h2 class="font-weight-bold">
-                Pham Minh <br>
-                ｸﾞｴﾝ ﾃｨ ﾆｰ
-              </h2>
-              <h5>
-                電気設計エンジニア <br>
-                《エントリー》
-              </h5>
-            </div>
-          </div>
-
-          <div class="content-detail px-4">
-            <h4 class="text-center">最終面接</h4>
-            <b-form v-if="step === 1 || step === 2" ref="form">
-              <b-form-group
-                id="input-group-1"
-                :label="$t('INTERVIEW_FORMAT')"
-                label-for="input-1"
-              >
-                <span class="ml-4">
-                  {{ $t('INTERVIEW_GROUP') }}
-                </span>
-              </b-form-group>
-              <b-form-group
-                id="input-group-1"
-                :label="$t('INTERVIEW_CANDIDATE_DATE')"
-                label-for="input-1"
-                class="mt-5"
-              >
-                <b-form-select
-                  :options="[
-                    '2023年3月1日（水）午後2時〜午後3時',
-                    '2023年3月1日（水）午後2時〜午後3時',
-                    '2023年3月2日（木）午後1時〜午後2時',
-                    '2023年3月2日（木）午後2時〜午後3時',
-                    '2023年3月2日（木）午後4時〜午後5時',
-                    'いずれの日時も不可、再調整',
-                  ]"
-                />
-              </b-form-group>
-              <h6 v-if="step === 2" class="text-red">
-                この人材は他の3名の人材 Nguyen Trang、Phan Nam、Pham Minh
-                と集団面接の設定がされています。面接候補日を設定した場合、残りのエントリー者にも同じ日程が自動で設定されます。
-              </h6>
-            </b-form>
-            <div v-if="step === 3">
-              <b-row>
-                <b-col cols="4">面接形式 </b-col>
-                <b-col cols="8">集団面接</b-col>
-              </b-row>
-              <b-row>
-                <b-col cols="4" class="my-2">面接候補日 </b-col>
-                <b-col
-                  cols="8"
-                  class="d-flex flex-wrap align-items-center my-2"
-                >
-                  <div>2023年3月1日（水）午後2時〜午後3時</div>
-                </b-col>
-              </b-row>
-            </div>
-            <!-- Button -->
-            <div class="d-flex flex-column align-items-center mt-5">
-              <b-button
-                v-if="step === 1 || step === 2"
-                variant="warning"
-                class="my-1 text-white w-137"
-                @click="handleNextStep"
-              >
-                確認画面へ</b-button>
-              <b-button
-                v-if="step === 1"
-                variant="danger"
-                class="text-white my-1 w-137"
-              >面接辞退</b-button>
-
-              <div v-if="step === 3" class="d-flex justify-content-center mt-5">
-                <b-button variant="secondary" class="mx-1">
-                  <i class="fas fa-solid fa-caret-left fs-16" />
-                  <span class="mx-1" @click="handleBack">前の画面に戻る</span>
-                </b-button>
-                <b-button
-                  variant="warning"
-                  class="text-white mx-1"
-                  @click="'';"
-                >この内容で送信する</b-button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </modal-common>
-    <!-- cancel + adjusting -->
-    <modal-common
-      :refs="'cancel_adjusting'"
-      :size="'lg'"
-      @reset-modal="resetModal"
-    >
-      <div slot="body">
-        <div slot="body">
-          <h3 class="font-weight-bold text-center">
-            Nguyen Thi Nhi <br>
-            ｸﾞｴﾝ ﾃｨ ﾆｰ
-          </h3>
-          <div class="text-center mt-4">
-            電気設計エンジニア
-            <br>
-            《エントリー》
-          </div>
-          <div class="content-detail">
-            <h3 class="text-center text-red p-5">面接中止</h3>
-          </div>
-
-          <div class="content-detail px-4">
-            <h4 class="text-center">一次面接</h4>
-            <b-form ref="form">
-              <b-form-group
-                id="input-group-1"
-                :label="$t('INTERVIEW_FORMAT')"
-                label-for="input-1"
-              >
-                <span class="ml-4">
-                  {{ $t('INTERVIEW_GROUP') }}
-                </span>
-              </b-form-group>
-              <b-form-group
-                id="input-group-1"
-                :label="$t('INTERVIEW_CANDIDATE_DATE')"
-                label-for="input-1"
-                class="mt-5"
-              >
-                <b-form-select
-                  disabled
-                  :options="[
-                    '2023年3月1日（水）午後2時〜午後3時',
-                    '2023年3月1日（水）午後2時〜午後3時',
-                    '2023年3月2日（木）午後1時〜午後2時',
-                    '2023年3月2日（木）午後2時〜午後3時',
-                    '2023年3月2日（木）午後4時〜午後5時',
-                    'いずれの日時も不可、再調整',
-                  ]"
-                />
-              </b-form-group>
-            </b-form>
-            <!-- Button -->
-            <div class="d-flex flex-column align-items-center mt-5">
-              <b-button
-                disabled
-                variant="secondary"
-                class="my-1 text-white w-137"
-                @click="handleNextStep"
-              >
-                確認画面へ</b-button>
-              <b-button
-                disabled
-                variant="secondary"
-                class="text-white my-1 w-137"
-              >面接辞退</b-button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </modal-common>
-    <!-- reject + adjusting -->
-    <modal-common
-      :refs="'reject_adjusting'"
-      :size="'lg'"
-      @reset-modal="resetModal"
-    >
-      <div slot="body">
-        <div slot="body">
-          <h3 class="font-weight-bold text-center">
-            Nguyen Thi Nhi <br>
-            ｸﾞｴﾝ ﾃｨ ﾆｰ
-          </h3>
-          <div class="text-center mt-4">
-            電気設計エンジニア
-            <br>
-            《エントリー》
-          </div>
-          <div class="content-detail">
-            <h3 class="text-center text-red p-5">面接辞退</h3>
-          </div>
-
-          <div class="content-detail px-4">
-            <h4 class="text-center">一次面接</h4>
-            <b-form ref="form">
-              <b-form-group
-                id="input-group-1"
-                :label="$t('INTERVIEW_FORMAT')"
-                label-for="input-1"
-              >
-                <span class="ml-4">
-                  {{ $t('INTERVIEW_GROUP') }}
-                </span>
-              </b-form-group>
-              <b-form-group
-                id="input-group-1"
-                :label="$t('INTERVIEW_CANDIDATE_DATE')"
-                label-for="input-1"
-                class="mt-5"
-              >
-                <b-form-select
-                  disabled
-                  :options="[
-                    '2023年3月1日（水）午後2時〜午後3時',
-                    '2023年3月1日（水）午後2時〜午後3時',
-                    '2023年3月2日（木）午後1時〜午後2時',
-                    '2023年3月2日（木）午後2時〜午後3時',
-                    '2023年3月2日（木）午後4時〜午後5時',
-                    'いずれの日時も不可、再調整',
-                  ]"
-                />
-              </b-form-group>
-            </b-form>
-            <!-- Button -->
-            <div class="d-flex flex-column align-items-center mt-5">
-              <b-button
-                disabled
-                variant="secondary"
-                class="my-1 text-white w-137"
-                @click="handleNextStep"
-              >
-                確認画面へ</b-button>
-              <b-button
-                disabled
-                variant="secondary"
-                class="text-white my-1 w-137"
-              >面接辞退</b-button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </modal-common>
-
-    <!-- offer confirmation + URL setting -->
-    <modal-common :refs="'offer-confirmation_URL-setting'" :size="'md'">
-      <div slot="body">
-        <h3 class="font-weight-bold text-center">
-          Nguyen Thi Nhi <br>
-          ｸﾞｴﾝ ﾃｨ ﾆｰ
-        </h3>
-        <div class="text-center mt-4">
-          電気設計エンジニア
-          <br>
-          《オファー》
-        </div>
-        <div class="content-detail px-5">
-          <h3 class="text-center">一次面接</h3>
-          <h6 class="text-center">個人面接</h6>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <h5 class="mb-5">2023年4月6日（木）13:30〜14:30</h5>
-          </div>
-          <form ref="form">
-            <b-form-group
-              label="オンライン面接URL"
-              label-for="name-input"
-              invalid-feedback="Name is required"
-              :state="nameState"
-            >
-              <b-form-input
-                id="name-input"
-                v-model="name"
-                :state="nameState"
-                required
-              />
-            </b-form-group>
-            <b-form-group
-              label="ミーティングID"
-              label-for="name-input"
-              invalid-feedback="Name is required"
-              :state="nameState"
-            >
-              <b-form-input
-                id="name-input"
-                v-model="name"
-                :state="nameState"
-                required
-              />
-            </b-form-group>
-            <b-form-group
-              label="パスコード"
-              label-for="name-input"
-              invalid-feedback="Name is required"
-              :state="nameState"
-            >
-              <b-form-input
-                id="name-input"
-                v-model="name"
-                :state="nameState"
-                required
-              />
-            </b-form-group>
-          </form>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <b-button variant="warning" class="w-25 text-white" @click="'';">
-              {{ $t('BUTTON.SAVE') }}
-            </b-button>
-          </div>
-        </div>
-      </div>
-    </modal-common>
-    <!-- document passing + URL setting -->
-    <modal-common :refs="'document-passing_URL-setting'" :size="'md'">
-      <div slot="body">
-        <h3 class="font-weight-bold text-center">
-          Nguyen Thi Nhi <br>
-          ｸﾞｴﾝ ﾃｨ ﾆｰ
-        </h3>
-        <div class="text-center mt-4">
-          電気設計エンジニア
-          <br>
-          《エントリー》
-        </div>
-        <div class="content-detail px-5">
-          <h3 class="text-center">一次面接</h3>
-          <h6 class="text-center">個別面接</h6>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <h5 class="mb-5">2023年4月6日（木）13:30〜14:30</h5>
-          </div>
-          <form ref="form">
-            <b-form-group
-              label="オンライン面接URL"
-              label-for="name-input"
-              invalid-feedback="Name is required"
-              :state="nameState"
-            >
-              <b-form-input
-                id="name-input"
-                v-model="name"
-                :state="nameState"
-                required
-              />
-            </b-form-group>
-            <b-form-group
-              label="ミーティングID"
-              label-for="name-input"
-              invalid-feedback="Name is required"
-              :state="nameState"
-            >
-              <b-form-input
-                id="name-input"
-                v-model="name"
-                :state="nameState"
-                required
-              />
-            </b-form-group>
-            <b-form-group
-              label="パスコード"
-              label-for="name-input"
-              invalid-feedback="Name is required"
-              :state="nameState"
-            >
-              <b-form-input
-                id="name-input"
-                v-model="name"
-                :state="nameState"
-                required
-              />
-            </b-form-group>
-          </form>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <b-button variant="warning" class="w-25 text-white" @click="'';">
-              {{ $t('BUTTON.SAVE') }}
-            </b-button>
-          </div>
-        </div>
-      </div>
-    </modal-common>
-    <!-- first passing + URL setting -->
-    <modal-common :refs="'first-passing_URL-setting'" :size="'md'">
-      <div slot="body">
-        <h3 class="font-weight-bold text-center">
-          Nguyen Thi Nhi <br>
-          ｸﾞｴﾝ ﾃｨ ﾆｰ
-        </h3>
-        <div class="text-center mt-4">
-          電気設計エンジニア
-          <br>
-          《エントリー》
-        </div>
-        <div class="content-detail">
-          <h3 class="text-center">二次面接</h3>
-          <h6 class="text-center">個別面接</h6>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <h5 class="mb-5">2023年4月6日（木）13:30〜14:30</h5>
-          </div>
-          <form ref="form">
-            <b-form-group
-              label="オンライン面接URL"
-              label-for="name-input"
-              invalid-feedback="Name is required"
-              :state="nameState"
-            >
-              <b-form-input
-                id="name-input"
-                v-model="name"
-                :state="nameState"
-                required
-              />
-            </b-form-group>
-            <b-form-group
-              label="ミーティングID"
-              label-for="name-input"
-              invalid-feedback="Name is required"
-              :state="nameState"
-            >
-              <b-form-input
-                id="name-input"
-                v-model="name"
-                :state="nameState"
-                required
-              />
-            </b-form-group>
-            <b-form-group
-              label="パスコード"
-              label-for="name-input"
-              invalid-feedback="Name is required"
-              :state="nameState"
-            >
-              <b-form-input
-                id="name-input"
-                v-model="name"
-                :state="nameState"
-                required
-              />
-            </b-form-group>
-          </form>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <b-button variant="warning" class="w-25 text-white" @click="'';">
-              {{ $t('BUTTON.SAVE') }}
-            </b-button>
-          </div>
-        </div>
-      </div>
-    </modal-common>
-    <!-- second passing + URL setting -->
-    <modal-common :refs="'second-passing_URL-setting'" :size="'md'">
-      <div slot="body">
-        <h3 class="font-weight-bold text-center">
-          Nguyen Thi Nhi <br>
-          ｸﾞｴﾝ ﾃｨ ﾆｰ
-        </h3>
-        <div class="text-center mt-4">
-          電気設計エンジニア
-          <br>
-          《エントリー》
-        </div>
-        <div class="content-detail">
-          <h3 class="text-center">三次面接</h3>
-          <h6 class="text-center">個別面接</h6>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <h5 class="mb-5">2023年4月6日（木）13:30〜14:30</h5>
-          </div>
-          <form ref="form">
-            <b-form-group
-              label="オンライン面接URL"
-              label-for="name-input"
-              invalid-feedback="Name is required"
-              :state="nameState"
-            >
-              <b-form-input
-                id="name-input"
-                v-model="name"
-                :state="nameState"
-                required
-              />
-            </b-form-group>
-            <b-form-group
-              label="ミーティングID"
-              label-for="name-input"
-              invalid-feedback="Name is required"
-              :state="nameState"
-            >
-              <b-form-input
-                id="name-input"
-                v-model="name"
-                :state="nameState"
-                required
-              />
-            </b-form-group>
-            <b-form-group
-              label="パスコード"
-              label-for="name-input"
-              invalid-feedback="Name is required"
-              :state="nameState"
-            >
-              <b-form-input
-                id="name-input"
-                v-model="name"
-                :state="nameState"
-                required
-              />
-            </b-form-group>
-          </form>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <b-button variant="warning" class="w-25 text-white" @click="'';">
-              {{ $t('BUTTON.SAVE') }}
-            </b-button>
-          </div>
-        </div>
-
-        <div class="content-detail">
-          <h3 class="text-center">一次合格</h3>
-          <h6 class="text-center">個別面接</h6>
-          <h3 class="text-center font-weight-bold">合格</h3>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <h5>2023年3月24日（金）15:00〜16:00</h5>
-            <b-link>
-              <u> https://us02web.zoom.us/j/12345678987 </u>
-            </b-link>
-          </div>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <p>
-              ミーティングID：12345678987 <br>
-              パスコード：yhA0oq19JH
-            </p>
-          </div>
-        </div>
-      </div>
-    </modal-common>
-    <!-- third passing + URL setting -->
-    <modal-common :refs="'third-passing_URL-setting'" :size="'md'">
-      <div slot="body">
-        <h3 class="font-weight-bold text-center">
-          Nguyen Thi Nhi <br>
-          ｸﾞｴﾝ ﾃｨ ﾆｰ
-        </h3>
-        <div class="text-center mt-4">
-          電気設計エンジニア
-          <br>
-          《エントリー》
-        </div>
-        <div class="content-detail">
-          <h3 class="text-center">四次面接</h3>
-          <h6 class="text-center">個別面接</h6>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <h5 class="mb-5">2023年4月6日（木）13:30〜14:30</h5>
-          </div>
-          <form ref="form">
-            <b-form-group
-              label="オンライン面接URL"
-              label-for="name-input"
-              invalid-feedback="Name is required"
-              :state="nameState"
-            >
-              <b-form-input
-                id="name-input"
-                v-model="name"
-                :state="nameState"
-                required
-              />
-            </b-form-group>
-            <b-form-group
-              label="ミーティングID"
-              label-for="name-input"
-              invalid-feedback="Name is required"
-              :state="nameState"
-            >
-              <b-form-input
-                id="name-input"
-                v-model="name"
-                :state="nameState"
-                required
-              />
-            </b-form-group>
-            <b-form-group
-              label="パスコード"
-              label-for="name-input"
-              invalid-feedback="Name is required"
-              :state="nameState"
-            >
-              <b-form-input
-                id="name-input"
-                v-model="name"
-                :state="nameState"
-                required
-              />
-            </b-form-group>
-          </form>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <b-button variant="warning" class="w-25 text-white" @click="'';">
-              {{ $t('BUTTON.SAVE') }}
-            </b-button>
-          </div>
-        </div>
-
-        <div class="content-detail">
-          <h3 class="text-center">二次合格</h3>
-          <h6 class="text-center">個別面接</h6>
-          <h3 class="text-center font-weight-bold">合格</h3>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <h5>2023年3月24日（金）15:00〜16:00</h5>
-            <b-link>
-              <u> https://us02web.zoom.us/j/12345678987 </u>
-            </b-link>
-          </div>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <p>
-              ミーティングID：12345678987 <br>
-              パスコード：yhA0oq19JH
-            </p>
-          </div>
-        </div>
-
-        <div class="content-detail">
-          <h3 class="text-center">一次合格</h3>
-          <h6 class="text-center">個別面接</h6>
-          <h3 class="text-center font-weight-bold">合格</h3>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <h5>2023年3月24日（金）15:00〜16:00</h5>
-            <b-link>
-              <u> https://us02web.zoom.us/j/12345678987 </u>
-            </b-link>
-          </div>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <p>
-              ミーティングID：12345678987 <br>
-              パスコード：yhA0oq19JH
-            </p>
-          </div>
-        </div>
-      </div>
-    </modal-common>
-    <!-- fourth passing + URL setting -->
-    <modal-common :refs="'fourth-passing_URL-setting'" :size="'md'">
-      <div slot="body">
-        <h3 class="font-weight-bold text-center">
-          Nguyen Thi Nhi <br>
-          ｸﾞｴﾝ ﾃｨ ﾆｰ
-        </h3>
-        <div class="text-center mt-4">
-          電気設計エンジニア
-          <br>
-          《エントリー》
-        </div>
-        <div class="content-detail">
-          <h3 class="text-center">五次面接</h3>
-          <h6 class="text-center">個別面接</h6>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <h5 class="mb-5">2023年4月6日（木）13:30〜14:30</h5>
-          </div>
-          <form ref="form">
-            <b-form-group
-              label="オンライン面接URL"
-              label-for="name-input"
-              invalid-feedback="Name is required"
-              :state="nameState"
-            >
-              <b-form-input
-                id="name-input"
-                v-model="name"
-                :state="nameState"
-                required
-              />
-            </b-form-group>
-            <b-form-group
-              label="ミーティングID"
-              label-for="name-input"
-              invalid-feedback="Name is required"
-              :state="nameState"
-            >
-              <b-form-input
-                id="name-input"
-                v-model="name"
-                :state="nameState"
-                required
-              />
-            </b-form-group>
-            <b-form-group
-              label="パスコード"
-              label-for="name-input"
-              invalid-feedback="Name is required"
-              :state="nameState"
-            >
-              <b-form-input
-                id="name-input"
-                v-model="name"
-                :state="nameState"
-                required
-              />
-            </b-form-group>
-          </form>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <b-button variant="warning" class="w-25 text-white" @click="'';">
-              {{ $t('BUTTON.SAVE') }}
-            </b-button>
-          </div>
-        </div>
-
-        <div class="content-detail">
-          <h3 class="text-center">三次合格</h3>
-          <h6 class="text-center">個別面接</h6>
-          <h3 class="text-center font-weight-bold">合格</h3>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <h5>2023年3月24日（金）15:00〜16:00</h5>
-            <b-link>
-              <u> https://us02web.zoom.us/j/12345678987 </u>
-            </b-link>
-          </div>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <p>
-              ミーティングID：12345678987 <br>
-              パスコード：yhA0oq19JH
-            </p>
-          </div>
-        </div>
-
-        <div class="content-detail">
-          <h3 class="text-center">二次合格</h3>
-          <h6 class="text-center">個別面接</h6>
-          <h3 class="text-center font-weight-bold">合格</h3>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <h5>2023年3月24日（金）15:00〜16:00</h5>
-            <b-link>
-              <u> https://us02web.zoom.us/j/12345678987 </u>
-            </b-link>
-          </div>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <p>
-              ミーティングID：12345678987 <br>
-              パスコード：yhA0oq19JH
-            </p>
-          </div>
-        </div>
-
-        <div class="content-detail">
-          <h3 class="text-center">一次合格</h3>
-          <h6 class="text-center">個別面接</h6>
-          <h3 class="text-center font-weight-bold">合格</h3>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <h5>2023年3月24日（金）15:00〜16:00</h5>
-            <b-link>
-              <u> https://us02web.zoom.us/j/12345678987 </u>
-            </b-link>
-          </div>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <p>
-              ミーティングID：12345678987 <br>
-              パスコード：yhA0oq19JH
-            </p>
-          </div>
-        </div>
-      </div>
-    </modal-common>
-    <!-- fifth passing + URL setting -->
-    <modal-common :refs="'fifth-passing_URL-setting'" :size="'md'">
-      <div slot="body">
-        <h3 class="font-weight-bold text-center">
-          Nguyen Thi Nhi <br>
-          ｸﾞｴﾝ ﾃｨ ﾆｰ
-        </h3>
-        <div class="text-center mt-4">
-          電気設計エンジニア
-          <br>
-          《エントリー》
-        </div>
-        <div class="content-detail">
-          <h3 class="text-center">最終面接</h3>
-          <h6 class="text-center">個別面接</h6>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <h5 class="mb-5">2023年4月6日（木）13:30〜14:30</h5>
-          </div>
-          <form ref="form">
-            <b-form-group
-              label="オンライン面接URL"
-              label-for="name-input"
-              invalid-feedback="Name is required"
-              :state="nameState"
-            >
-              <b-form-input
-                id="name-input"
-                v-model="name"
-                :state="nameState"
-                required
-              />
-            </b-form-group>
-            <b-form-group
-              label="ミーティングID"
-              label-for="name-input"
-              invalid-feedback="Name is required"
-              :state="nameState"
-            >
-              <b-form-input
-                id="name-input"
-                v-model="name"
-                :state="nameState"
-                required
-              />
-            </b-form-group>
-            <b-form-group
-              label="パスコード"
-              label-for="name-input"
-              invalid-feedback="Name is required"
-              :state="nameState"
-            >
-              <b-form-input
-                id="name-input"
-                v-model="name"
-                :state="nameState"
-                required
-              />
-            </b-form-group>
-          </form>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <b-button variant="warning" class="w-25 text-white" @click="'';">
-              {{ $t('BUTTON.SAVE') }}
-            </b-button>
-          </div>
-        </div>
-
-        <div class="content-detail">
-          <h3 class="text-center">四次合格</h3>
-          <h6 class="text-center">個別面接</h6>
-          <h3 class="text-center font-weight-bold">合格</h3>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <h5>2023年3月24日（金）15:00〜16:00</h5>
-            <b-link>
-              <u> https://us02web.zoom.us/j/12345678987 </u>
-            </b-link>
-          </div>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <p>
-              ミーティングID：12345678987 <br>
-              パスコード：yhA0oq19JH
-            </p>
-          </div>
-        </div>
-
-        <div class="content-detail">
-          <h3 class="text-center">三次合格</h3>
-          <h6 class="text-center">個別面接</h6>
-          <h3 class="text-center font-weight-bold">合格</h3>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <h5>2023年3月24日（金）15:00〜16:00</h5>
-            <b-link>
-              <u> https://us02web.zoom.us/j/12345678987 </u>
-            </b-link>
-          </div>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <p>
-              ミーティングID：12345678987 <br>
-              パスコード：yhA0oq19JH
-            </p>
-          </div>
-        </div>
-
-        <div class="content-detail">
-          <h3 class="text-center">二次合格</h3>
-          <h6 class="text-center">個別面接</h6>
-          <h3 class="text-center font-weight-bold">合格</h3>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <h5>2023年3月24日（金）15:00〜16:00</h5>
-            <b-link>
-              <u> https://us02web.zoom.us/j/12345678987 </u>
-            </b-link>
-          </div>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <p>
-              ミーティングID：12345678987 <br>
-              パスコード：yhA0oq19JH
-            </p>
-          </div>
-        </div>
-
-        <div class="content-detail">
-          <h3 class="text-center">一次合格</h3>
-          <h6 class="text-center">個別面接</h6>
-          <h3 class="text-center font-weight-bold">合格</h3>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <h5>2023年3月24日（金）15:00〜16:00</h5>
-            <b-link>
-              <u> https://us02web.zoom.us/j/12345678987 </u>
-            </b-link>
-          </div>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <p>
-              ミーティングID：12345678987 <br>
-              パスコード：yhA0oq19JH
-            </p>
-          </div>
-        </div>
-      </div>
-    </modal-common>
-    <!-- cancel + URL setting -->
-    <modal-common :refs="'cancel_URL-setting'" :size="'md'">
-      <div slot="body">
-        <h3 class="font-weight-bold text-center">
-          Nguyen Thi Nhi <br>
-          ｸﾞｴﾝ ﾃｨ ﾆｰ
-        </h3>
-        <div class="text-center mt-4">
-          電気設計エンジニア
-          <br>
-          《エントリー》
-        </div>
-        <div class="content-detail">
-          <h3 class="text-center text-red p-5">面接中止</h3>
-        </div>
-        <div class="content-detail">
-          <h3 class="text-center">最終面接</h3>
-          <h6 class="text-center">個別面接</h6>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <h5 class="mb-5">2023年4月6日（木）13:30〜14:30</h5>
-          </div>
-          <form ref="form">
-            <b-form-group
-              label="オンライン面接URL"
-              label-for="name-input"
-              invalid-feedback="Name is required"
-              :state="nameState"
-            >
-              <b-form-input
-                id="name-input"
-                v-model="name"
-                :state="nameState"
-                required
-                disabled
-              />
-            </b-form-group>
-            <b-form-group
-              label="ミーティングID"
-              label-for="name-input"
-              invalid-feedback="Name is required"
-              :state="nameState"
-            >
-              <b-form-input
-                id="name-input"
-                v-model="name"
-                :state="nameState"
-                required
-                disabled
-              />
-            </b-form-group>
-            <b-form-group
-              label="パスコード"
-              label-for="name-input"
-              invalid-feedback="Name is required"
-              :state="nameState"
-            >
-              <b-form-input
-                id="name-input"
-                v-model="name"
-                :state="nameState"
-                required
-                disabled
-              />
-            </b-form-group>
-          </form>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <b-button
-              variant="secondary"
-              disabled
-              class="w-25 text-white"
-              @click="'';"
-            >
-              {{ $t('BUTTON.SAVE') }}
-            </b-button>
-          </div>
-        </div>
-
-        <div class="content-detail">
-          <h3 class="text-center">二次面接</h3>
-          <h6 class="text-center">個別面接</h6>
-          <h3 class="text-center font-weight-bold">合格</h3>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <h5>2023年3月24日（金）15:00〜16:00</h5>
-            <b-link>
-              <u> https://us02web.zoom.us/j/12345678987 </u>
-            </b-link>
-          </div>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <p>
-              ミーティングID：12345678987 <br>
-              パスコード：yhA0oq19JH
-            </p>
-          </div>
-        </div>
-
-        <div class="content-detail">
-          <h3 class="text-center">一次面接</h3>
-          <h6 class="text-center">集団面接</h6>
-          <h3 class="text-center font-weight-bold">合格</h3>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <h5>2023年3月24日（金）15:00〜16:00</h5>
-            <b-link>
-              <u> https://us02web.zoom.us/j/12345678987 </u>
-            </b-link>
-          </div>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <p>
-              ミーティングID：12345678987 <br>
-              パスコード：yhA0oq19JH
-            </p>
-          </div>
-        </div>
-      </div>
-    </modal-common>
-    <!-- reject + URL setting -->
-    <modal-common :refs="'reject_URL-setting'" :size="'md'">
-      <div slot="body">
-        <h3 class="font-weight-bold text-center">
-          Nguyen Thi Nhi <br>
-          ｸﾞｴﾝ ﾃｨ ﾆｰ
-        </h3>
-        <div class="text-center mt-4">
-          電気設計エンジニア
-          <br>
-          《エントリー》
-        </div>
-        <div class="content-detail">
-          <h3 class="text-center text-red p-5">面接辞退</h3>
-        </div>
-        <div class="content-detail">
-          <h3 class="text-center">最終面接</h3>
-          <h6 class="text-center">個別面接</h6>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <h5 class="mb-5">2023年4月6日（木）13:30〜14:30</h5>
-          </div>
-          <form ref="form">
-            <b-form-group
-              label="オンライン面接URL"
-              label-for="name-input"
-              invalid-feedback="Name is required"
-              :state="nameState"
-            >
-              <b-form-input
-                id="name-input"
-                v-model="name"
-                :state="nameState"
-                required
-                disabled
-              />
-            </b-form-group>
-            <b-form-group
-              label="ミーティングID"
-              label-for="name-input"
-              invalid-feedback="Name is required"
-              :state="nameState"
-            >
-              <b-form-input
-                id="name-input"
-                v-model="name"
-                :state="nameState"
-                required
-                disabled
-              />
-            </b-form-group>
-            <b-form-group
-              label="パスコード"
-              label-for="name-input"
-              invalid-feedback="Name is required"
-              :state="nameState"
-            >
-              <b-form-input
-                id="name-input"
-                v-model="name"
-                :state="nameState"
-                required
-                disabled
-              />
-            </b-form-group>
-          </form>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <b-button
-              variant="secondary"
-              disabled
-              class="w-25 text-white"
-              @click="'';"
-            >
-              {{ $t('BUTTON.SAVE') }}
-            </b-button>
-          </div>
-        </div>
-
-        <div class="content-detail">
-          <h3 class="text-center">二次面接</h3>
-          <h6 class="text-center">個別面接</h6>
-          <h3 class="text-center font-weight-bold">合格</h3>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <h5>2023年3月24日（金）15:00〜16:00</h5>
-            <b-link>
-              <u> https://us02web.zoom.us/j/12345678987 </u>
-            </b-link>
-          </div>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <p>
-              ミーティングID：12345678987 <br>
-              パスコード：yhA0oq19JH
-            </p>
-          </div>
-        </div>
-
-        <div class="content-detail">
-          <h3 class="text-center">一次面接</h3>
-          <h6 class="text-center">集団面接</h6>
-          <h3 class="text-center font-weight-bold">合格</h3>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <h5>2023年3月24日（金）15:00〜16:00</h5>
-            <b-link>
-              <u> https://us02web.zoom.us/j/12345678987 </u>
-            </b-link>
-          </div>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <p>
-              ミーティングID：12345678987 <br>
-              パスコード：yhA0oq19JH
-            </p>
-          </div>
-        </div>
-      </div>
-    </modal-common>
-
-    <!-- offer confirmation + adjusted-->
-    <modal-common
-      :refs="'offer-confirmation_adjusted'"
-      :size="step === 4 || step === 5 ? 'lg' : 'md'"
-      @reset-modal="resetModal"
-    >
-      <div slot="body">
-        <div class="text-center">
-          <h2 class="font-weight-bold">
-            Nguyen Thi Nhi <br>
-            ｸﾞｴﾝ ﾃｨ ﾆｰ
-          </h2>
-          <h5>
-            電気設計エンジニア <br>
-            《オファー》
-          </h5>
-          <h5 v-if="step === 3">以下の内容で送信しました。 <br></h5>
-        </div>
-
-        <div class="content-detail">
-          <h3 v-if="step === 1 || step === 2 || step === 3" class="text-center">
-            一次面接
-          </h3>
-          <h3 v-if="step === 4 || step === 5" class="text-center">二次合格</h3>
-          <template v-if="step === 1 || step === 2 || step === 3">
-            <h6 class="text-center">個人面接</h6>
-            <div class="d-flex flex-column align-items-center mt-4">
-              <h5>2023年4月6日（木）11:00〜12:00</h5>
-              <b-link>
-                <u> https://us02web.zoom.us/j/987654321 </u>
-              </b-link>
-            </div>
-            <div class="d-flex flex-column align-items-center mt-4">
-              <p>
-                ミーティングID：987654321 <br>
-                パスコード：Lr20JAs47
-              </p>
-            </div>
-            <template v-if="step === 2">
-              <b-form-select
-                v-model="optionSelectStatus"
-                :options="['合格', '不合格', '内定']"
-                @change="handleSelectStatus"
-              />
-              <b-form-select
-                v-if="isDisplaySecond"
-                v-model="optionSelectSecondStatus"
-                class="mt-3"
-                :options="['二次合格へ', '最終面接へ']"
-              />
-
-              <template v-if="isDisplaySecondOffical">
-                <div class="d-flex align-items-center mt-3">
-                  <label class="mb-0 mx-1">
-                    {{ '回答期限' }}
-                  </label>
-                  <span class="mx-1">※7日後以降で設定可能</span>
-                </div>
-                <b-form-input v-model="optionSelectSecondStatus" type="date" />
-              </template>
-            </template>
-            <template v-if="step === 3">
-              <b-row>
-                <b-col cols="4">結果</b-col>
-                <b-col cols="8" class="d-flex flex-wrap align-items-center">
-                  {{ optionSelectStatus }}
-                </b-col>
-              </b-row>
-              <b-row>
-                <b-col cols="4">
-                  {{ optionSelectStatus === '合格' ? '' : '回答期限' }}</b-col>
-                <b-col cols="8" class="d-flex flex-wrap align-items-center">
-                  {{ optionSelectSecondStatus }}
-                </b-col>
-              </b-row>
-            </template>
-          </template>
-          <template v-if="step === 4">
-            <b-form-group label="面接形式">
-              <b-form-radio-group
-                :options="['集団面接', '個人面接']"
-                name="面接形式"
-                stacked
-              />
-            </b-form-group>
-
-            <h6 class="text-red">
-              ※
-              二次面接以降は個別面接のみとなります。集団面接を希望する場合はコンシェルジュに問い合わせてください。
-            </h6>
-
-            <b-table
-              class="bg-white"
-              bordered
-              :fields="fieldsModal"
-              :items="itemsModal"
-            >
-              <template #cell(candidate_date)="">
-                <b-form-input type="date" />
-              </template>
-
-              <template #cell(starting_time)="">
-                <div class="d-flex">
-                  <b-form-select :options="clockOptions" class="ml-1 mr-2" />
-                  <b-form-select :options="hourOptions" class="mr-1 ml-2" />
-                </div>
-              </template>
-              <template #cell(expected_time)="">
-                <div class="d-flex align-items-center">
-                  <b-form-select :options="minuteOptions" class="mx-2" />
-                  <span>分</span>
-                </div>
-              </template>
-            </b-table>
-          </template>
-
-          <template v-if="step === 5">
-            <b-row>
-              <b-col cols="4">面接形式 </b-col>
-              <b-col cols="8">集団面接</b-col>
-            </b-row>
-            <b-row>
-              <b-col cols="4" class="my-2">面接候補日 </b-col>
-              <b-col cols="8" class="d-flex flex-wrap align-items-center my-2">
-                <div>2023年3月5日（月）午前11時〜午後12時</div>
-                <div>2023年3月5日（月）午後1時〜午後2時</div>
-                <div>2023年3月6日（火）午後1時〜午後2時</div>
-                <div>2023年3月6日（火）午後2時〜午後3時</div>
-                <div>2023年3月7日（水）午前10時〜午前11時</div>
-              </b-col>
-            </b-row>
-          </template>
-          <!-- button -->
-          <div class="d-flex flex-column align-items-center mt-4">
-            <template v-if="step === 1">
-              <b-button
-                variant="warning"
-                class="text-white my-1 w-137"
-                @click="handleNextStep"
-              >
-                {{ $t('BUTTON.BTN_TAB_4_MODAL_INTERVIEW.BTN_COMPLETE') }}
-              </b-button>
-
-              <b-button
-                variant="danger"
-                class="my-1 text-white w-137"
-                @click="handleStopInterview"
-              >
-                {{
-                  $t('BUTTON.BTN_TAB_4_MODAL_INTERVIEW.BTN_INTERVIEW_CANCEL')
-                }}
-              </b-button>
-            </template>
-            <b-button
-              v-if="step === 2"
-              variant="warning"
-              class="text-white my-1 w-137"
-              @click="handleNextStep"
-            >
-              {{ '確定' }}
-            </b-button>
-
-            <template v-if="step === 3">
-              <div
-                v-if="optionSelectStatus === '合格'"
-                class="d-flex justify-content-center mt-5"
-              >
-                <b-button variant="secondary" class="mx-1">
-                  <span class="mx-1" @click="'';">閉じる</span>
-                </b-button>
-                <b-button
-                  variant="warning"
-                  class="text-white mx-1"
-                  @click="handleNextStep"
-                >
-                  <span> 日程調整へ進む</span>
-
-                  <i class="fas fa-solid fa-caret-right fs-16" />
-                </b-button>
-              </div>
-              <div
-                v-if="optionSelectStatus === '内定'"
-                class="d-flex justify-content-center mt-5"
-              >
-                <b-button
-                  variant="warning"
-                  class="text-white mx-1"
-                  @click="'';"
-                >
-                  編集
-                </b-button>
-              </div>
-            </template>
-            <template v-if="step === 4">
-              <div class="d-flex justify-content-center mt-5">
-                <b-button variant="secondary" class="mx-1">
-                  <i class="fas fa-solid fa-caret-left fs-16" />
-                  <span class="mx-1" @click="handleBack">前の画面に戻る</span>
-                </b-button>
-                <b-button
-                  variant="warning"
-                  class="text-white mx-1"
-                  @click="handleNextStep"
-                >
-                  <span>この内容で送信する</span>
-                </b-button>
-              </div>
-            </template>
-            <template v-if="step === 5">
-              <div class="d-flex justify-content-center mt-5">
-                <b-button variant="secondary" class="mx-1">
-                  <i class="fas fa-solid fa-caret-left fs-16" />
-                  <span class="mx-1" @click="handleBack">前の画面に戻る</span>
-                </b-button>
-                <b-button
-                  variant="warning"
-                  class="text-white mx-1"
-                  @click="'';"
-                >
-                  <span>この内容で送信する</span>
-                </b-button>
-              </div>
-            </template>
-          </div>
-        </div>
-      </div>
-    </modal-common>
-    <!-- document passing + adjusted-->
-    <modal-common
-      :refs="'document-passing_adjusted'"
-      :size="step === 4 || step === 5 ? 'lg' : 'md'"
-      @reset-modal="resetModal"
-    >
-      <div slot="body">
-        <div class="text-center">
-          <h2 class="font-weight-bold">
-            Nguyen Thi Nhi <br>
-            ｸﾞｴﾝ ﾃｨ ﾆｰ
-          </h2>
-          <h5>
-            電気設計エンジニア <br>
-            《エントリー》
-          </h5>
-
-          <h5 v-if="step === 3">以下の内容で送信しました。 <br></h5>
-        </div>
-
-        <!--  -->
-        <div class="content-detail">
-          <h3 v-if="step === 1 || step === 2 || step === 3" class="text-center">
-            一次面接
-          </h3>
-          <h3 v-if="step === 4 || step === 5" class="text-center">二次合格</h3>
-          <template v-if="step === 1 || step === 2 || step === 3">
-            <h6 class="text-center">個別面接</h6>
-            <div class="d-flex flex-column align-items-center mt-4">
-              <h5>2023年4月6日（木）11:00〜12:00</h5>
-              <b-link>
-                <u> https://us02web.zoom.us/j/987654321 </u>
-              </b-link>
-            </div>
-            <div class="d-flex flex-column align-items-center mt-4">
-              <p>
-                ミーティングID：987654321 <br>
-                パスコード：Lr20JAs47
-              </p>
-            </div>
-            <template v-if="step === 2">
-              <b-form-select
-                v-model="optionSelectStatus"
-                :options="['合格', '不合格', '内定']"
-                @change="handleSelectStatus"
-              />
-
-              <b-form-select
-                v-if="isDisplaySecond"
-                v-model="optionSelectSecondStatus"
-                class="mt-3"
-                :options="['二次合格へ', ' 最終面接へ']"
-                @change="'';"
-              />
-
-              <template v-if="isDisplaySecondOffical">
-                <div class="d-flex align-items-center mt-3">
-                  <label class="mb-0 mx-1">{{ '回答期限' }}</label>
-                  <span class="mx-1">※7日後以降で設定可能</span>
-                </div>
-                <b-form-input v-model="optionSelectSecondStatus" type="date" />
-              </template>
-            </template>
-            <template v-if="step === 3">
-              <b-row>
-                <b-col cols="4">結果</b-col>
-                <b-col cols="8" class="d-flex flex-wrap align-items-center">
-                  {{ optionSelectStatus }}
-                </b-col>
-              </b-row>
-              <b-row>
-                <b-col cols="4">
-                  {{ optionSelectStatus === '合格' ? '' : '回答期限' }}
-                </b-col>
-                <b-col cols="8" class="d-flex flex-wrap align-items-center">
-                  {{ optionSelectSecondStatus }}
-                </b-col>
-              </b-row>
-            </template>
-          </template>
-          <template v-if="step === 4">
-            <b-form-group label="面接形式">
-              <b-form-radio-group
-                :options="['集団面接', '個人面接']"
-                name="面接形式"
-                stacked
-              />
-            </b-form-group>
-
-            <h6 class="text-red">
-              ※
-              二次面接以降は個別面接のみとなります。集団面接を希望する場合はコンシェルジュに問い合わせてください。
-            </h6>
-
-            <b-table
-              class="bg-white"
-              bordered
-              :fields="fieldsModal"
-              :items="itemsModal"
-            >
-              <template #cell(candidate_date)="">
-                <b-form-input type="date" />
-              </template>
-
-              <template #cell(starting_time)="">
-                <div class="d-flex">
-                  <b-form-select :options="clockOptions" class="ml-1 mr-2" />
-                  <b-form-select :options="hourOptions" class="mr-1 ml-2" />
-                </div>
-              </template>
-              <template #cell(expected_time)="">
-                <div class="d-flex align-items-center">
-                  <b-form-select :options="minuteOptions" class="mx-2" />
-                  <span>分</span>
-                </div>
-              </template>
-            </b-table>
-          </template>
-
-          <template v-if="step === 5">
-            <b-row>
-              <b-col cols="4">面接形式 </b-col>
-              <b-col cols="8">集団面接</b-col>
-            </b-row>
-            <b-row>
-              <b-col cols="4" class="my-2">面接候補日 </b-col>
-              <b-col cols="8" class="d-flex flex-wrap align-items-center my-2">
-                <div>2023年3月5日（月）午前11時〜午後12時</div>
-                <div>2023年3月5日（月）午後1時〜午後2時</div>
-                <div>2023年3月6日（火）午後1時〜午後2時</div>
-                <div>2023年3月6日（火）午後2時〜午後3時</div>
-                <div>2023年3月7日（水）午前10時〜午前11時</div>
-              </b-col>
-            </b-row>
-          </template>
-          <!-- button -->
-          <div class="d-flex flex-column align-items-center mt-4">
-            <template v-if="step === 1">
-              <b-button
-                variant="warning"
-                class="text-white my-1 w-137"
-                @click="handleNextStep"
-              >
-                {{ $t('BUTTON.BTN_TAB_4_MODAL_INTERVIEW.BTN_COMPLETE') }}
-              </b-button>
-
-              <b-button
-                variant="danger"
-                class="my-1 text-white w-137"
-                @click="handleStopInterview"
-              >
-                {{
-                  $t('BUTTON.BTN_TAB_4_MODAL_INTERVIEW.BTN_INTERVIEW_CANCEL')
-                }}
-              </b-button>
-            </template>
-            <b-button
-              v-if="step === 2"
-              variant="warning"
-              class="text-white my-1 w-137"
-              @click="handleNextStep"
-            >
-              {{ '確定' }}
-            </b-button>
-
-            <template v-if="step === 3">
-              <div class="d-flex justify-content-center mt-5">
-                <b-button variant="secondary" class="mx-1">
-                  <span class="mx-1" @click="'';">閉じる</span>
-                </b-button>
-                <b-button
-                  variant="warning"
-                  class="text-white mx-1"
-                  @click="handleNextStep"
-                >
-                  <span> 日程調整へ進む</span>
-
-                  <i class="fas fa-solid fa-caret-right fs-16" />
-                </b-button>
-              </div>
-            </template>
-            <template v-if="step === 4">
-              <div class="d-flex justify-content-center mt-5">
-                <b-button variant="secondary" class="mx-1">
-                  <i class="fas fa-solid fa-caret-left fs-16" />
-                  <span class="mx-1" @click="handleBack">前の画面に戻る</span>
-                </b-button>
-                <b-button
-                  variant="warning"
-                  class="text-white mx-1"
-                  @click="handleNextStep"
-                >
-                  <span>この内容で送信する</span>
-                </b-button>
-              </div>
-            </template>
-            <template v-if="step === 5">
-              <div class="d-flex justify-content-center mt-5">
-                <b-button variant="secondary" class="mx-1">
-                  <i class="fas fa-solid fa-caret-left fs-16" />
-                  <span class="mx-1" @click="handleBack">前の画面に戻る</span>
-                </b-button>
-                <b-button
-                  variant="warning"
-                  class="text-white mx-1"
-                  @click="'';"
-                >
-                  <span>この内容で送信する</span>
-                </b-button>
-              </div>
-            </template>
-          </div>
-        </div>
-      </div>
-    </modal-common>
-    <!-- first passing + adjusted-->
-    <modal-common
-      :refs="'first-passing_adjusted'"
-      :size="step === 4 || step === 5 ? 'lg' : 'md'"
-      @reset-modal="resetModal"
-    >
-      <div slot="body">
-        <div class="text-center">
-          <h2 class="font-weight-bold">
-            Nguyen Thi Nhi <br>
-            ｸﾞｴﾝ ﾃｨ ﾆｰ
-          </h2>
-          <h5>
-            電気設計エンジニア <br>
-            《エントリー》
-          </h5>
-
-          <h5 v-if="step === 3">以下の内容で送信しました。 <br></h5>
-        </div>
-
-        <div class="content-detail">
-          <template v-if="step === 1 || step === 2 || step === 3">
-            <h3 class="text-center">二次面接</h3>
-            <h6 class="text-center">個別面接</h6>
-            <div class="d-flex flex-column align-items-center mt-4">
-              <h5>2023年4月6日（木）11:00〜12:00</h5>
-              <b-link>
-                <u> https://us02web.zoom.us/j/987654321 </u>
-              </b-link>
-            </div>
-            <div class="d-flex flex-column align-items-center mt-4">
-              <p>
-                ミーティングID：987654321 <br>
-                パスコード：Lr20JAs47
-              </p>
-            </div>
-            <template v-if="step === 2">
-              <b-form-select
-                v-model="optionSelectStatus"
-                :options="['合格', '不合格', '内定']"
-                @change="handleSelectStatus"
-              />
-
-              <b-form-select
-                v-if="isDisplaySecond"
-                v-model="optionSelectSecondStatus"
-                class="mt-3"
-                :options="['三次面接へ', ' 最終面接へ']"
-              />
-
-              <template v-if="isDisplaySecondOffical">
-                <div class="d-flex align-items-center mt-3">
-                  <label class="mb-0 mx-1" for="textarea">{{
-                    '回答期限'
-                  }}</label>
-                  <span class="mx-1">※7日後以降で設定可能</span>
-                </div>
-                <b-form-input type="date" />
-              </template>
-            </template>
-            <template v-if="step === 3">
-              <b-row>
-                <b-col cols="4">結果</b-col>
-                <b-col cols="8">{{ optionSelectStatus }}</b-col>
-              </b-row>
-              <b-row>
-                <b-col cols="4">
-                  {{ optionSelectStatus === '合格' ? '' : '回答期限' }}
-                </b-col>
-                <b-col cols="8"> {{ optionSelectSecondStatus }}</b-col>
-              </b-row>
-            </template>
-          </template>
-
-          <template v-if="step === 4 || step === 5">
-            <h3 class="text-center">三次面接</h3>
-            <template v-if="step === 4">
-              <b-form-group label="面接形式">
-                <b-form-radio-group
-                  :options="['集団面接', '個人面接']"
-                  name="面接形式"
-                  stacked
-                />
-              </b-form-group>
-
-              <h6 class="text-red">
-                ※
-                二次面接以降は個別面接のみとなります。集団面接を希望する場合はコンシェルジュに問い合わせてください。
-              </h6>
-
-              <b-table
-                class="bg-white"
-                bordered
-                :fields="fieldsModal"
-                :items="itemsModal"
-              >
-                <template #cell(candidate_date)="">
-                  <b-form-input type="date" />
-                </template>
-
-                <template #cell(starting_time)="">
-                  <div class="d-flex">
-                    <b-form-select :options="clockOptions" class="ml-1 mr-2" />
-                    <b-form-select :options="hourOptions" class="mr-1 ml-2" />
-                  </div>
-                </template>
-                <template #cell(expected_time)="">
-                  <div class="d-flex align-items-center">
-                    <b-form-select :options="minuteOptions" class="mx-2" />
-                    <span>分</span>
-                  </div>
-                </template>
-              </b-table>
-            </template>
-
-            <template v-if="step === 5">
-              <b-row>
-                <b-col cols="4">面接形式 </b-col>
-                <b-col cols="8">集団面接</b-col>
-              </b-row>
-              <b-row>
-                <b-col cols="4" class="my-2">面接候補日 </b-col>
-                <b-col
-                  cols="8"
-                  class="d-flex flex-wrap align-items-center my-2"
-                >
-                  <div>2023年3月5日（月）午前11時〜午後12時</div>
-                  <div>2023年3月5日（月）午後1時〜午後2時</div>
-                  <div>2023年3月6日（火）午後1時〜午後2時</div>
-                  <div>2023年3月6日（火）午後2時〜午後3時</div>
-                  <div>2023年3月7日（水）午前10時〜午前11時</div>
-                </b-col>
-              </b-row>
-            </template>
-          </template>
-
-          <!-- button -->
-          <div class="d-flex flex-column align-items-center mt-4">
-            <template v-if="step === 1">
-              <b-button
-                variant="warning"
-                class="text-white my-1 w-137"
-                @click="handleNextStep"
-              >
-                {{ $t('BUTTON.BTN_TAB_4_MODAL_INTERVIEW.BTN_COMPLETE') }}
-              </b-button>
-
-              <b-button
-                variant="danger"
-                class="my-1 text-white w-137"
-                @click="handleStopInterview"
-              >
-                {{
-                  $t('BUTTON.BTN_TAB_4_MODAL_INTERVIEW.BTN_INTERVIEW_CANCEL')
-                }}
-              </b-button>
-            </template>
-            <b-button
-              v-if="step === 2"
-              variant="warning"
-              class="text-white my-1 w-137"
-              @click="handleNextStep"
-            >
-              {{ '確定' }}
-            </b-button>
-
-            <template v-if="step === 3">
-              <div class="d-flex justify-content-center mt-5">
-                <b-button variant="secondary" class="mx-1">
-                  <span class="mx-1" @click="'';">閉じる</span>
-                </b-button>
-                <b-button
-                  variant="warning"
-                  class="text-white mx-1"
-                  @click="handleNextStep"
-                >
-                  <span> 日程調整へ進む</span>
-
-                  <i class="fas fa-solid fa-caret-right fs-16" />
-                </b-button>
-              </div>
-            </template>
-            <template v-if="step === 4">
-              <div class="d-flex justify-content-center mt-5">
-                <b-button variant="secondary" class="mx-1">
-                  <i class="fas fa-solid fa-caret-left fs-16" />
-                  <span class="mx-1" @click="handleBack">前の画面に戻る</span>
-                </b-button>
-                <b-button
-                  variant="warning"
-                  class="text-white mx-1"
-                  @click="handleNextStep"
-                >
-                  <span>この内容で送信する</span>
-                </b-button>
-              </div>
-            </template>
-            <template v-if="step === 5">
-              <div class="d-flex justify-content-center mt-5">
-                <b-button variant="secondary" class="mx-1">
-                  <i class="fas fa-solid fa-caret-left fs-16" />
-                  <span class="mx-1" @click="handleBack">前の画面に戻る</span>
-                </b-button>
-                <b-button
-                  variant="warning"
-                  class="text-white mx-1"
-                  @click="'';"
-                >
-                  <span>この内容で送信する</span>
-                </b-button>
-              </div>
-            </template>
-          </div>
-        </div>
-        <!--  -->
-        <template v-if="step === 1">
-          <div class="content-detail">
-            <h3 class="text-center">一次面接</h3>
-            <h6 class="text-center">集団面接</h6>
-            <h3 class="text-center font-weight-bold">合格</h3>
-            <div class="d-flex flex-column align-items-center mt-4">
-              <h5>2023年3月24日（金）15:00〜16:00</h5>
-              <b-link>
-                <u> https://us02web.zoom.us/j/12345678987 </u>
-              </b-link>
-            </div>
-            <div class="d-flex flex-column align-items-center mt-4">
-              <p>
-                ミーティングID：12345678987 <br>
-                パスコード：yhA0oq19JH
-              </p>
-            </div>
-          </div>
-        </template>
-      </div>
-    </modal-common>
-    <!-- second passing + adjusted -->
-    <modal-common
-      :refs="'second-passing_adjusted'"
-      :size="step === 4 || step === 5 ? 'lg' : 'md'"
-      @reset-modal="resetModal"
-    >
-      <div slot="body">
-        <div class="text-center">
-          <h2 class="font-weight-bold">
-            Nguyen Thi Nhi <br>
-            ｸﾞｴﾝ ﾃｨ ﾆｰ
-          </h2>
-          <h5>
-            電気設計エンジニア <br>
-            《エントリー》
-          </h5>
-          <h5 v-if="step === 3">以下の内容で送信しました。 <br></h5>
-        </div>
-        <div class="content-detail">
-          <template v-if="step === 1 || step === 2 || step === 3">
-            <h3 class="text-center">三次面接</h3>
-            <h6 class="text-center">個別面接</h6>
-            <div class="d-flex flex-column align-items-center mt-4">
-              <h5>2023年4月6日（木）11:00〜12:00</h5>
-              <b-link>
-                <u> https://us02web.zoom.us/j/987654321 </u>
-              </b-link>
-            </div>
-            <div class="d-flex flex-column align-items-center mt-4">
-              <p>
-                ミーティングID：987654321 <br>
-                パスコード：Lr20JAs47
-              </p>
-            </div>
-            <template v-if="step === 2">
-              <b-form-select
-                v-model="optionSelectStatus"
-                :options="['合格', '不合格', '内定']"
-                @change="handleSelectStatus"
-              />
-
-              <b-form-select
-                v-if="isDisplaySecond"
-                v-model="optionSelectSecondStatus"
-                class="mt-3"
-                :options="['四次面接へ', ' 最終面接へ']"
-              />
-
-              <template v-if="isDisplaySecondOffical">
-                <div class="d-flex align-items-center mt-3">
-                  <label class="mb-0 mx-1" for="textarea">{{
-                    '回答期限'
-                  }}</label>
-                  <span class="mx-1">※7日後以降で設定可能</span>
-                </div>
-                <b-form-input type="date" />
-              </template>
-            </template>
-            <template v-if="step === 3">
-              <b-row>
-                <b-col cols="4">結果</b-col>
-                <b-col cols="8">{{ optionSelectStatus }}</b-col>
-              </b-row>
-              <b-row>
-                <b-col cols="4">
-                  {{ optionSelectStatus === '合格' ? '' : '回答期限' }}
-                </b-col>
-                <b-col cols="8"> {{ optionSelectSecondStatus }}</b-col>
-              </b-row>
-            </template>
-          </template>
-          <template v-if="step === 4 || step === 5">
-            <h3 class="text-center">三次面接</h3>
-            <template v-if="step === 4">
-              <b-form-group label="面接形式">
-                <b-form-radio-group
-                  :options="['集団面接', '個人面接']"
-                  name="面接形式"
-                  stacked
-                />
-              </b-form-group>
-
-              <h6 class="text-red">
-                ※
-                二次面接以降は個別面接のみとなります。集団面接を希望する場合はコンシェルジュに問い合わせてください。
-              </h6>
-
-              <b-table
-                class="bg-white"
-                bordered
-                :fields="fieldsModal"
-                :items="itemsModal"
-              >
-                <template #cell(candidate_date)="">
-                  <b-form-input type="date" />
-                </template>
-
-                <template #cell(starting_time)="">
-                  <div class="d-flex">
-                    <b-form-select :options="clockOptions" class="ml-1 mr-2" />
-                    <b-form-select :options="hourOptions" class="mr-1 ml-2" />
-                  </div>
-                </template>
-                <template #cell(expected_time)="">
-                  <div class="d-flex align-items-center">
-                    <b-form-select :options="minuteOptions" class="mx-2" />
-                    <span>分</span>
-                  </div>
-                </template>
-              </b-table>
-            </template>
-
-            <template v-if="step === 5">
-              <b-row>
-                <b-col cols="4">面接形式 </b-col>
-                <b-col cols="8">集団面接</b-col>
-              </b-row>
-              <b-row>
-                <b-col cols="4" class="my-2">面接候補日 </b-col>
-                <b-col
-                  cols="8"
-                  class="d-flex flex-wrap align-items-center my-2"
-                >
-                  <div>2023年3月5日（月）午前11時〜午後12時</div>
-                  <div>2023年3月5日（月）午後1時〜午後2時</div>
-                  <div>2023年3月6日（火）午後1時〜午後2時</div>
-                  <div>2023年3月6日（火）午後2時〜午後3時</div>
-                  <div>2023年3月7日（水）午前10時〜午前11時</div>
-                </b-col>
-              </b-row>
-            </template>
-          </template>
-          <!-- button -->
-          <div class="d-flex flex-column align-items-center mt-4">
-            <template v-if="step === 1">
-              <b-button
-                variant="warning"
-                class="text-white my-1 w-137"
-                @click="handleNextStep"
-              >
-                {{ $t('BUTTON.BTN_TAB_4_MODAL_INTERVIEW.BTN_COMPLETE') }}
-              </b-button>
-
-              <b-button
-                variant="danger"
-                class="my-1 text-white w-137"
-                @click="handleStopInterview"
-              >
-                {{
-                  $t('BUTTON.BTN_TAB_4_MODAL_INTERVIEW.BTN_INTERVIEW_CANCEL')
-                }}
-              </b-button>
-            </template>
-            <b-button
-              v-if="step === 2"
-              variant="warning"
-              class="text-white my-1 w-137"
-              @click="handleNextStep"
-            >
-              {{ '確定' }}
-            </b-button>
-
-            <template v-if="step === 3">
-              <div class="d-flex justify-content-center mt-5">
-                <b-button variant="secondary" class="mx-1">
-                  <span class="mx-1" @click="'';">閉じる</span>
-                </b-button>
-                <b-button
-                  variant="warning"
-                  class="text-white mx-1"
-                  @click="handleNextStep"
-                >
-                  <span> 日程調整へ進む</span>
-
-                  <i class="fas fa-solid fa-caret-right fs-16" />
-                </b-button>
-              </div>
-            </template>
-            <template v-if="step === 4">
-              <div class="d-flex justify-content-center mt-5">
-                <b-button variant="secondary" class="mx-1">
-                  <i class="fas fa-solid fa-caret-left fs-16" />
-                  <span class="mx-1" @click="handleBack">前の画面に戻る</span>
-                </b-button>
-                <b-button
-                  variant="warning"
-                  class="text-white mx-1"
-                  @click="handleNextStep"
-                >
-                  <span>この内容で送信する</span>
-                </b-button>
-              </div>
-            </template>
-            <template v-if="step === 5">
-              <div class="d-flex justify-content-center mt-5">
-                <b-button variant="secondary" class="mx-1">
-                  <i class="fas fa-solid fa-caret-left fs-16" />
-                  <span class="mx-1" @click="handleBack">前の画面に戻る</span>
-                </b-button>
-                <b-button
-                  variant="warning"
-                  class="text-white mx-1"
-                  @click="'';"
-                >
-                  <span>この内容で送信する</span>
-                </b-button>
-              </div>
-            </template>
-          </div>
-        </div>
-
-        <template v-if="step === 1">
-          <div class="content-detail">
-            <h3 class="text-center">二次面接</h3>
-            <h6 class="text-center">個別面接</h6>
-            <h3 class="text-center font-weight-bold">合格</h3>
-            <div class="d-flex flex-column align-items-center mt-4">
-              <h4>2023年3月30日（木）11:00〜12:00</h4>
-              <b-link>
-                <u> https://us02web.zoom.us/j/987654321 </u>
-              </b-link>
-            </div>
-            <div class="d-flex flex-column align-items-center mt-4">
-              <p>
-                ミーティングID：987654321 <br>
-                パスコード：Lr20JAs47
-              </p>
-            </div>
-          </div>
-          <div class="content-detail">
-            <h3 class="text-center">一次面接</h3>
-            <h6 class="text-center">集団面接</h6>
-            <h3 class="text-center font-weight-bold">合格</h3>
-            <div class="d-flex flex-column align-items-center mt-4">
-              <h5>2023年3月24日（金）15:00〜16:00</h5>
-              <b-link>
-                <u> https://us02web.zoom.us/j/12345678987 </u>
-              </b-link>
-            </div>
-            <div class="d-flex flex-column align-items-center mt-4">
-              <p>
-                ミーティングID：12345678987 <br>
-                パスコード：yhA0oq19JH
-              </p>
-            </div>
-          </div>
-        </template>
-      </div>
-    </modal-common>
-    <!-- third passing + adjusted -->
-    <modal-common
-      :refs="'third-passing_adjusted'"
-      :size="step === 4 || step === 5 ? 'lg' : 'md'"
-      @reset-modal="resetModal"
-    >
-      <div slot="body">
-        <div class="text-center">
-          <h2 class="font-weight-bold">
-            Nguyen Thi Nhi <br>
-            ｸﾞｴﾝ ﾃｨ ﾆｰ
-          </h2>
-          <h5>
-            電気設計エンジニア <br>
-            《エントリー》
-          </h5>
-          <h5 v-if="step === 3">以下の内容で送信しました。 <br></h5>
-        </div>
-        <div class="content-detail">
-          <template v-if="step === 1 || step === 2 || step === 3">
-            <h3 class="text-center">四次面接</h3>
-            <h6 class="text-center">個別面接</h6>
-            <div class="d-flex flex-column align-items-center mt-4">
-              <h5>2023年4月6日（木）11:00〜12:00</h5>
-              <b-link>
-                <u> https://us02web.zoom.us/j/987654321 </u>
-              </b-link>
-            </div>
-            <div class="d-flex flex-column align-items-center mt-4">
-              <p>
-                ミーティングID：987654321 <br>
-                パスコード：Lr20JAs47
-              </p>
-            </div>
-            <template v-if="step === 2">
-              <b-form-select
-                v-model="optionSelectStatus"
-                :options="['合格', '不合格', '内定']"
-                @change="handleSelectStatus"
-              />
-
-              <b-form-select
-                v-if="isDisplaySecond"
-                v-model="optionSelectSecondStatus"
-                class="mt-3"
-                :options="['四次面接へ', ' 最終面接へ']"
-              />
-
-              <template v-if="isDisplaySecondOffical">
-                <div class="d-flex align-items-center mt-3">
-                  <label class="mb-0 mx-1" for="textarea">{{
-                    '回答期限'
-                  }}</label>
-                  <span class="mx-1">※7日後以降で設定可能</span>
-                </div>
-                <b-form-input type="date" />
-              </template>
-            </template>
-            <template v-if="step === 3">
-              <b-row>
-                <b-col cols="4">結果</b-col>
-                <b-col cols="8">{{ optionSelectStatus }}</b-col>
-              </b-row>
-              <b-row>
-                <b-col cols="4">
-                  {{ optionSelectStatus === '合格' ? '' : '回答期限' }}
-                </b-col>
-                <b-col cols="8"> {{ optionSelectSecondStatus }}</b-col>
-              </b-row>
-            </template>
-          </template>
-          <template v-if="step === 4 || step === 5">
-            <h3 class="text-center">四次面接</h3>
-            <template v-if="step === 4">
-              <b-form-group label="面接形式">
-                <b-form-radio-group
-                  :options="['集団面接', '個人面接']"
-                  name="面接形式"
-                  stacked
-                />
-              </b-form-group>
-
-              <h6 class="text-red">
-                ※
-                二次面接以降は個別面接のみとなります。集団面接を希望する場合はコンシェルジュに問い合わせてください。
-              </h6>
-
-              <b-table
-                class="bg-white"
-                bordered
-                :fields="fieldsModal"
-                :items="itemsModal"
-              >
-                <template #cell(candidate_date)="">
-                  <b-form-input type="date" />
-                </template>
-
-                <template #cell(starting_time)="">
-                  <div class="d-flex">
-                    <b-form-select :options="clockOptions" class="ml-1 mr-2" />
-                    <b-form-select :options="hourOptions" class="mr-1 ml-2" />
-                  </div>
-                </template>
-                <template #cell(expected_time)="">
-                  <div class="d-flex align-items-center">
-                    <b-form-select :options="minuteOptions" class="mx-2" />
-                    <span>分</span>
-                  </div>
-                </template>
-              </b-table>
-            </template>
-
-            <template v-if="step === 5">
-              <b-row>
-                <b-col cols="4">面接形式 </b-col>
-                <b-col cols="8">集団面接</b-col>
-              </b-row>
-              <b-row>
-                <b-col cols="4" class="my-2">面接候補日 </b-col>
-                <b-col
-                  cols="8"
-                  class="d-flex flex-wrap align-items-center my-2"
-                >
-                  <div>2023年3月5日（月）午前11時〜午後12時</div>
-                  <div>2023年3月5日（月）午後1時〜午後2時</div>
-                  <div>2023年3月6日（火）午後1時〜午後2時</div>
-                  <div>2023年3月6日（火）午後2時〜午後3時</div>
-                  <div>2023年3月7日（水）午前10時〜午前11時</div>
-                </b-col>
-              </b-row>
-            </template>
-          </template>
-          <!-- button -->
-          <div class="d-flex flex-column align-items-center mt-4">
-            <template v-if="step === 1">
-              <b-button
-                variant="warning"
-                class="text-white my-1 w-137"
-                @click="handleNextStep"
-              >
-                {{ $t('BUTTON.BTN_TAB_4_MODAL_INTERVIEW.BTN_COMPLETE') }}
-              </b-button>
-
-              <b-button
-                variant="danger"
-                class="my-1 text-white w-137"
-                @click="handleStopInterview"
-              >
-                {{
-                  $t('BUTTON.BTN_TAB_4_MODAL_INTERVIEW.BTN_INTERVIEW_CANCEL')
-                }}
-              </b-button>
-            </template>
-            <b-button
-              v-if="step === 2"
-              variant="warning"
-              class="text-white my-1 w-137"
-              @click="handleNextStep"
-            >
-              {{ '確定' }}
-            </b-button>
-
-            <template v-if="step === 3">
-              <div class="d-flex justify-content-center mt-5">
-                <b-button variant="secondary" class="mx-1">
-                  <span class="mx-1" @click="'';">閉じる</span>
-                </b-button>
-                <b-button
-                  variant="warning"
-                  class="text-white mx-1"
-                  @click="handleNextStep"
-                >
-                  <span> 日程調整へ進む</span>
-
-                  <i class="fas fa-solid fa-caret-right fs-16" />
-                </b-button>
-              </div>
-            </template>
-            <template v-if="step === 4">
-              <div class="d-flex justify-content-center mt-5">
-                <b-button variant="secondary" class="mx-1">
-                  <i class="fas fa-solid fa-caret-left fs-16" />
-                  <span class="mx-1" @click="handleBack">前の画面に戻る</span>
-                </b-button>
-                <b-button
-                  variant="warning"
-                  class="text-white mx-1"
-                  @click="handleNextStep"
-                >
-                  <span>この内容で送信する</span>
-                </b-button>
-              </div>
-            </template>
-            <template v-if="step === 5">
-              <div class="d-flex justify-content-center mt-5">
-                <b-button variant="secondary" class="mx-1">
-                  <i class="fas fa-solid fa-caret-left fs-16" />
-                  <span class="mx-1" @click="handleBack">前の画面に戻る</span>
-                </b-button>
-                <b-button
-                  variant="warning"
-                  class="text-white mx-1"
-                  @click="'';"
-                >
-                  <span>この内容で送信する</span>
-                </b-button>
-              </div>
-            </template>
-          </div>
-        </div>
-
-        <template v-if="step === 1">
-          <div class="content-detail">
-            <h3 class="text-center">三次面接</h3>
-            <h6 class="text-center">個別面接</h6>
-            <h3 class="text-center font-weight-bold">合格</h3>
-            <div class="d-flex flex-column align-items-center mt-4">
-              <h4>2023年3月30日（木）11:00〜12:00</h4>
-              <b-link>
-                <u> https://us02web.zoom.us/j/987654321 </u>
-              </b-link>
-            </div>
-            <div class="d-flex flex-column align-items-center mt-4">
-              <p>
-                ミーティングID：987654321 <br>
-                パスコード：Lr20JAs47
-              </p>
-            </div>
-          </div>
-          <div class="content-detail">
-            <h3 class="text-center">二次面接</h3>
-            <h6 class="text-center">個別面接</h6>
-            <h3 class="text-center font-weight-bold">合格</h3>
-            <div class="d-flex flex-column align-items-center mt-4">
-              <h4>2023年3月30日（木）11:00〜12:00</h4>
-              <b-link>
-                <u> https://us02web.zoom.us/j/987654321 </u>
-              </b-link>
-            </div>
-            <div class="d-flex flex-column align-items-center mt-4">
-              <p>
-                ミーティングID：987654321 <br>
-                パスコード：Lr20JAs47
-              </p>
-            </div>
-          </div>
-          <div class="content-detail">
-            <h3 class="text-center">一次面接</h3>
-            <h6 class="text-center">集団面接</h6>
-            <h3 class="text-center font-weight-bold">合格</h3>
-            <div class="d-flex flex-column align-items-center mt-4">
-              <h5>2023年3月24日（金）15:00〜16:00</h5>
-              <b-link>
-                <u> https://us02web.zoom.us/j/12345678987 </u>
-              </b-link>
-            </div>
-            <div class="d-flex flex-column align-items-center mt-4">
-              <p>
-                ミーティングID：12345678987 <br>
-                パスコード：yhA0oq19JH
-              </p>
-            </div>
-          </div>
-        </template>
-      </div>
-    </modal-common>
-    <!-- fourth passing + adjusted-->
-    <modal-common
-      :refs="'fourth-passing_adjusted'"
-      :size="step === 4 || step === 5 ? 'lg' : 'md'"
-      @reset-modal="resetModal"
-    >
-      <div slot="body">
-        <div class="text-center">
-          <h2 class="font-weight-bold">
-            Nguyen Thi Nhi <br>
-            ｸﾞｴﾝ ﾃｨ ﾆｰ
-          </h2>
-          <h5>
-            電気設計エンジニア <br>
-            《エントリー》
-          </h5>
-          <h5 v-if="step === 3">以下の内容で送信しました。 <br></h5>
-        </div>
-        <div class="content-detail">
-          <template v-if="step === 1 || step === 2 || step === 3">
-            <h3 class="text-center">五次面接</h3>
-            <h6 class="text-center">個別面接</h6>
-            <div class="d-flex flex-column align-items-center mt-4">
-              <h5>2023年4月6日（木）11:00〜12:00</h5>
-              <b-link>
-                <u> https://us02web.zoom.us/j/987654321 </u>
-              </b-link>
-            </div>
-            <div class="d-flex flex-column align-items-center mt-4">
-              <p>
-                ミーティングID：987654321 <br>
-                パスコード：Lr20JAs47
-              </p>
-            </div>
-            <template v-if="step === 2">
-              <b-form-select
-                v-model="optionSelectStatus"
-                :options="['合格', '不合格', '内定']"
-                @change="handleSelectStatus"
-              />
-
-              <b-form-select
-                v-if="isDisplaySecond"
-                v-model="optionSelectSecondStatus"
-                class="mt-3"
-                :options="['五次面接へ', ' 最終面接へ']"
-              />
-
-              <template v-if="isDisplaySecondOffical">
-                <div class="d-flex align-items-center mt-3">
-                  <label class="mb-0 mx-1" for="textarea">{{
-                    '回答期限'
-                  }}</label>
-                  <span class="mx-1">※7日後以降で設定可能</span>
-                </div>
-                <b-form-input type="date" />
-              </template>
-            </template>
-            <template v-if="step === 3">
-              <b-row>
-                <b-col cols="4">結果</b-col>
-                <b-col cols="8">{{ optionSelectStatus }}</b-col>
-              </b-row>
-              <b-row>
-                <b-col cols="4">
-                  {{ optionSelectStatus === '合格' ? '' : '回答期限' }}
-                </b-col>
-                <b-col cols="8"> {{ optionSelectSecondStatus }}</b-col>
-              </b-row>
-            </template>
-          </template>
-          <template v-if="step === 4 || step === 5">
-            <h3 class="text-center">五次面接</h3>
-            <template v-if="step === 4">
-              <b-form-group label="面接形式">
-                <b-form-radio-group
-                  :options="['集団面接', '個人面接']"
-                  name="面接形式"
-                  stacked
-                />
-              </b-form-group>
-
-              <h6 class="text-red">
-                ※
-                二次面接以降は個別面接のみとなります。集団面接を希望する場合はコンシェルジュに問い合わせてください。
-              </h6>
-
-              <b-table
-                class="bg-white"
-                bordered
-                :fields="fieldsModal"
-                :items="itemsModal"
-              >
-                <template #cell(candidate_date)="">
-                  <b-form-input type="date" />
-                </template>
-
-                <template #cell(starting_time)="">
-                  <div class="d-flex">
-                    <b-form-select :options="clockOptions" class="ml-1 mr-2" />
-                    <b-form-select :options="hourOptions" class="mr-1 ml-2" />
-                  </div>
-                </template>
-                <template #cell(expected_time)="">
-                  <div class="d-flex align-items-center">
-                    <b-form-select :options="minuteOptions" class="mx-2" />
-                    <span>分</span>
-                  </div>
-                </template>
-              </b-table>
-            </template>
-
-            <template v-if="step === 5">
-              <b-row>
-                <b-col cols="4">面接形式 </b-col>
-                <b-col cols="8">集団面接</b-col>
-              </b-row>
-              <b-row>
-                <b-col cols="4" class="my-2">面接候補日 </b-col>
-                <b-col
-                  cols="8"
-                  class="d-flex flex-wrap align-items-center my-2"
-                >
-                  <div>2023年3月5日（月）午前11時〜午後12時</div>
-                  <div>2023年3月5日（月）午後1時〜午後2時</div>
-                  <div>2023年3月6日（火）午後1時〜午後2時</div>
-                  <div>2023年3月6日（火）午後2時〜午後3時</div>
-                  <div>2023年3月7日（水）午前10時〜午前11時</div>
-                </b-col>
-              </b-row>
-            </template>
-          </template>
-          <!-- button -->
-          <div class="d-flex flex-column align-items-center mt-4">
-            <template v-if="step === 1">
-              <b-button
-                variant="warning"
-                class="text-white my-1 w-137"
-                @click="handleNextStep"
-              >
-                {{ $t('BUTTON.BTN_TAB_4_MODAL_INTERVIEW.BTN_COMPLETE') }}
-              </b-button>
-
-              <b-button
-                variant="danger"
-                class="my-1 text-white w-137"
-                @click="handleStopInterview"
-              >
-                {{
-                  $t('BUTTON.BTN_TAB_4_MODAL_INTERVIEW.BTN_INTERVIEW_CANCEL')
-                }}
-              </b-button>
-            </template>
-            <b-button
-              v-if="step === 2"
-              variant="warning"
-              class="text-white my-1 w-137"
-              @click="handleNextStep"
-            >
-              {{ '確定' }}
-            </b-button>
-
-            <template v-if="step === 3">
-              <div class="d-flex justify-content-center mt-5">
-                <b-button variant="secondary" class="mx-1">
-                  <span class="mx-1" @click="'';">閉じる</span>
-                </b-button>
-                <b-button
-                  variant="warning"
-                  class="text-white mx-1"
-                  @click="handleNextStep"
-                >
-                  <span> 日程調整へ進む</span>
-
-                  <i class="fas fa-solid fa-caret-right fs-16" />
-                </b-button>
-              </div>
-            </template>
-            <template v-if="step === 4">
-              <div class="d-flex justify-content-center mt-5">
-                <b-button variant="secondary" class="mx-1">
-                  <i class="fas fa-solid fa-caret-left fs-16" />
-                  <span class="mx-1" @click="handleBack">前の画面に戻る</span>
-                </b-button>
-                <b-button
-                  variant="warning"
-                  class="text-white mx-1"
-                  @click="handleNextStep"
-                >
-                  <span>この内容で送信する</span>
-                </b-button>
-              </div>
-            </template>
-            <template v-if="step === 5">
-              <div class="d-flex justify-content-center mt-5">
-                <b-button variant="secondary" class="mx-1">
-                  <i class="fas fa-solid fa-caret-left fs-16" />
-                  <span class="mx-1" @click="handleBack">前の画面に戻る</span>
-                </b-button>
-                <b-button
-                  variant="warning"
-                  class="text-white mx-1"
-                  @click="'';"
-                >
-                  <span>この内容で送信する</span>
-                </b-button>
-              </div>
-            </template>
-          </div>
-        </div>
-
-        <template v-if="step === 1">
-          <div class="content-detail">
-            <h3 class="text-center">四次面接</h3>
-            <h6 class="text-center">個別面接</h6>
-            <h3 class="text-center font-weight-bold">合格</h3>
-            <div class="d-flex flex-column align-items-center mt-4">
-              <h4>2023年3月30日（木）11:00〜12:00</h4>
-              <b-link>
-                <u> https://us02web.zoom.us/j/987654321 </u>
-              </b-link>
-            </div>
-            <div class="d-flex flex-column align-items-center mt-4">
-              <p>
-                ミーティングID：987654321 <br>
-                パスコード：Lr20JAs47
-              </p>
-            </div>
-          </div>
-          <div class="content-detail">
-            <h3 class="text-center">三次面接</h3>
-            <h6 class="text-center">個別面接</h6>
-            <h3 class="text-center font-weight-bold">合格</h3>
-            <div class="d-flex flex-column align-items-center mt-4">
-              <h4>2023年3月30日（木）11:00〜12:00</h4>
-              <b-link>
-                <u> https://us02web.zoom.us/j/987654321 </u>
-              </b-link>
-            </div>
-            <div class="d-flex flex-column align-items-center mt-4">
-              <p>
-                ミーティングID：987654321 <br>
-                パスコード：Lr20JAs47
-              </p>
-            </div>
-          </div>
-          <div class="content-detail">
-            <h3 class="text-center">二次面接</h3>
-            <h6 class="text-center">個別面接</h6>
-            <h3 class="text-center font-weight-bold">合格</h3>
-            <div class="d-flex flex-column align-items-center mt-4">
-              <h4>2023年3月30日（木）11:00〜12:00</h4>
-              <b-link>
-                <u> https://us02web.zoom.us/j/987654321 </u>
-              </b-link>
-            </div>
-            <div class="d-flex flex-column align-items-center mt-4">
-              <p>
-                ミーティングID：987654321 <br>
-                パスコード：Lr20JAs47
-              </p>
-            </div>
-          </div>
-          <div class="content-detail">
-            <h3 class="text-center">一次面接</h3>
-            <h6 class="text-center">集団面接</h6>
-            <h3 class="text-center font-weight-bold">合格</h3>
-            <div class="d-flex flex-column align-items-center mt-4">
-              <h5>2023年3月24日（金）15:00〜16:00</h5>
-              <b-link>
-                <u> https://us02web.zoom.us/j/12345678987 </u>
-              </b-link>
-            </div>
-            <div class="d-flex flex-column align-items-center mt-4">
-              <p>
-                ミーティングID：12345678987 <br>
-                パスコード：yhA0oq19JH
-              </p>
-            </div>
-          </div>
-        </template>
-      </div>
-    </modal-common>
-    <!-- fifth passing + adjusted -->
-    <modal-common
-      :refs="'fifth-passing_adjusted'"
-      :size="'md'"
-      @reset-modal="resetModal"
-    >
-      <div slot="body">
-        <div class="text-center">
-          <h2 class="font-weight-bold">
-            Nguyen Thi Nhi <br>
-            ｸﾞｴﾝ ﾃｨ ﾆｰ
-          </h2>
-          <h5>
-            電気設計エンジニア <br>
-            《エントリー》
-          </h5>
-          <h5 v-if="step === 3">以下の内容で送信しました。 <br></h5>
-        </div>
-        <div class="content-detail">
-          <template v-if="step === 1 || step === 2 || step === 3">
-            <h3 class="text-center">最終面接</h3>
-            <h6 class="text-center">個別面接</h6>
-            <div class="d-flex flex-column align-items-center mt-4">
-              <h5>2023年4月6日（木）11:00〜12:00</h5>
-              <b-link>
-                <u> https://us02web.zoom.us/j/987654321 </u>
-              </b-link>
-            </div>
-            <div class="d-flex flex-column align-items-center mt-4">
-              <p>
-                ミーティングID：987654321 <br>
-                パスコード：Lr20JAs47
-              </p>
-            </div>
-            <template v-if="step === 2">
-              <b-form-select
-                v-model="optionSelectStatus"
-                :options="['合格', '不合格', '内定']"
-                @change="handleSelectStatus"
-              />
-
-              <b-form-select
-                v-if="isDisplaySecond"
-                v-model="optionSelectSecondStatus"
-                class="mt-3"
-                :options="['最終面接へ']"
-              />
-
-              <template v-if="isDisplaySecondOffical">
-                <div class="d-flex align-items-center mt-3">
-                  <label class="mb-0 mx-1" for="textarea">{{
-                    '回答期限'
-                  }}</label>
-                  <span class="mx-1">※7日後以降で設定可能</span>
-                </div>
-                <b-form-input type="date" />
-              </template>
-            </template>
-            <template v-if="step === 3">
-              <b-row>
-                <b-col cols="4">結果</b-col>
-                <b-col cols="8">{{ optionSelectStatus }}</b-col>
-              </b-row>
-              <b-row>
-                <b-col cols="4">
-                  {{ optionSelectStatus === '合格' ? '' : '回答期限' }}
-                </b-col>
-                <b-col cols="8"> {{ optionSelectSecondStatus }}</b-col>
-              </b-row>
-            </template>
-          </template>
-          <template v-if="step === 4 || step === 5">
-            <h3 class="text-center">最終面接</h3>
-            <template v-if="step === 4">
-              <b-form-group label="面接形式">
-                <b-form-radio-group
-                  :options="['集団面接', '個人面接']"
-                  name="面接形式"
-                  stacked
-                />
-              </b-form-group>
-
-              <h6 class="text-red">
-                ※
-                二次面接以降は個別面接のみとなります。集団面接を希望する場合はコンシェルジュに問い合わせてください。
-              </h6>
-
-              <b-table
-                class="bg-white"
-                bordered
-                :fields="fieldsModal"
-                :items="itemsModal"
-              >
-                <template #cell(candidate_date)="">
-                  <b-form-input type="date" />
-                </template>
-
-                <template #cell(starting_time)="">
-                  <div class="d-flex">
-                    <b-form-select :options="clockOptions" class="ml-1 mr-2" />
-                    <b-form-select :options="hourOptions" class="mr-1 ml-2" />
-                  </div>
-                </template>
-                <template #cell(expected_time)="">
-                  <div class="d-flex align-items-center">
-                    <b-form-select :options="minuteOptions" class="mx-2" />
-                    <span>分</span>
-                  </div>
-                </template>
-              </b-table>
-            </template>
-
-            <template v-if="step === 5">
-              <b-row>
-                <b-col cols="4">面接形式 </b-col>
-                <b-col cols="8">集団面接</b-col>
-              </b-row>
-              <b-row>
-                <b-col cols="4" class="my-2">面接候補日 </b-col>
-                <b-col
-                  cols="8"
-                  class="d-flex flex-wrap align-items-center my-2"
-                >
-                  <div>2023年3月5日（月）午前11時〜午後12時</div>
-                  <div>2023年3月5日（月）午後1時〜午後2時</div>
-                  <div>2023年3月6日（火）午後1時〜午後2時</div>
-                  <div>2023年3月6日（火）午後2時〜午後3時</div>
-                  <div>2023年3月7日（水）午前10時〜午前11時</div>
-                </b-col>
-              </b-row>
-            </template>
-          </template>
-          <!-- button -->
-          <div class="d-flex flex-column align-items-center mt-4">
-            <template v-if="step === 1">
-              <b-button
-                variant="warning"
-                class="text-white my-1 w-137"
-                @click="handleNextStep"
-              >
-                {{ $t('BUTTON.BTN_TAB_4_MODAL_INTERVIEW.BTN_COMPLETE') }}
-              </b-button>
-
-              <b-button
-                variant="danger"
-                class="my-1 text-white w-137"
-                @click="handleStopInterview"
-              >
-                {{
-                  $t('BUTTON.BTN_TAB_4_MODAL_INTERVIEW.BTN_INTERVIEW_CANCEL')
-                }}
-              </b-button>
-            </template>
-            <b-button
-              v-if="step === 2"
-              variant="warning"
-              class="text-white my-1 w-137"
-              @click="handleNextStep"
-            >
-              {{ '確定' }}
-            </b-button>
-
-            <template v-if="step === 3">
-              <div class="d-flex justify-content-center mt-5">
-                <b-button variant="secondary" class="mx-1">
-                  <span class="mx-1" @click="'';">閉じる</span>
-                </b-button>
-                <b-button
-                  variant="warning"
-                  class="text-white mx-1"
-                  @click="handleNextStep"
-                >
-                  <span> 日程調整へ進む</span>
-
-                  <i class="fas fa-solid fa-caret-right fs-16" />
-                </b-button>
-              </div>
-            </template>
-            <template v-if="step === 4">
-              <div class="d-flex justify-content-center mt-5">
-                <b-button variant="secondary" class="mx-1">
-                  <i class="fas fa-solid fa-caret-left fs-16" />
-                  <span class="mx-1" @click="handleBack">前の画面に戻る</span>
-                </b-button>
-                <b-button
-                  variant="warning"
-                  class="text-white mx-1"
-                  @click="handleNextStep"
-                >
-                  <span>この内容で送信する</span>
-                </b-button>
-              </div>
-            </template>
-            <template v-if="step === 5">
-              <div class="d-flex justify-content-center mt-5">
-                <b-button variant="secondary" class="mx-1">
-                  <i class="fas fa-solid fa-caret-left fs-16" />
-                  <span class="mx-1" @click="handleBack">前の画面に戻る</span>
-                </b-button>
-                <b-button
-                  variant="warning"
-                  class="text-white mx-1"
-                  @click="'';"
-                >
-                  <span>この内容で送信する</span>
-                </b-button>
-              </div>
-            </template>
-          </div>
-        </div>
-
-        <template v-if="step === 1">
-          <div class="content-detail">
-            <h3 class="text-center">五次面接</h3>
-            <h6 class="text-center">個別面接</h6>
-            <h3 class="text-center font-weight-bold">合格</h3>
-            <div class="d-flex flex-column align-items-center mt-4">
-              <h4>2023年3月30日（木）11:00〜12:00</h4>
-              <b-link>
-                <u> https://us02web.zoom.us/j/987654321 </u>
-              </b-link>
-            </div>
-            <div class="d-flex flex-column align-items-center mt-4">
-              <p>
-                ミーティングID：987654321 <br>
-                パスコード：Lr20JAs47
-              </p>
-            </div>
-          </div>
-          <div class="content-detail">
-            <h3 class="text-center">四次面接</h3>
-            <h6 class="text-center">個別面接</h6>
-            <h3 class="text-center font-weight-bold">合格</h3>
-            <div class="d-flex flex-column align-items-center mt-4">
-              <h4>2023年3月30日（木）11:00〜12:00</h4>
-              <b-link>
-                <u> https://us02web.zoom.us/j/987654321 </u>
-              </b-link>
-            </div>
-            <div class="d-flex flex-column align-items-center mt-4">
-              <p>
-                ミーティングID：987654321 <br>
-                パスコード：Lr20JAs47
-              </p>
-            </div>
-          </div>
-          <div class="content-detail">
-            <h3 class="text-center">三次面接</h3>
-            <h6 class="text-center">個別面接</h6>
-            <h3 class="text-center font-weight-bold">合格</h3>
-            <div class="d-flex flex-column align-items-center mt-4">
-              <h4>2023年3月30日（木）11:00〜12:00</h4>
-              <b-link>
-                <u> https://us02web.zoom.us/j/987654321 </u>
-              </b-link>
-            </div>
-            <div class="d-flex flex-column align-items-center mt-4">
-              <p>
-                ミーティングID：987654321 <br>
-                パスコード：Lr20JAs47
-              </p>
-            </div>
-          </div>
-          <div class="content-detail">
-            <h3 class="text-center">二次面接</h3>
-            <h6 class="text-center">個別面接</h6>
-            <h3 class="text-center font-weight-bold">合格</h3>
-            <div class="d-flex flex-column align-items-center mt-4">
-              <h4>2023年3月30日（木）11:00〜12:00</h4>
-              <b-link>
-                <u> https://us02web.zoom.us/j/987654321 </u>
-              </b-link>
-            </div>
-            <div class="d-flex flex-column align-items-center mt-4">
-              <p>
-                ミーティングID：987654321 <br>
-                パスコード：Lr20JAs47
-              </p>
-            </div>
-          </div>
-          <div class="content-detail">
-            <h3 class="text-center">一次面接</h3>
-            <h6 class="text-center">集団面接</h6>
-            <h3 class="text-center font-weight-bold">合格</h3>
-            <div class="d-flex flex-column align-items-center mt-4">
-              <h5>2023年3月24日（金）15:00〜16:00</h5>
-              <b-link>
-                <u> https://us02web.zoom.us/j/12345678987 </u>
-              </b-link>
-            </div>
-            <div class="d-flex flex-column align-items-center mt-4">
-              <p>
-                ミーティングID：12345678987 <br>
-                パスコード：yhA0oq19JH
-              </p>
-            </div>
-          </div>
-        </template>
-      </div>
-    </modal-common>
-    <!-- cancel + adjusted -->
-    <modal-common
-      :refs="'cancel_adjusted'"
-      :size="'md'"
-      @reset-modal="resetModal"
-    >
-      <div slot="body">
-        <h3 class="font-weight-bold text-center">
-          Nguyen Thi Nhi <br>
-          ｸﾞｴﾝ ﾃｨ ﾆｰ
-        </h3>
-        <div class="text-center mt-4">
-          電気設計エンジニア
-          <br>
-          《エントリー》
-        </div>
-        <div class="content-detail">
-          <h3 class="text-center text-red p-5">面接中止</h3>
-        </div>
-        <div class="content-detail">
-          <h3 class="text-center">一次合格</h3>
-          <h6 class="text-center">個別面接</h6>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <h5>2023年4月6日（木）11:00〜12:00</h5>
-            <b-link>
-              <u> https://us02web.zoom.us/j/987654321 </u>
-            </b-link>
-          </div>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <p>
-              ミーティングID：987654321 <br>
-              パスコード：Lr20JAs47
-            </p>
-          </div>
-          <!-- button -->
-          <div class="d-flex flex-column align-items-center mt-4">
-            <b-button
-              variant="secondary"
-              class="text-white my-1 w-137"
-              disabled
-            >
-              {{ $t('BUTTON.BTN_TAB_4_MODAL_INTERVIEW.BTN_COMPLETE') }}
-            </b-button>
-
-            <b-button
-              variant="secondary"
-              class="my-1 text-white w-137"
-              disabled
-            >
-              {{ $t('BUTTON.BTN_TAB_4_MODAL_INTERVIEW.BTN_INTERVIEW_CANCEL') }}
-            </b-button>
-          </div>
-        </div>
-      </div>
-    </modal-common>
-    <!-- reject + adjusted -->
-    <modal-common
-      :refs="'reject_adjusted'"
-      :size="'md'"
-      @reset-modal="resetModal"
-    >
-      <div slot="body">
-        <h3 class="font-weight-bold text-center">
-          Nguyen Thi Nhi <br>
-          ｸﾞｴﾝ ﾃｨ ﾆｰ
-        </h3>
-        <div class="text-center mt-4">
-          電気設計エンジニア
-          <br>
-          《エントリー》
-        </div>
-        <div class="content-detail">
-          <h3 class="text-center text-red p-5">面接辞退</h3>
-        </div>
-        <div class="content-detail">
-          <h3 class="text-center">一次合格</h3>
-          <h6 class="text-center">個別面接</h6>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <h5>2023年4月6日（木）11:00〜12:00</h5>
-            <b-link>
-              <u> https://us02web.zoom.us/j/987654321 </u>
-            </b-link>
-          </div>
-          <div class="d-flex flex-column align-items-center mt-4">
-            <p>
-              ミーティングID：987654321 <br>
-              パスコード：Lr20JAs47
-            </p>
-          </div>
-          <!-- button -->
-          <div class="d-flex flex-column align-items-center mt-4">
-            <b-button
-              variant="secondary"
-              class="text-white my-1 w-137"
-              disabled
-            >
-              {{ $t('BUTTON.BTN_TAB_4_MODAL_INTERVIEW.BTN_COMPLETE') }}
-            </b-button>
-
-            <b-button
-              variant="secondary"
-              class="my-1 text-white w-137"
-              disabled
-            >
-              {{ $t('BUTTON.BTN_TAB_4_MODAL_INTERVIEW.BTN_INTERVIEW_CANCEL') }}
-            </b-button>
-          </div>
-        </div>
-      </div>
-    </modal-common>
+    </div>
+    <!-- Pagination -->
+    <!-- <div class="w-100 d-flex justify-end align-center">
+      <b-pagination
+        v-model="queryData.current_page"
+        style="padding-top: 20px"
+        :total-rows="queryData.total_records"
+        :per-page="queryData.per_page"
+        aria-controls="interview-table"
+        pills
+        :next-class="'next'"
+        :prev-class="'prev'"
+        @change="($event) => getCurrentPage($event)"
+      />
+    </div> -->
+    <custom-pagination
+      v-if="itemsInterview && itemsInterview.length > 0"
+      :total-rows="queryData.total_records"
+      :current-page="queryData.current_page"
+      :per-page="queryData.per_page"
+      :key-tab="'tab_2'"
+      @pagechanged="onPageChange"
+      @changeSize="changeSize"
+    />
+    <!-- before adjustment -->
+    <BeforeAdjustMent
+      :detail-data="detail_data"
+      @reloadList="onGetListInterview"
+    />
+
+    <!-- adjusting -->
+    <Adjusting :detail-data="detail_data" @reloadList="onGetListInterview" />
+
+    <!-- URL setting -->
+    <url-setting :detail-data="detail_data" @reloadList="onGetListInterview" />
+
+    <!-- adjusted-->
+    <adjusted
+      :detail-data="detail_data"
+      @reloadList="onGetListInterview"
+      @reloadResult="onReloadResult"
+    />
 
     <!-- Confirm again -->
     <modal-common :refs="'adjusted-stop'" :size="'md'">
       <div slot="body" class="p-4">
-        <h4 class="text-center text-red">本当に面接を中止しますか？</h4>
+        <h4 class="text-center text-red">
+          {{ $t('CANCEL_INTERVIEW_TITLE') }}
+        </h4>
         <form ref="form">
           <div class="d-flex align-items-center">
-            <label class="mb-0" for="textarea">{{ $t('TEXT_CONFIRM2') }}</label>
-            <b-badge class="badge-not-required mx-2" variant="secondary">
-              任意
-            </b-badge>
+            <label class="mb-0 mr-2" for="textarea">{{ $t('TEXT_CONFIRM2') }}</label>
+            <!-- <b-badge class="badge-not-required mx-2" variant="secondary">
+              {{ $t('ARBITRARY') }}
+            </b-badge> -->
+            <Arbitrarily />
           </div>
           <b-form-textarea
             id="textarea"
@@ -5214,35 +237,107 @@
         </div>
       </div>
     </modal-common>
+
+    <!-- Modal Delete -->
+    <b-modal
+      id="confirm-delete-interview"
+      v-model="statusModalConfirmDelAll"
+      hide-header
+      hide-footer
+      static
+      title=""
+    >
+      <div class="modal-body-content">
+        <div
+          class="w-100 modal-content-title-del-hr d-flex justify-center align-center"
+        >
+          <span>{{ $t('CONFIRM_DELETE') }}</span>
+        </div>
+        <div class="hr-list-btns">
+          <div
+            id="delete-all-item-hr"
+            class="btn"
+            @click="statusModalConfirmDelAll = false"
+          >
+            <span> {{ $t('BUTTON.CANCEL') }}</span>
+          </div>
+          <!-- Cancel -->
+          <div
+            id="import-csv"
+            class="btn accept"
+            @click="handleDeleteInterview"
+          >
+            <span>{{ $t('BUTTON.DELETE') }}</span>
+          </div>
+          <!-- delete -->
+        </div>
+      </div>
+    </b-modal>
   </div>
 </template>
 
 <script>
+import EventBus from '@/utils/eventBus';
+
 import ModalCommon from '../../../layout/components/ModalCommon/matching.vue';
 import {
-  fieldsInterview,
-  itemsInterview,
-  itemsModal,
-  fieldsModal,
-  typeStatusOptions,
-} from './data.js';
-// import { getAllUserManagement, deleteUserManagement, deleteAllUserManagement } from '@/api/modules/userManagement';
-// import { MakeToast } from '../../utils/toastMessage';
+  deleteMultipleInterview,
+  getDetailInterview,
+} from '@/api/modules/matching';
+import { MakeToast } from '@/utils/toastMessage';
+import BeforeAdjustMent from '../InterviewControl/beforeAdjustment.vue';
+import Adjusting from '../InterviewControl/adjusting.vue';
+import UrlSetting from '../InterviewControl/urlSetting.vue';
+import Adjusted from '../InterviewControl/adjusted.vue';
+import ROLE from '@/const/role.js';
+import Arbitrarily from '@/components/Arbitrarily/Arbitrarily.vue';
 // import { obj2Path } from '@/utils/obj2Path';
+const HR_NAME_COL_WIDTH = '200px';
+const WORK_TITLE_COL_WIDTH = '200px';
 
 export default {
-  name: 'Entry',
+  name: 'Interview',
   components: {
     ModalCommon,
+    BeforeAdjustMent,
+    Adjusting,
+    UrlSetting,
+    Adjusted,
+    Arbitrarily,
+  },
+  props: {
+    dataInterview: {
+      required: true,
+      type: Array,
+      default: function() {
+        return [];
+      },
+    },
+    pagination: {
+      required: true,
+      type: Object,
+      default: function() {
+        return {};
+      },
+    },
+    sidebarExists: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
+      statusModalConfirmDelAll: false,
       typeStatus: 0,
-      typeStatusOptions: typeStatusOptions,
+      typeStatusOptions: [
+        { key: 1, value: '集団面接' },
+        { key: 2, value: '個人面接' },
+      ],
       tabIndex: 0,
       itemDetail: '',
       nameState: '',
       name: '',
+      ROLE: ROLE,
 
       overlay: {
         show: false,
@@ -5251,24 +346,232 @@ export default {
         blur: '1rem',
         rounded: 'sm',
       },
-
-      queryData: {
-        page: 1,
-        per_page: 20,
-        total_records: 0,
-        search: '',
-        order_type: '',
-        order_column: '',
-      },
+      queryData: {},
 
       reRender: 0,
       // table
-      fieldsInterview: fieldsInterview,
-      itemsInterview: itemsInterview,
-      itemsModal: itemsModal,
-      fieldsModal: fieldsModal,
+      fieldsInterview: [
+        {
+          key: 'selected',
+          sortable: false,
+          label: '',
+          class: 'bg-header',
+          thStyle: {
+            backgroundColor: '#1D266A',
+            width: '50px',
+            color: '#fff',
+            textAlign: 'center',
+          },
+          thClass: 'text-center',
+          tdClass: 'text-center',
+        },
+        {
+          key: 'id',
+          sortable: true,
+          label: 'ID',
+          class: 'bg-header',
+          thStyle: {
+            backgroundColor: '#1D266A',
+            width: '80px',
+            color: '#fff',
+            textAlign: 'center',
+          },
+          thClass: 'text-center',
+          tdClass: 'text-center',
+        },
+        {
+          key: 'entry_code',
+          sortable: true,
+          label: 'エントリーID',
+          class: 'bg-header',
+          thStyle: {
+            width: '114px',
+            backgroundColor: '#1D266A',
+            color: '#fff',
+            textAlign: 'center',
+          },
+          tdClass: 'text-center',
+        },
+        {
+          key: 'interview_date',
+          sortable: true,
+          // label: this.$t('HEADER_REQUEST_DATE_ENTRY_MATCHING'),
+          label: '面接日',
+          class: 'bg-header',
+          thStyle: {
+            backgroundColor: '#1D266A',
+            width: '120px',
+            color: '#fff',
+            textAlign: 'center',
+          },
+          tdClass: 'text-center',
+        },
+        {
+          key: 'full_name',
+          sortable: true,
+          // label: this.$t('HEADER_FULL_NAME_ENTRY_MATCHING'),
+          label: '氏名',
+          class: 'bg-header',
+          thStyle: {
+            backgroundColor: '#1D266A',
+            width: HR_NAME_COL_WIDTH,
+            color: '#fff',
+            textAlign: 'center',
+          },
+        },
+        {
+          key: 'job_name',
+          sortable: true,
+          // label: this.$t('HEADER_JOB_LIST_ENTRY_MATCHING'),
+          label: '求人名',
+          class: 'bg-header',
+          thStyle: {
+            backgroundColor: '#1D266A',
+            width: WORK_TITLE_COL_WIDTH,
+            color: '#fff',
+            textAlign: 'center',
+          },
+        },
+        {
+          key: 'status_selection',
+          sortable: true,
+          label: '選考 ｽﾃｰﾀｽ',
+          class: 'bg-header',
+          thStyle: {
+            backgroundColor: '#1D266A',
+            width: '120px',
+            color: '#fff',
+            textAlign: 'center',
+          },
+          tdClass: 'text-center',
+        },
+        {
+          key: 'status_interview_adjustment',
+          sortable: true,
+          label: '面接調整ｽﾃｰﾀｽ',
+          class: 'bg-header',
+          thStyle: {
+            backgroundColor: '#1D266A',
+            width: '120px',
+            color: '#fff',
+            textAlign: 'center',
+          },
+          tdClass: 'text-center',
+        },
+        // This one needs a custom template, so we define the key and the label
+        {
+          key: 'detail',
+          label: '詳細',
+          class: 'bg-header',
+          thStyle: {
+            width: '104px',
+            backgroundColor: '#1D266A',
+            color: '#fff',
+            textAlign: 'center',
+          },
+          tdClass: 'text-center',
+        },
+      ],
+      itemsInterview: [],
+      itemsModal: [
+        {
+          no: '候補1',
+          candidate_date: '',
+          starting_time: '',
+          expected_time: '',
+        },
+        {
+          no: '候補2',
+          candidate_date: '',
+          starting_time: '',
+          expected_time: '',
+        },
+        {
+          no: '候補3',
+          candidate_date: '',
+          starting_time: '',
+          expected_time: '',
+        },
+        {
+          no: '候補4',
+          candidate_date: '',
+          starting_time: '',
+          expected_time: '',
+        },
+        {
+          no: '候補5',
+          candidate_date: '',
+          starting_time: '',
+          expected_time: '',
+        },
+      ],
+      fieldsModal: [
+        {
+          key: 'no',
+          sortable: false,
+          label: 'No.',
+          class: 'bg-header',
+          thStyle: {
+            width: '10%',
+            color: '#fff',
+            textAlign: 'center',
+          },
+          thClass: 'text-center',
+          tdClass: 'text-center',
+        },
+        {
+          key: 'candidate_date',
+          sortable: false,
+          label: '候補日',
+          class: 'bg-header',
+          thStyle: {
+            width: '35%',
+            color: '#fff',
+            textAlign: 'center',
+          },
+          thClass: 'text-center',
+          tdClass: 'text-center',
+          tdStyle: 'padding-left: 5px',
+        },
+        {
+          key: 'starting_time',
+          sortable: false,
+          label: '開始時間',
+          class: 'bg-header',
+          thStyle: {
+            width: '35%',
+            color: '#fff',
+            textAlign: 'center',
+          },
+          thClass: 'text-center',
+          tdClass: 'text-center',
+        },
+        {
+          key: 'expected_time',
+          sortable: false,
+          label: '想定所要時間',
+          class: 'bg-header',
+          thStyle: {
+            width: '20%',
+            color: '#fff',
+            textAlign: 'center',
+          },
+          thClass: 'text-center',
+          tdClass: 'text-center',
+        },
+      ],
 
-      clockOptions: ['AM', 'PM'],
+      // clockOptions: ['AM', 'PM'],
+      clockOptions: [
+        {
+          value: 'AM',
+          text: '午前',
+        },
+        {
+          value: 'PM',
+          text: '午後',
+        },
+      ],
       hourOptions: [
         '12:00',
         '12:30',
@@ -5281,7 +584,7 @@ export default {
         '4:00',
         '4:30',
         '5:00',
-        '5:40',
+        '5:30',
         '6:00',
         '6:30',
         '7:00',
@@ -5302,22 +605,83 @@ export default {
       optionSelectStatus: '',
       isDisplaySecond: false,
       isDisplaySecondOffical: '',
+
+      detail_data: {},
     };
   },
 
   computed: {
-    listUser() {
-      return this.$store.getters.listUser;
+    permissionCheck() {
+      return this.$store.getters.permissionCheck;
+    },
+    hrFullNameColWidth() {
+      return HR_NAME_COL_WIDTH;
+    },
+    workTitleColWidth() {
+      return WORK_TITLE_COL_WIDTH;
     },
   },
 
-  watch: {},
+  watch: {
+    dataInterview: {
+      handler: function(props_data) {
+        if (props_data) {
+          this.itemsInterview = props_data;
+        }
+      },
+      deep: true,
+    },
+    pagination: {
+      handler: function(props_data) {
+        if (props_data) {
+          this.queryData = props_data;
+        }
+      },
+      deep: true,
+    },
+  },
 
   created() {
     // this.getListAllData();
+    EventBus.$on('handleDeleteInterview', () => {
+      // this.handleDeleteInterview();
+      this.checkDeleteAll();
+    });
+  },
+
+  destroyed() {
+    EventBus.$off('handleDeleteInterview');
   },
 
   methods: {
+    checkDeleteAll() {
+      if (this.selectedItems.length !== 0) {
+        this.statusModalConfirmDelAll = true;
+      } else {
+        MakeToast({
+          variant: 'warning',
+          title: this.$t('WARNING'),
+          content: this.$t('PLEASE_SELECT_DATA'),
+        });
+      }
+    },
+    handleSort(ctx) {
+      let customSortBy = ctx?.sortBy;
+      if (customSortBy === 'entry_code') {
+        customSortBy = 'code';
+      }
+      if (customSortBy === 'id') {
+        customSortBy = 'hr_id';
+      }
+      const sortQuery = {
+        field: customSortBy,
+        sort_by: ctx?.sortDesc ? 'desc' : 'asc',
+      };
+
+      this.$emit('getListInterview', sortQuery);
+      this.selectAll = false;
+      this.selectedItems = [];
+    },
     resetModal() {
       this.step = 1;
       this.typeStatus = 0;
@@ -5326,190 +690,48 @@ export default {
       this.optionSelectStatus = '';
       this.optionSelectSecondStatus = '';
     },
+    async handleGetDetail(item) {
+      console.log('call detail');
+      try {
+        const res = await getDetailInterview(item.id);
+        const { code, message, data } = res.data;
+        if (code === 200) {
+          this.detail_data = data;
+
+          const DETAIL_DATA = {
+            status_selection: data.status_selection,
+            status_selection_name: data.status_selection_name,
+            status_interview_adjustment: data.status_interview_adjustment,
+            status_interview_adjustment_name:
+              data.status_interview_adjustment_name,
+          };
+          this.goToDetail(DETAIL_DATA);
+        } else {
+          MakeToast({
+            variant: 'danger',
+            title: this.$t('DANGER'),
+            content: message,
+          });
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
     goToDetail(item) {
       // adjust|adjusting|URL-setting|adjusted
-      this.itemDetail = item;
-      if (
-        item.selection_status === 'オファー承認' &&
-        item.interview_adjustment_status === '調整前'
-      ) {
-        this.step = 1;
-        this.$bus.emit('open-modal', 'offer-confirmation_adjust');
-      } else if (
-        item.selection_status === 'オファー承認' &&
-        item.interview_adjustment_status === '調整中'
-      ) {
-        this.$bus.emit('open-modal', 'offer-confirmation_adjusting');
-      } else if (
-        item.selection_status === 'オファー承認' &&
-        item.interview_adjustment_status === 'URL設定中'
-      ) {
-        this.$bus.emit('open-modal', 'offer-confirmation_URL-setting');
-      } else if (
-        item.selection_status === 'オファー承認' &&
-        item.interview_adjustment_status === '調整済'
-      ) {
-        this.$bus.emit('open-modal', 'offer-confirmation_adjusted');
-      } else if (
-        item.selection_status === '書類通過' &&
-        item.interview_adjustment_status === '調整前'
-      ) {
-        this.$bus.emit('open-modal', 'document-passing_adjust');
-      } else if (
-        item.selection_status === '書類通過' &&
-        item.interview_adjustment_status === '調整中'
-      ) {
-        this.$bus.emit('open-modal', 'document-passing_adjusting');
-      } else if (
-        item.selection_status === '書類通過' &&
-        item.interview_adjustment_status === 'URL設定中'
-      ) {
-        this.$bus.emit('open-modal', 'document-passing_URL-setting');
-      } else if (
-        item.selection_status === '書類通過' &&
-        item.interview_adjustment_status === '調整済'
-      ) {
-        this.$bus.emit('open-modal', 'document-passing_adjusted');
-      } else if (
-        item.selection_status === '一次合格' &&
-        item.interview_adjustment_status === '調整前'
-      ) {
-        this.$bus.emit('open-modal', 'first-passing_adjust');
-      } else if (
-        item.selection_status === '一次合格' &&
-        item.interview_adjustment_status === '調整中'
-      ) {
-        this.$bus.emit('open-modal', 'first-passing_adjusting');
-      } else if (
-        item.selection_status === '一次合格' &&
-        item.interview_adjustment_status === 'URL設定中'
-      ) {
-        this.$bus.emit('open-modal', 'first-passing_URL-setting');
-      } else if (
-        item.selection_status === '一次合格' &&
-        item.interview_adjustment_status === '調整済'
-      ) {
-        this.$bus.emit('open-modal', 'first-passing_adjusted');
-      } else if (
-        item.selection_status === '二次合格' &&
-        item.interview_adjustment_status === '調整前'
-      ) {
-        this.$bus.emit('open-modal', 'second-passing_adjust');
-      } else if (
-        item.selection_status === '二次合格' &&
-        item.interview_adjustment_status === '調整中'
-      ) {
-        this.$bus.emit('open-modal', 'second-passing_adjusting');
-      } else if (
-        item.selection_status === '二次合格' &&
-        item.interview_adjustment_status === 'URL設定中'
-      ) {
-        this.$bus.emit('open-modal', 'second-passing_URL-setting');
-      } else if (
-        item.selection_status === '二次合格' &&
-        item.interview_adjustment_status === '調整済'
-      ) {
-        this.$bus.emit('open-modal', 'second-passing_adjusted');
-      } else if (
-        item.selection_status === '三次合格' &&
-        item.interview_adjustment_status === '調整前'
-      ) {
-        this.$bus.emit('open-modal', 'third-passing_adjust');
-      } else if (
-        item.selection_status === '三次合格' &&
-        item.interview_adjustment_status === '調整中'
-      ) {
-        this.$bus.emit('open-modal', 'third-passing_adjusting');
-      } else if (
-        item.selection_status === '三次合格' &&
-        item.interview_adjustment_status === 'URL設定中'
-      ) {
-        this.$bus.emit('open-modal', 'third-passing_URL-setting');
-      } else if (
-        item.selection_status === '三次合格' &&
-        item.interview_adjustment_status === '調整済'
-      ) {
-        this.$bus.emit('open-modal', 'third-passing_adjusted');
-      } else if (
-        item.selection_status === '四次合格' &&
-        item.interview_adjustment_status === '調整前'
-      ) {
-        this.$bus.emit('open-modal', 'fourth-passing_adjust');
-      } else if (
-        item.selection_status === '四次合格' &&
-        item.interview_adjustment_status === '調整中'
-      ) {
-        this.$bus.emit('open-modal', 'fourth-passing_adjusting');
-      } else if (
-        item.selection_status === '四次合格' &&
-        item.interview_adjustment_status === 'URL設定中'
-      ) {
-        this.$bus.emit('open-modal', 'fourth-passing_URL-setting');
-      } else if (
-        item.selection_status === '四次合格' &&
-        item.interview_adjustment_status === '調整済'
-      ) {
-        this.$bus.emit('open-modal', 'fourth-passing_adjusted');
-      } else if (
-        item.selection_status === '五次合格' &&
-        item.interview_adjustment_status === '調整前'
-      ) {
-        this.$bus.emit('open-modal', 'fifth-passing_adjust');
-      } else if (
-        item.selection_status === '五次合格' &&
-        item.interview_adjustment_status === '調整中'
-      ) {
-        this.$bus.emit('open-modal', 'fifth-passing_adjusting');
-      } else if (
-        item.selection_status === '五次合格' &&
-        item.interview_adjustment_status === 'URL設定中'
-      ) {
-        this.$bus.emit('open-modal', 'fifth-passing_URL-setting');
-      } else if (
-        item.selection_status === '五次合格' &&
-        item.interview_adjustment_status === '調整済'
-      ) {
-        this.$bus.emit('open-modal', 'fifth-passing_adjusted');
-      } else if (
-        item.selection_status === '面接中止' &&
-        item.interview_adjustment_status === '調整前'
-      ) {
-        this.$bus.emit('open-modal', 'cancel_adjust');
-      } else if (
-        item.selection_status === '面接中止' &&
-        item.interview_adjustment_status === '調整中'
-      ) {
-        this.$bus.emit('open-modal', 'cancel_adjusting');
-      } else if (
-        item.selection_status === '面接中止' &&
-        item.interview_adjustment_status === 'URL設定中'
-      ) {
-        this.$bus.emit('open-modal', 'cancel_URL-setting');
-      } else if (
-        item.selection_status === '面接中止' &&
-        item.interview_adjustment_status === '調整済'
-      ) {
-        this.$bus.emit('open-modal', 'cancel_adjusted');
-      } else if (
-        item.selection_status === '面接辞退' &&
-        item.interview_adjustment_status === '調整前'
-      ) {
-        this.$bus.emit('open-modal', 'reject_adjust');
-      } else if (
-        item.selection_status === '面接辞退' &&
-        item.interview_adjustment_status === '調整中'
-      ) {
-        this.$bus.emit('open-modal', 'reject_adjusting');
-      } else if (
-        item.selection_status === '面接辞退' &&
-        item.interview_adjustment_status === 'URL設定中'
-      ) {
-        this.$bus.emit('open-modal', 'reject_URL-setting');
-      } else if (
-        item.selection_status === '面接辞退' &&
-        item.interview_adjustment_status === '調整済'
-      ) {
-        this.$bus.emit('open-modal', 'reject_adjusted');
+      if (item.status_interview_adjustment === 1) {
+        EventBus.$emit('open-modal-before-adjustment');
+        return;
+      } else if (item.status_interview_adjustment === 2) {
+        EventBus.$emit('open-modal-adjusting');
+        return;
+      } else if (item.status_interview_adjustment === 3) {
+        EventBus.$emit('open-modal-url-setting');
+        return;
+      } else if (item.status_interview_adjustment === 4) {
+        EventBus.$emit('open-modal-adjusted');
+        // EventBus.$emit('open-modal', 'document-passing_adjusted');
+        return;
       }
     },
 
@@ -5529,41 +751,52 @@ export default {
     handleNextStep(e) {
       e.preventDefault();
       this.checkvalidate();
-      console.log('handleNextStep', this.formData);
       this.step++;
-      if (this.checkvalidate() === true) {
-        console.log('Vào đây');
-      } else {
+      if (!this.checkvalidate()) {
         e.stopPropagation();
       }
     },
 
     handleStopInterview() {
-      this.$bus.emit('open-modal', 'adjusted-stop');
+      EventBus.$emit('open-modal', 'adjusted-stop');
     },
 
     handleBack() {
       this.step--;
       if (this.step === 0) {
-        this.$bus.emit('close-modal');
-        this.step++;
+        EventBus.$emit('close-modal');
+        this.step = 1;
       }
     },
 
     checkvalidate() {},
 
     onSelectAllCheckboxChange() {
+      const tempArr = this.itemsInterview.filter(
+        (item) => ![1, 2, 5, 6, 7, 8, 9].includes(item.status_selection)
+      );
       if (this.selectAll) {
-        this.selectedItems = [...this.items];
+        this.selectedItems = [...tempArr];
       } else {
         this.selectedItems = [];
       }
-      this.items.forEach((item) => {
+      tempArr.forEach((item) => {
         item._isSelected = this.selectAll;
       });
+      // if (this.selectAll) {
+      //   this.selectedItems = [...this.itemsInterview];
+      // } else {
+      //   this.selectedItems = [];
+      // }
+      // this.itemsInterview.forEach((item) => {
+      //   item._isSelected = this.selectAll;
+      // });
     },
 
     onItemCheckboxChange(item) {
+      const newArray = this.itemsInterview.filter((element) => {
+        return ![1, 2, 5, 6, 7, 8, 9].includes(element.status_selection);
+      });
       if (item._isSelected) {
         this.selectedItems.push(item);
       } else {
@@ -5572,14 +805,84 @@ export default {
         );
         this.selectedItems.splice(index, 1);
       }
-      this.selectAll = this.selectedItems.length === this.items.length;
+      this.selectAll = this.selectedItems.length === newArray.length;
+      // if (item._isSelected) {
+      //   this.selectedItems.push(item);
+      // } else {
+      //   const index = this.selectedItems.findIndex(
+      //     (selectedItem) => selectedItem.id === item.id
+      //   );
+      //   this.selectedItems.splice(index, 1);
+      // }
+      // this.selectAll = this.selectedItems.length === this.itemsInterview.length;
     },
 
-    handleDeleteAll() {
-      const mangIds = this.selectedItems.map((item, id) => {
+    // handleDeleteAll() {
+    //   const mangIds = this.selectedItems.map((item, id) => {
+    //     return item.id;
+    //   });
+    //   console.log('handleDeleteAll', mangIds);
+    // },
+
+    onGetListInterview() {
+      this.$emit('getListInterview');
+    },
+
+    onReloadResult() {
+      this.$emit('reloadListResult');
+    },
+
+    async handleDeleteInterview() {
+      this.statusModalConfirmDelAll = false;
+      const ids = this.selectedItems.map((item) => {
         return item.id;
       });
-      console.log('handleDeleteAll', mangIds);
+      if (ids.length > 0) {
+        try {
+          const response = await deleteMultipleInterview({ ids: ids });
+          const { code, message } = response.data;
+          if (code === 200) {
+            MakeToast({
+              variant: 'success',
+              title: this.$t('SUCCESS'),
+              content: '削除しました',
+            });
+            this.selectAll = false;
+            this.$emit('getListInterview');
+          } else {
+            MakeToast({
+              variant: 'danger',
+              title: this.$t('DANGER'),
+              content: message,
+            });
+          }
+        } catch (error) {
+          console.log('error', error);
+        }
+      } else {
+        MakeToast({
+          variant: 'warning',
+          title: '危険',
+          content: this.$t('PLEASE_SELECT_DATA'),
+        });
+      }
+    },
+    onPageChange(page) {
+      if (page) {
+        this.queryData.current_page = page;
+        this.$emit('getListInterview');
+        this.selectAll = false;
+        this.selectedItems = [];
+      }
+    },
+    changeSize(size) {
+      if (size) {
+        this.queryData.per_page = size;
+        this.queryData.current_page = 1;
+        this.$emit('getListInterview');
+        this.selectAll = false;
+        this.selectedItems = [];
+      }
     },
   },
 };
@@ -5589,10 +892,76 @@ export default {
 @import '@/scss/_variables.scss';
 @import '@/scss/modules/common/common.scss';
 @import '@/scss/modules/MatchingManagement/Header.scss';
+// @import '@/components/Modal/ModalStyle.scss';
 
+::v-deep #confirm-delete-interview {
+  // Moddal
+  .modal-content {
+    width: 450px;
+    // transform: translate(-14.5%, 12%);
+    // padding: 4.5rem 5rem;
+  }
+
+  .modal-content-title {
+    font-weight: 400;
+    font-size: 24px;
+    line-height: 29px;
+    color: #262626;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .modal-content-title-del-hr {
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 24px;
+    color: $black;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .hr-list-btns {
+    margin-top: 5.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 30px;
+    text-align: center;
+    & span {
+      color: #ffffff !important;
+    }
+    & div:nth-child(1),
+    & div:nth-child(2) {
+      background: #acacac;
+      border-radius: 40px;
+      padding: 0.5rem 1.75rem;
+    }
+  }
+
+  .accept {
+    background: #f9be00 !important;
+  }
+}
+::v-deep .is-invalid-type-check {
+  label {
+    color: #dc3545;
+  }
+  label::before {
+    border-color: #dc3545;
+  }
+}
 .content-detail {
   background-color: #f9f9ff;
-  padding: 1.5rem 4rem;
+  padding: 1rem 2rem;
   margin-top: 2rem;
 }
 
@@ -5610,5 +979,16 @@ export default {
 
 .text-red {
   color: red;
+}
+
+.hr-list-table-list__table {
+  width: max-content;
+  height: 100%;
+}
+.over-flow {
+  width: 100%;
+  position: relative;
+  padding-left: 0;
+  overflow-x: auto;
 }
 </style>

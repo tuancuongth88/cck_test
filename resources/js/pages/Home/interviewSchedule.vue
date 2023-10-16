@@ -166,10 +166,6 @@ export default {
       // }
       // this.$router.push('/home/detail');
     },
-
-    handleSubmitDistribute() {
-      console.log('handleSubmitDistribute');
-    },
   },
 };
 </script>

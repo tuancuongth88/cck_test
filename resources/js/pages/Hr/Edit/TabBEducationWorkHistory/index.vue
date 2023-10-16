@@ -4,11 +4,6 @@
     <!-- <button style="position: fixed; background: gray; opacity: 0.1;" class="btn" @click="changeStatus">Change</button> -->
 
     <div class="hr-content-tab-wrap">
-      <!-- <div>final_education_classification_id: {{ educationWorkHistoryInit.final_education_classification_id }}</div> -->
-      <!-- <div>final_education_degree_id: {{ educationWorkHistoryInit.final_education_degree_id }}</div> -->
-      <!-- <div>major_classification_id: {{ educationWorkHistoryInit.major_classification_id }}</div> -->
-      <!-- <div>middle_classification_id: {{ educationWorkHistoryInit.middle_classification_id }}</div> -->
-
       <!-- 1 最終学歴 - Final Education -->
       <div class="hr-content-tab-item border-t border-l border-r">
         <div
@@ -395,7 +390,7 @@
                           cleacValueWhenDisable($event, 'main-job-career-1')
                       "
                     />
-                    <span>現在</span>
+                    <span>{{ $t('CURRENT') }}</span>
                   </div>
                   <!--  -->
                 </div>
@@ -692,7 +687,7 @@
                           cleacValueWhenDisable($event, 'main-job-career-2')
                       "
                     />
-                    <span>現在</span>
+                    <span>{{ $t('CURRENT') }}</span>
                   </div>
                   <!--  -->
                 </div>
@@ -990,7 +985,7 @@
                           cleacValueWhenDisable($event, 'main-job-career-3')
                       "
                     />
-                    <span>現在</span>
+                    <span>{{ $t('CURRENT') }}</span>
                   </div>
                   <!--  -->
                 </div>
@@ -1172,7 +1167,6 @@ export default {
       return age;
     },
     resultOptionJobTitleDynamic(department_id) {
-      console.log('resultOptionJobTitleDynamic: ', department_id);
       const init_arr = [
         { value: null, text: '選択してください', translate: 'please select' },
       ];
@@ -1188,7 +1182,6 @@ export default {
     clearInputWithOption() {},
     //
     cleacValueWhenDisable(event, area) {
-      console.log('cleacValueWhenDisable event, idCheckBox: ', event, area);
       if (area === 'main-job-career-1') {
         this.educationWorkHistoryInit.main_job_career_1_year_to_id = null;
         this.educationWorkHistoryInit.main_job_career_1_month_to_id = null;

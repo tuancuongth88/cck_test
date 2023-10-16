@@ -1,4 +1,5 @@
 import Layout from '@/layout';
+import ROLE from '../../const/role';
 
 const jobManagement = {
   path: '/job',
@@ -7,7 +8,7 @@ const jobManagement = {
   meta: {
     title: 'TAB_JOB_LIST',
     breadcrumb: 'BREADCRUMB_COMPANY_MANAGEMENT',
-    role: [1, 2, 4],
+    role: [ROLE.TYPE_SUPER_ADMIN, ROLE.TYPE_COMPANY_ADMIN, ROLE.TYPE_COMPANY],
   },
   component: Layout,
   redirect: { name: 'JobList' },
@@ -18,6 +19,7 @@ const jobManagement = {
       meta: {
         title: 'ROUTER_COMPANY_MANAGEMENT_LIST',
         breadcrumb: 'BREADCRUMB_COMPANY_MANAGEMENT_LIST',
+        role: [ROLE.TYPE_SUPER_ADMIN, ROLE.TYPE_COMPANY_ADMIN, ROLE.TYPE_COMPANY],
       },
       component: () => import('@/pages/CompanyManagement/Job/index.vue'),
     },
@@ -27,6 +29,7 @@ const jobManagement = {
       meta: {
         title: 'ROUTER_COMPANY_MANAGEMENT_CREATE',
         breadcrumb: 'BREADCRUMB_COMPANY_MANAGEMENT_CREATE',
+        role: [ROLE.TYPE_SUPER_ADMIN, ROLE.TYPE_COMPANY_ADMIN, ROLE.TYPE_COMPANY],
       },
       component: () => import('@/pages/CompanyManagement/Job/create.vue'),
     },
@@ -36,6 +39,7 @@ const jobManagement = {
       meta: {
         title: 'ROUTER_COMPANY_MANAGEMENT_DETAIL',
         breadcrumb: 'BREADCRUMB_COMPANY_MANAGEMENT_DETAIL',
+        role: [ROLE.TYPE_SUPER_ADMIN, ROLE.TYPE_COMPANY_ADMIN, ROLE.TYPE_COMPANY],
       },
       component: () => import('@/pages/CompanyManagement/Job/detail.vue'),
     },
@@ -45,6 +49,7 @@ const jobManagement = {
       meta: {
         title: 'ROUTER_COMPANY_MANAGEMENT_EDIT',
         breadcrumb: 'BREADCRUMB_COMPANY_MANAGEMENT_EDIT',
+        role: [ROLE.TYPE_SUPER_ADMIN, ROLE.TYPE_COMPANY_ADMIN, ROLE.TYPE_COMPANY],
       },
       component: () => import('@/pages/CompanyManagement/Job/edit.vue'),
     },

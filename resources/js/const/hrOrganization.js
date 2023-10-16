@@ -1,5 +1,5 @@
 const account_classification_option = [
-  { key: 1, value: '自社プラットフォーム', translate: 'Own platform' },
+  { key: 1, value: '自社PF', translate: 'Own platform' },
   { key: 2, value: '送り出し機関', translate: 'Sending agency' },
   { key: 3, value: '派遣会社', translate: 'Dispatch agency' },
   { key: 4, value: '学校', translate: 'School' },
@@ -22,7 +22,7 @@ const jaLevelOption = [
   { key: 3, value: 'N3' },
   { key: 4, value: 'N4' },
   { key: 5, value: 'N5' },
-  { key: 6, value: 'なし' },
+  { key: 6, value: '資格なし' },
 ];
 
 const finalEductionClassification = [
@@ -74,15 +74,15 @@ const finalEductionYear = [
 
 const finalEductionMonth = [
   // { key: null, text: '', translate: 'please select' },
-  { key: '01', value: '01' },
-  { key: '02', value: '02' },
-  { key: '03', value: '03' },
-  { key: '04', value: '04' },
-  { key: '05', value: '05' },
-  { key: '06', value: '06' },
-  { key: '07', value: '07' },
-  { key: '08', value: '08' },
-  { key: '09', value: '09' },
+  { key: '01', value: '1' },
+  { key: '02', value: '2' },
+  { key: '03', value: '3' },
+  { key: '04', value: '4' },
+  { key: '05', value: '5' },
+  { key: '06', value: '6' },
+  { key: '07', value: '7' },
+  { key: '08', value: '8' },
+  { key: '09', value: '9' },
   { key: '10', value: '10' },
   { key: '11', value: '11' },
   { key: '12', value: '12' },
@@ -95,12 +95,20 @@ const genderOptions = [
 
 const renderAge = () => {
   // = 2010 - 1960
-  let year_arr = [];
-  const year_from = 13;
-  const year_to = 63;
-  const number_length = Math.abs(parseInt(year_from - year_to)) + 1; // + 1 Thêm số cuối mảng là year_to
-  year_arr = Array.from({ length: number_length }, (_, i) => year_from + i);
-  return year_arr;
+  // let year_arr = [];
+  // const year_from = 13;
+  // const year_to = 63;
+  // const number_length = Math.abs(parseInt(year_from - year_to)) + 1; // + 1 Thêm số cuối mảng là year_to
+  // year_arr = Array.from({ length: number_length }, (_, i) => year_from + i);
+  // return year_arr;
+
+  const age_list = [{ value: null, text: '' }];
+  const age_from = 13;
+  const age_to = 63;
+  for (let i = age_from; i <= age_to; i++) {
+    age_list.push(i);
+  }
+  return age_list;
 };
 
 const renderYearsEducationTiming = () => {

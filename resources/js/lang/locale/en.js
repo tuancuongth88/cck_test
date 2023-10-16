@@ -1,13 +1,86 @@
 export default {
+  SAMA: '様',
   // VAlidate
+  DISPLAY_LABEL: 'DISPLAY',
+  RESULT: 'RESULT',
+  HOUSING_ALLOWANCE_AVAILABLE: 'HOUSING ALLOWANCE AVAILABLE',
+  JOB_REGISTRATION: 'JOB REGISTRATION',
+  MINUTES: 'MINUTES',
+  INTERVIEW_ARRANGEMENT: 'INTERVIEW ARRANGEMENT',
+  HIRE_DATE: 'HIRE DATE',
+  AFFILIATION: 'AFFILIATION',
+  CURRENT: 'CURRENT',
+  AGE: 'AGE',
+  FINAL_ACADEMIC_BACKGROUND: 'FINAL ACADEMIC BACKGROUND (YEAR/MONTH)',
+  RETURN_TO_PREVIOUS_SCREEN: 'RETURN TO PREVIOUS SCREEN',
+  CONFIRM_BTN: 'CONFIRM',
+  CLOSE_BTN: 'CLOSE',
+  RETURN_TO_PERSONNEL_SELECTION: 'RETURN TO PERSONNEL SELECTION',
+  GO_CONFIRM: 'GO TO CONFIRMATION SCREEN',
+  PRIVATE_INTERVIEW: 'PRIVATE INTERVIEW',
+  GROUP_INTERVIEW: 'GROUP INTERVIEW',
+  PASSED: 'PASSED',
+  RETURN_TO_DOCUMENT_REGISTRATION: 'RETURN TO DOCUMENT REGISTRATION',
+  ENTER_WITH_THIS_CONTENT: 'ENTER WITH THIS CONTENT',
+  SEND_WITH_THIS_CONTENT: 'SEND WITH THIS CONTENT',
+  RESUME: 'RESUME',
+  CV: 'CV',
+  OTHER_DOCUMENT: 'OTHER DOCUMENTS',
+  INPUT: 'INPUT',
+  ADD_FILE: 'ADD FILE',
+  STATUS_LABEL: 'STATUS',
+  KEY_WORD: 'KEY_WORD',
+  SELECT_LABEL: 'SELECT',
+  ADDED_TO_FAVORITES: 'ADDED TO FAVORITES',
+  REMOVE_FROM_FAVORITES: 'REMOVE FROM FAVORITES',
+  ENTER: 'ENTER',
+  ENTRY_LABEL: 'ENTRY',
+  ARBITRARY: 'ARBITRARY',
+  CANCEL_INTERVIEW_TITLE: 'Are you sure you want to cancel the interview?',
+  LETTER_RECOMMENDATION: 'LETTER RECOMMENDATION',
+  MEETING_ID: 'MEETING ID',
+  PASSCODE: 'PASSCODE',
+  EXPIRE: 'EXPIRE',
+  ENTRY: '《ENTRY》',
+  OFFER: '《OFFER》',
+  SPECIAL_POINTS: 'SPECIAL POINTS',
+  ELEMENT_NOT_FOUND: 'ELEMENT NOT FOUND. PLEASE CHANGE YOUR SEARCH QUERY.',
+  SELECT: 'SELECT',
+  SELECT_PREFECTURE: 'SELECT PREFECTURE',
+  SEARCH_FOR_JOB_CONDITION: 'SEARCH FOR JOB CONDITION',
+  SUPER_ADMIN: 'SUPER ADMIN',
+  COMPANY_ADMIN: 'COMPANY ADMIN',
+  HR_ADMIN: 'HR ADMIN',
+  RECOMMENDATION: 'RECOMMENDATION',
+  STAY_ON: 'stay on this page',
+  MOVE_AWAY: 'Move away from this page',
+  TITLE_QUESTION1: 'Do you want to leave this page? The information you enter will not be saved.',
+  DECISION: 'DECISION',
+  REGIST_DOCUMENT: 'REGIST DOCUMENT',
+  WATING_FROM_COMPANY: 'PLEASE WAITING FROM COMPANY ',
+  ITEM_SENT: 'YOUR ITEM IS SENT',
+  INFORMATION_JOB: 'INPUT INFORMATION JOB',
+  NOT_PERMISSION: 'YOU DO NOT HAVE PERMISSION',
+  SENT: 'SENT',
+  WAITING: 'PLEASE WAITING RESULT FROM ADMIN',
+  CONFIRM_DELETE: 'ARE YOU SURE TO DELETE?',
+  NOT_DATA: 'NOT DATA',
+  REQUIRED: 'Required',
   VALIDATE: {
     REQUIRED_TEXT: 'Text required',
     REQUIRED_SELECT: 'Select required',
+    FILE_UPLOAD_ERORR: '添付できるファイルは3MB以内のPDF, mp3, mp4のみです',
+    FILE_CSV_UPLOAD_ERORR: '添付できるファイルは3MB以内のCSVのみです',
+    NOT_SELECT_HR_WHEN_CREATE_ENTRY: 'エントリーする人材を選択してください', // When create entry,
+    NOT_SELECT_JOB_WHEN_CREATE_OFFER: 'オファーする求人 を選択してください', // When create offer
   },
-
+  WARNING_MESS: {
+    REQUIRED_FIELD_NOT_INPUT: '必須項目を入力してください',
+    NOT_SELECT_DECLINE: '辞退理由を選択してください',
+  },
   // TAB
   TAB_HOME_MANAGEMENT: 'HOME',
-
+  JOB_INFORMATION_SEARCH_LIST: 'Job information search list',
   TAB_COMPANY_MANAGEMENT: 'COMPANY MANAGEMENT',
   TAB_JOB_LIST: 'JOB LIST',
   TAB_COMPANY_LIST: 'COMPANY LIST',
@@ -17,7 +90,8 @@ export default {
   ROUTER_HR_ORGANIZATION_LIST: 'HR ORGANIZATION LIST',
 
   TAB_MATCHING_MANAGEMENT: 'MATCHING MANAGEMENT',
-
+  ROUTER_JOB_OFFER_LIST_COMPANY: 'JOB OFFER LIST (FOR COMPANIES)',
+  ROUTER_JOB_OFFER_LIST_HR: 'JOB OFFER LIST (FOR HR)',
   TAB_JOB_SEARCH: 'JOB SEARCH',
   TAB_HR_SEARCH: 'HR SEARCH',
 
@@ -65,6 +139,7 @@ export default {
   IF_YOU_FORGET_YOUR_PASSWORD: 'If you forget your password',
   REGISTRATION_FOR_HUMAN_RESOURCE_ORGANIZATIONS: 'Click here for new registration for human resource organizations',
   CORPORATE_REGISTRATION: 'Click here for new registration for company',
+  LOGIN_FOOTER_TEXT: 'R2 Business Reconstruction',
 
   // Reset Pass Word
   RESET_PASSWORD_TITLE: 'Password reset',
@@ -88,13 +163,14 @@ export default {
   // Change Password
   CHANGE_PASSWORD_TITLE: 'Change password',
   CHANGE_PASSWORD_DESCRIPTION: 'Please enter the following information to set a new password。.',
+  CHANGE_PASSWORD_DESCRIPTION_FORMAT: 'Please enter your password using 12 half-width alphanumeric characters including uppercase letters.',
   CHANGE_PASSWORD_DESCRIPTION_2: 'Please set a new password.',
   CHANGE_PASSWORD_DESCRIPTION_3: 'New password reset completed',
   CURRENTLY_PASSWORD: 'Currently Password',
   CURRENTLY_PASSWORD_CONFIRM: 'Currently Password（Confirm）',
   NEXT_BTN: 'Next',
   NEW_PASSWORD_RESET_COMPLETED: 'New password reset completed',
-  PASS_NOT_MATCH: 'Confirmation password does not match',
+  PASSWORD_NOT_MATCH: 'Confirmation password does not match',
   OLD_PASSWORD_IS_NOT_CORRECT: 'Old password is not correct',
   VALIDATE_PASS_INPUT: 'Please enter only and have at least uppercase letters, lowercase letters, numbers',
 
@@ -125,6 +201,10 @@ export default {
   // Text Button Control
   BUTTON_EDIT: 'Edit',
   BUTTON_DELETE: 'Delete',
+  OK: 'OK',
+
+  // Update Company, Hr.Org success
+  HR_ORG_COMPANY_UPDATE_SUCCESS: 'Has been updated',
 
   // Modal
   MODAL_CONFIRM_DELETE: 'Delete the following:',
@@ -252,6 +332,10 @@ export default {
     TEXT: 'TEXT',
     PICTURE: 'PICTURE',
     CREATE_MESSAGE: 'CREATE MESSAGE',
+    CANCELLATION_CONFIRMATION: 'Are you sure you want to leave this page? Anything you entered will be discarded.',
+    CREATE_DISTRIBUILT_SUCCESSFULLY: 'Create distribuilt successfully',
+    PLEASE_DOWNLOAD_THE_ATTACHMENT_CORRECT_FORMAT: 'Please upload an image within 3MB.',
+    PLEASE_UPLOAD_IMAGES_NO_LARGER_THAN_MB: 'Please upload either a jpeg, jpg, gif, or png file as an attachment.',
   },
 
   BUTTON: {
@@ -324,7 +408,8 @@ export default {
     FIRST: 'First',
     UNOFFICIAL: 'Unofficial',
     CANCEL: 'Cancel',
-
+    FAILURE: 'FAILURE',
+    DECLINE_JOB_OFFER: 'DECLINE JOB OFFER',
   },
 
   TITLE: {
@@ -332,7 +417,8 @@ export default {
     NEW_MSG: 'NEW MSG',
     MSG: 'MSG',
     DISTRIBUTION_MSG: 'DISTRIBUTION MSG',
-    SHOW_MORE_MESSAGES: 'SHOW MORE MESSAGES',
+    SHOW_MORE_MESSAGES: 'Show more messages',
+    SHOW_MORE_MESSAGES_ON_GOING_JOB: 'View more ongoing projects',
     OCCUPATION: 'OCCUPATION',
     DISTRIBUTE: 'DISTRIBUTE',
     JOB_LIST: 'JOB LIST',
@@ -474,7 +560,7 @@ export default {
     MONTH: 'Month',
     DAY: 'Day',
     TEN_THOUSAND_YEN: 'Ten thousand yen',
-
+    MORE_THAN_TEN_THOUSAND_YEN: 'More than Ten thousand yen',
   },
 
   COMPANY: {
@@ -548,11 +634,13 @@ export default {
     LABEL: {
       CORPORATE_NAME: 'Corporate name',
       CORPORATE_NAME_JAPAN: 'Corporate name japan',
+      CORPORATE_NAME_JAPANESE: '(japan)',
       LICENSE_NO: 'License no',
       ACCOUNT_CLASSIFICATION: 'Account classification',
       CONTRY: 'Country',
       REPRESENTATIVE_FULL_NAME: 'Representative fullname',
       REPRESENTATIVE_FULL_NAME_FURIGANA: 'Representative fullname (furigana)',
+      REPRESENTATIVE_FULL_NAME_FURIGANA_JAPANESE: '(furigana)',
       REPRESENTATIVE_CONTACT: 'Representative contact',
       ASSIGNEE_CONTACT: 'Assignee contact',
       ADDRESS: 'Address',
@@ -565,10 +653,11 @@ export default {
       URL: 'URL',
       CERTIFICATE: 'Certificate',
     },
+    BTN_NEXT_DETAIL: 'Next',
     PLEASE_ENTER_ALL_REQUIRED_INFORMATION: 'Please enter all required information',
     SELECT_FILE: 'Select file',
     FILE_NOT_SELECTED: 'File not selected',
-
+    CONFIRM_LEAVING: 'Your input is discarded. Are you sure you want to leave this page?',
   },
   // Company register
   COMPANY_REGISTER: {
@@ -602,7 +691,8 @@ export default {
     OFFER_RECEIVED: 'Offer received',
     ARRINTERVIEW: 'ArrInterview',
     RESULT: 'Result',
-    ENTRY_DATE: 'Entry date',
+    // ENTRY_DATE: 'Entry date',
+    ENTRY_DATE: 'Update date',
     FULLNAME: 'Full name',
 
     STATUS_PUBLIC: 'Public',
@@ -623,14 +713,17 @@ export default {
     DEAIL_FORM_TITLE: 'HR information detail',
     EDIT_FORM_TITLE: ' HR information edit',
     // Tab 2
+    ACADEMIC_BACKGROUND: 'ACADEMIC BACKGROUND・WORK HISTORY',
     FINAL_EDUCATION: 'Final education',
     FINAL_EDUCATION_DATE: 'Final education date',
     FINAL_EDUCATION_CLASSIFICATION: 'Final education classification',
     FINAL_EDUCATION_DEGREE: 'Final education degree',
     FINAL_EDUCATION_COURSE: 'Final education course',
     GRADUATION_DATE: 'Graduation date',
+    FINAL_ACADEMIC: 'FINAL ACADEMIC BACKGROUND (SELECTION DEPARTMENT)',
     YEAR: 'Year',
     MONTH: 'Month',
+    YEAR_MONTH: 'YEAR_MONTH',
 
     CLASSIFICATION: 'Classification',
     DEGREE: 'Degree',
@@ -678,7 +771,7 @@ export default {
     TITLE: 'Job Entry',
     ENTRY_HR: 'Entry HR',
     MOVE_TO_ENTRY: 'Move to entry',
-
+    MODAL_ENTRY_TITME: 'Entry personnel selection',
   },
 
   // title HR organization user registration
@@ -707,12 +800,15 @@ export default {
     DETAIL: 'DETAIL',
   },
 
+  INTERVIEW_CANCEL_MODAL_TITLE: 'Are you sure you want to reject the Entry?',
+  INTERVIEW_CANCEL_MODAL_LABEL: 'Reason',
+
   TEXT_CONFIRM1: 'Are you sure you want to cancel the interview?',
   TEXT_CONFIRM2: 'Reason for canceling interview',
   TEXT_CONFIRM3: 'Are you sure you want to approve?',
   TEXT_CONFIRM4: ' Approve this entry? ',
   MOTIVATION: 'MOTIVATION ',
-  TEXT_CONFIRM5: ' Other files 1',
+  OTHER_FILES: 'Other files ',
   REMARKS: ' REMARKS',
   TEXT_CONFIRM6: ' Accept this offer?',
   SELECTION_STATUS: 'selection status',
@@ -720,8 +816,17 @@ export default {
   INTERVIEW_CANDIDATE_DATE: 'interview candidate date',
   INTERVIEW_FORMAT: 'interview format',
   INTERVIEW_GROUP: 'interview group',
+  INTERVIEW_PRIVATE: 'interview private',
+  INTERVIEW_CANDIDATE: 'Interview candidate',
+  INTERVIEW_REJECT_CANDIDATE: 'Neither date or time is allowed, readjust',
 
+  ALL_TIMES_ARE_JAPAN_TIME: '※All times are Japan time',
   BASIC_INFORMATION_REGISTER: 'BASIC INFORMATION REGISTER',
   CONFIRM_INPUT_CONTENT: 'CONFIRM INPUT CONTENT',
   APPLICATION_COMPLETED: 'APPLICATION COMPLETED',
+
+  FAVORITE: {
+    JOB: 'FAVORITE JOB',
+    HR: 'FAVORITE HR',
+  },
 };

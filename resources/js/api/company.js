@@ -24,6 +24,10 @@ export const updateJob = async(params = {}) => {
 export const listCompany = async(params) => {
   return await axios.get('company', { params });
 };
+//
+export const listCompanyOption = async(params) => {
+  return await axios.get('company-option', { params });
+};
 // Company Register - /api/company
 export const companyRegister = async(params) => {
   return await axios.post('company', params);

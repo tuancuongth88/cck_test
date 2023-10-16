@@ -11,19 +11,22 @@
 
     <div class="distribute_msg-line" ></div>
     <div class="distribute-msg-frame__inputs-datas">
-        <h6 class="my-4">{{ $data['company'] }} &nbsp;&nbsp;様</h6>
+        <h6 class="my-4">{{ @$data['permission'] }}様</h6>
         <div>
+
             {!! $data['content'] !!}
         </div>
     </div>
     <!-- エントリー求人情報 / Entry job information -->
+    @if(!empty($data['entry_code']))
     <div class="distribute-msg-frame__inputs-datas px-5">
         <h5 class="mt-4 font-weight-medium">エントリーID</h5>
-        <span class="ml-3">{{ $data['entry_code'] }}</span>
+        <span class="ml-3">{{ @$data['entry_code'] }}</span>
     </div>
+    @endif
     <div class="distribute-msg-frame__inputs-datas px-5">
         <h5 class="mt-4 font-weight-medium">
-            エントリー求人情報
+            求人情報
         </h5>
         <table role="table" aria-busy="false" aria-colcount="2" class="table b-table table-bordered">
             <thead role="rowgroup" class="">
@@ -38,32 +41,36 @@
             </thead>
             <tbody role="rowgroup">
             <tr role="row" class="">
-                <td aria-colindex="1" role="cell" class="">{{ @$data['job'] }}</td>
+                @if(in_array($data['type'],[HR,HR_MANAGER]))
+                    <td aria-colindex="1" role="cell" class=""><a href="{{ url('job-search/detail/'.@$data['job_id']) }}">{{ @$data['job'] }}</a></td>
+                @else
+                    <td aria-colindex="1" role="cell" class=""><a href="{{ url('job/detail/'.@$data['job_id']) }}">{{ @$data['job'] }}</a></td>
+                @endif
                 <td aria-colindex="2" role="cell" class="">{{ @$data['company'] }}</td>
             </tr>
             </tbody>
         </table>
     </div>
     <div class="distribute-msg-frame__inputs-datas px-5">
-        <h5 class="mt-4 font-weight-medium">エントリー人材</h5>
+        <h5 class="mt-4 font-weight-medium">人材情報</h5>
         <table role="table" aria-busy="false" aria-colcount="1" class="table b-table table-bordered">
             <thead role="rowgroup" class="">
             <tr role="row" class="">
-                <th role="columnheader" scope="col" aria-colindex="1" class="" style="width: 50%; text-align: center;">
+                <th role="columnheader" scope="col" aria-colindex="1" class="" style="width: 40%; text-align: center;">
                     <div>氏名 </div>
                 </th>
-                <th role="columnheader" scope="col" aria-colindex="2" class="" style="width: 50%; text-align: center;">
+                <th role="columnheader" scope="col" aria-colindex="2" class="" style="width: 30%; text-align: center;">
                     <div>面接日</div>
                 </th>
-                <th role="columnheader" scope="col" aria-colindex="2" class="" style="width: 50%; text-align: center;">
+                <th role="columnheader" scope="col" aria-colindex="2" class="" style="width: 30%; text-align: center;">
                     <div>結果</div>
                 </th>
             </tr>
             </thead>
             <tbody role="rowgroup">
-            <tr role="row" class="">
-                <td aria-colindex="1" role="cell" class="">{{ @$data['full_name_ja'] }}</td>
-                <td aria-colindex="1" role="cell" class="">{{ @$date['interview_date'] }}</td>
+            <tr role="row" class="" style="text-align: center;">
+                <td aria-colindex="1" role="cell" class=""><a href="{{ url('hr/detail/'.@$data['hrs_id']) }}">{{ @$data['full_name'] }} {{ @$data['full_name_ja'] }}</a></td>
+                <td aria-colindex="1" role="cell" class="">{{ @$data['interview_date'] }}</td>
                 <td aria-colindex="1" role="cell" class="">{{ $data['status'] }}</td>
             </tr>
             </tbody>

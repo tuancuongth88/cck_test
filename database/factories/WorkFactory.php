@@ -4,6 +4,8 @@ namespace Database\Factories;
 
 use App\Models\Company;
 use App\Models\HrOrganization;
+use App\Models\JobInfo;
+use App\Models\JobType;
 use App\Models\Work;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -18,6 +20,8 @@ class WorkFactory extends Factory
      */
     public function definition()
     {
+        $jobType = JobType::query()->first();
+        $jobInfo = JobInfo::query()->where(JobInfo::JOB_TYPE_ID, $jobType->id)->first();
         return [
             Work::TITLE => $this->faker->name,
             Work::COMPANY_ID => Company::factory()->create()->id,
@@ -39,5 +43,16 @@ class WorkFactory extends Factory
             Work::TRANSFER => rand(WORK_CONFIRM_YES, WORK_CONFIRM_NO),
             Work::INTERVIEW_FOLLOW => rand(1, 5),
         ];
+    }
+
+    private function addRelationHasMany($model, $items, $id, $column)
+    {
+        $model::where('work_id', $id)->delete();
+        $array = array();
+        foreach ($items as $k => $item){
+            $array[$k]['work_id'] = $id;
+            $array[$k][$column] = $item;
+        }
+        $model::insert($array);
     }
 }

@@ -21,7 +21,7 @@ class LanguageRequirementSeed extends Seeder
                 ['name' => 'N3'],
                 ['name' => 'N4'],
                 ['name' => 'N5'],
-                ['name' => 'Other']
+                ['name' => '問わない']
             ]
         );
     }

@@ -13,8 +13,12 @@
         <p style="margin-top: 10px">{{ $t('PLEASE_WAIT') }}</p>
       </div>
     </template>
-    <div class="hr-list">
-      <div v-if="stateCollaseHrFormSearch" class="hr-list__search">
+    <div class="hr-list" :style="overlay.show ? 'opacity: 0.5;' : ''">
+      <div
+        v-if="stateCollaseHrFormSearch"
+        class="hr-list__search"
+        dusk="hr_search"
+      >
         <HrFormSearch @handleSearch="handleSearch" />
       </div>
       <div
@@ -22,9 +26,10 @@
         :class="{ 'pl-0 hr-list-collapse': !stateCollaseHrFormSearch }"
       >
         <div class="btn collapse-bar-btn" @click="toggleHrFormSearch">
-          <div :class="{ 'rotate-180deg': stateCollaseHrFormSearch }">
+          <!-- <div :class="{ 'rotate-180deg': stateCollaseHrFormSearch }"> -->
+          <div class="rotate-180deg">
             <img
-              :src="require('@/assets/images/login/chervon-collase-bar.png')"
+              :src="require('@/assets/images/login/search-icon.png')"
               alt="collapse"
             >
           </div>
@@ -35,34 +40,64 @@
             <div><span>人材一覧</span></div>
             <!--  HR List -->
           </div>
-
           <div class="hr-list-head-btns">
-            <div>
-              <div
-                class="btn btn-light"
+            <div
+              v-if="
+                [
+                  ROLE.TYPE_SUPER_ADMIN,
+                  ROLE.TYPE_HR_MANAGER,
+                  ROLE.TYPE_HR,
+                ].includes(permissionCheck)
+              "
+            >
+              <button
+                class="btn btn_del_mul--custom"
+                dusk="btn_delete_hr"
                 @click="handleToggleDeleteAllItemModal"
               >
                 <span>チェックしたものを一括削除</span>
                 <b-icon icon="trash-fill" />
-              </div>
+              </button>
             </div>
             <!-- Download -->
-            <div class="btn btn-bold" @click="handleExportCsv">
+            <b-button
+              v-if="
+                [
+                  ROLE.TYPE_SUPER_ADMIN,
+                  ROLE.TYPE_HR_MANAGER,
+                  ROLE.TYPE_HR,
+                ].includes(permissionCheck)
+              "
+              class="btn btn_export--custom"
+              dusk="btn_export_csv_hr"
+              @click="handleExportCsv"
+            >
               <span>ダウンロード</span>
-            </div>
+            </b-button>
             <!-- New registration -->
             <b-dropdown
+              v-if="
+                [
+                  ROLE.TYPE_SUPER_ADMIN,
+                  ROLE.TYPE_HR_MANAGER,
+                  ROLE.TYPE_HR,
+                ].includes(permissionCheck)
+              "
               id="dropdown-1"
               text="新規登録"
               class="btn-bold"
               style="padding: 0"
             >
               <b-dropdown-item
+                class="btn-to-register-hr"
+                dusk="btn_to_register_hr"
                 @click="handleOpenRegisterForm"
               >一人追加</b-dropdown-item>
               <!-- add 1 person -->
               <b-dropdown-item
                 id="show-btn"
+                class="btn-import-csv-hr"
+                dusk="btn_import_csv_hr"
                 @click="handleToggleAddGroupModal"
               >一括追加</b-dropdown-item>
               <!-- add group -->
@@ -80,34 +115,78 @@
               }"
             >
               <b-table
-                :fields="hrFields"
+                id="hr-table-list"
+                dusk="hr_table_list"
+                :fields="
+                  [
+                    ROLE.TYPE_SUPER_ADMIN,
+                    ROLE.TYPE_HR_MANAGER,
+                    ROLE.TYPE_HR,
+                  ].includes(permissionCheck)
+                    ? hrFields
+                    : hrFieldsNotCheckbox
+                "
                 :items="hrItems"
+                aria-controls="hr-list-table"
+                show-empty
+                pills
+                hover
+                no-local-sorting
+                :next-class="'next'"
+                :prev-class="'prev'"
+                :sort-by="convertField()['field']"
+                :sort-desc="convertField()['desc']"
                 @sort-changed="handleSortTableHrList"
               >
                 <template #empty="">
-                  <span>{{ $t('TABLE_EMPTY_LIST') }}</span>
+                  <div class="text-center">
+                    {{ $t('TABLE_EMPTY') }}
+                  </div>
                 </template>
                 <!-- 0 - Check box all -->
-                <template #head(selected)="">
+                <template
+                  v-if="
+                    [
+                      ROLE.TYPE_SUPER_ADMIN,
+                      ROLE.TYPE_HR_MANAGER,
+                      ROLE.TYPE_HR,
+                    ].includes(permissionCheck)
+                  "
+                  #head(selected)=""
+                >
                   <b-form-checkbox
                     v-model="satateSelectAllHrItem"
                     @change="onSelectAllCheckboxChange"
                   />
                 </template>
                 <!-- 1 - Check box single -->
-                <template #cell(selected)="row">
+                <template
+                  v-if="
+                    [
+                      ROLE.TYPE_SUPER_ADMIN,
+                      ROLE.TYPE_HR_MANAGER,
+                      ROLE.TYPE_HR,
+                    ].includes(permissionCheck)
+                  "
+                  #cell(selected)="row"
+                >
                   <!-- <div class="w-100 d-flex" style="flex-direction: center; align-items: center; border: 1px solid red">
                   </div> -->
                   <b-form-checkbox
                     v-model="row.item._isSelected"
+                    :disabled="row.item.on_job"
                     @change="onItemCheckboxChange(row.item)"
                   />
                 </template>
 
                 <!-- 2 - ID -->
-                <template #cell(id)="id">
-                  <div class="w-100 justify-start" style="align-items: center">
-                    {{ id.item.id }}
+                <template #cell(id)="data">
+                  <div
+                    class="w-100 justify-center"
+                    style="align-items: center"
+                    :title="data.item.id"
+                  >
+                    {{ data.item.id }}
                   </div>
                 </template>
 
@@ -119,17 +198,25 @@
                     style="align-items: flex-start"
                   >
                     <div class="w-100 justify-space-between flex-column">
-                      <div class="text-overflow-ellipsis">
+                      <div
+                        class="text-overflow-ellipsis hr-fullname-col"
+                        :title="fullname.item.full_name"
+                      >
                         {{ fullname.item.full_name }}
                       </div>
-                      <div class="text-overflow-ellipsis">
+                      <div
+                        class="text-overflow-ellipsis hr-fullname-col"
+                        :title="fullname.item.full_name_ja"
+                      >
                         {{ fullname.item.full_name_ja }}
                       </div>
                     </div>
                     <!-- favorite -->
                     <img
                       v-if="fullname.item.is_favorite"
-                      :src="require('@/assets/images/login/heart.png')"
+                      :src="
+                        require('@/assets/images/login/favorite-removed.png')
+                      "
                       alt="heart"
                       style="
                         height: 20px;
@@ -149,10 +236,16 @@
                     style="align-items: flex-start"
                   >
                     <div class="w-100 justify-space-between flex-column">
-                      <div class="text-overflow-ellipsis">
+                      <div
+                        class="text-overflow-ellipsis hr-ogranization-col"
+                        :title="corporateName.item.corporate_name_en"
+                      >
                         {{ corporateName.item.corporate_name_en }}
                       </div>
-                      <div class="text-overflow-ellipsis">
+                      <div
+                        class="text-overflow-ellipsis hr-ogranization-col"
+                        :title="corporateName.item.corporate_name_ja"
+                      >
                         {{ corporateName.item.corporate_name_ja }}
                       </div>
                     </div>
@@ -161,7 +254,11 @@
 
                 <!-- 5 - 年齢 - Age -->
                 <template #cell(age)="age">
-                  <div class="w-100 justify-end" style="align-items: center">
+                  <div
+                    class="w-100 justify-center"
+                    style="align-items: center"
+                    :title="age.item.age"
+                  >
                     {{ age.item.age }}
                   </div>
                 </template>
@@ -169,13 +266,18 @@
                 <!-- 6 - 日本語 - Japanese Level -->
                 <template #cell(japanese_level)="japanese_level">
                   <div class="w-100 justify-center" style="align-items: center">
-                    N{{ japanese_level.item.japanese_level }}
+                    <span
+                      v-if="japanese_level.item.japanese_level === 6"
+                    >資格なし</span>
+                    <span
+                      v-else
+                    >N{{ japanese_level.item.japanese_level }}</span>
                   </div>
                 </template>
 
                 <!-- 7 ステータス - status -->
                 <template #cell(status)="status">
-                  <div
+                  <!-- <div
                     class="status-item w-100 justify-center"
                     style="align-items: center"
                   >
@@ -189,6 +291,37 @@
                     <span v-if="status.item.status === 3">{{
                       $t('HR_LIST.STATUS_OFFICIAL_OFFER_CONFIRM')
                     }}</span>
+                  </div> -->
+                  <div
+                    v-if="status.item.status === 1"
+                    class="status-item w-100 justify-center"
+                    style="align-items: center"
+                  >
+                    <span>{{ $t('HR_LIST.STATUS_PUBLIC') }}</span>
+                  </div>
+                  <div
+                    v-if="status.item.status === 2"
+                    class="status-item w-100 justify-center"
+                    style="
+                      align-items: center;
+                      color: #b1b1b1;
+                      border-color: #b1b1b1;
+                    "
+                  >
+                    <span>{{ $t('HR_LIST.STATUS_PRIVATE') }}</span>
+                  </div>
+                  <div
+                    v-if="status.item.status === 3"
+                    class="status-item w-100 justify-center"
+                    style="
+                      align-items: center;
+                      color: #0500ff;
+                      border-color: #0500ff;
+                    "
+                  >
+                    <span>{{
+                      $t('HR_LIST.STATUS_OFFICIAL_OFFER_CONFIRM')
+                    }}</span>
                   </div>
                 </template>
 
@@ -197,6 +330,7 @@
                   <div class="w-100 justify-center" style="align-items: center">
                     <i
                       class="btn fas fa-eye icon-detail"
+                      dusk="btn_detail_hr"
                       @click="goToHRDetail(detail)"
                     />
                   </div>
@@ -205,13 +339,29 @@
               <!-- <div class="hr-list-table-list-paggination">paggination</div> -->
             </div>
           </div>
-          <b-pagination
-            v-model="currentPage"
-            style="padding-top: 20px"
-            :total-rows="totalRows"
-            :per-page="perPage"
-            aria-controls="hr-list-table"
-          />
+          <div
+            v-show="hrItems && hrItems.length"
+            class="w-100 d-flex justify-end align-center"
+          >
+            <!-- <b-pagination
+              v-model="currentPage"
+              style="padding-top: 20px"
+              :total-rows="totalRows"
+              :per-page="perPage"
+              aria-controls="hr-list-table"
+              pills
+              :next-class="'next'"
+              :prev-class="'prev'"
+            /> -->
+            <custom-pagination
+              v-if="hrItems && hrItems.length > 0"
+              :total-rows="totalRows"
+              :current-page="currentPage"
+              :per-page="perPage"
+              @pagechanged="onPageChange"
+              @changeSize="changeSize"
+            />
+          </div>
         </div>
         <!--  -->
       </div>
@@ -229,7 +379,7 @@
           <div
             class="w-100 modal-content-title-del-hr d-flex justify-center align-center"
           >
-            <span>本当に削除しますか？</span>
+            <span>{{ $t('CONFIRM_DELETE') }}</span>
             <!-- Do you really want to delete this? -->
           </div>
           <!-- File - Select file -->
@@ -246,15 +396,16 @@
               class="btn"
               @click="handleToggleDeleteAllItemModal"
             >
-              <span>キャンセル</span>
+              <span> {{ $t('BUTTON.CANCEL') }}</span>
             </div>
             <!-- Cancel -->
             <div
               id="import-csv"
               class="btn accept"
+              dusk="btn_accept"
               @click="handleConfirmDeleteAllHRitem"
             >
-              <span>削除する</span>
+              <span>{{ $t('BUTTON.DELETE') }}</span>
             </div>
             <!-- delete -->
           </div>
@@ -268,43 +419,60 @@
         hide-footer
         title="Using Component Methods"
       >
-        <div class="modal-body-content">
-          <!--  -->
-          <div class="modal-content-title">
-            <span>人材情報をCSVで一括インポートする。</span>
-          </div>
-          <!-- File - Select file -->
-          <div class="hr-list-import">
-            <div class="hr-list-import__title" for="file-CSV-multi">
-              ファイル
+        <b-overlay
+          :show="overlay.show"
+          :blur="overlay.blur"
+          :rounded="overlay.sm"
+          :variant="overlay.variant"
+          :opacity="overlay.opacity"
+        >
+          <div class="modal-body-content">
+            <!--  -->
+            <div class="modal-content-title">
+              <span>人材情報をCSVで一括インポートする。</span>
+            </div>
+            <!-- File - Select file -->
+            <div class="hr-list-import">
+              <div class="hr-list-import__title" for="file-CSV-multi">
+                ファイル
+              </div>
+              <!--  -->
+              <div class="btn hr-list-import__btn">
+                <label
+                  v-if="file_import_name_select"
+                  for="upload-img"
+                  class="import-csv-file"
+                >{{ file_import_name_select }}</label>
+                <label v-else for="upload-img">{{
+                  $t('HR_REGISTER.SELECT_FILE')
+                }}</label>
+                <input
+                  id="upload-img"
+                  ref="MultiCSV"
+                  dusk="btn_file_import_hr"
+                  type="file"
+                  style="display: none"
+                  @change="handleImportMultiCSV"
+                >
+              </div>
+              <!--  -->
             </div>
             <!--  -->
-            <div class="btn hr-list-import__btn">
-              <label for="upload-img">ファイルを選択</label>
-              <input
-                id="upload-img"
-                ref="MultiCSV"
-                type="file"
-                style="display: none"
-                @change="handleImportMultiCSV"
+            <div class="hr-list-btns">
+              <div class="btn" @click="handleToggleAddGroupModal">
+                <span>{{ $t('BUTTON.CANCEL') }}</span>
+              </div>
+              <div
+                id="import"
+                class="btn accept"
+                dusk="import"
+                @click="handleConfirmImportMultiCSV"
               >
-            </div>
-            <!--  -->
-          </div>
-          <!--  -->
-          <div class="hr-list-btns">
-            <div class="btn" @click="handleToggleAddGroupModal">
-              <span>キャンセル</span>
-            </div>
-            <div
-              id="import"
-              class="btn accept"
-              @click="handleConfirmImportMultiCSV"
-            >
-              <span>取り込み</span>
+                <span>{{ $t('INPUT') }}</span>
+              </div>
             </div>
           </div>
-        </div>
+        </b-overlay>
       </b-modal>
       <!--  -->
 
@@ -314,7 +482,7 @@
         v-model="showModalErrorImportCSV"
         hide-footer
         title=""
-        size="lg"
+        size="xl"
       >
         <div class="modal-body-content">
           <!--  -->
@@ -324,7 +492,7 @@
               class="btn accept"
               @click="showModalErrorImportCSV = false"
             >
-              <span>OK</span>
+              <span>{{ $t('OK') }}</span>
             </div> -->
             <div class="w-100">
               <span>インポートに失敗しました。</span>
@@ -332,19 +500,40 @@
           </div>
           <div v-if="is_data_success" style="padding-bottom: 30px">
             <div id="import-csv" class="btn accept" @click="handleImportCSV">
-              <span>インポート実行</span>
+              インポート実行
             </div>
             <div class="w-100">
-              <span>{{ dateSuccessLength }}件中{{
-                totalDataImport
-              }}件のインポートに成功しました。</span>
+              ファイルを選択してください。
+              <span>
+                {{ dateSuccessLength }} 件中
+                {{ totalDataImport }} 件のインポートに成功しました。
+              </span>
             </div>
           </div>
           <b-table :fields="hrFieldsError" :items="error_data_import">
+            <template #cell(full_name)="item">
+              <div
+                class="text-overflow-ellipsis"
+                style="color: #000; width: 305px"
+              >
+                {{ item.item.full_name }}
+              </div>
+            </template>
+            <template #cell(full_name_ja)="item">
+              <div
+                class="text-overflow-ellipsis"
+                style="color: #000; width: 305px"
+              >
+                {{ item.item.full_name_ja }}
+              </div>
+            </template>
             <template #cell(message)="message">
-              <span style="color: #ff0000">
+              <div
+                class="text-overflow-ellipsis"
+                style="color: #ff0000; width: 421px"
+              >
                 {{ message.item.message }}
-              </span>
+              </div>
             </template>
           </b-table>
         </div>
@@ -354,24 +543,26 @@
 </template>
 
 <script>
-import Cookies from 'js-cookie';
-
 import HrFormSearch from '@/layout/components/search/HrFormSearch.vue';
-import { getHrs, downloadHrCsv, checkFileImportHr, ImportHrCSV, hideHr } from '@/api/hr.js';
+import {
+  getHrs,
+  // downloadHrCsv,
+  checkFileImportHr,
+  ImportHrCSV,
+  hideHr,
+} from '@/api/hr.js';
 import { MakeToast } from '../../utils/toastMessage';
 import { uploadFile } from '@/api/uploadFile';
-// const urlAPI = {
-//   urlGetLisUser: '/user',
-//   urlDeleAll: 'user/ ',
-// };
+import ROLE from '@/const/role.js';
+import { PAGINATION_CONSTANT } from '@/const/config.js';
+import { pushParamOrQueryToRouter } from '@/utils/routerUtils';
+import { LIMIT_FILE_SIZE, FILE_TYPE } from '@/const/config.js';
+const FILE_CAN_UPLOAD = [FILE_TYPE.CSV];
 export default {
   name: 'HrList',
   components: {
-    // SearchWithConditions,
-    // ModalCommon,
     HrFormSearch,
   },
-
   data() {
     return {
       overlay: {
@@ -382,20 +573,28 @@ export default {
         variant: 'light',
         fixed: true,
       },
-      // status_select_jobs_to_offer: status_select_jobs_to_offer,
-      stateCollaseHrFormSearch: true,
+
+      ROLE: ROLE,
+
+      stateCollaseHrFormSearch: false,
       statusModalConfirmDelAll: false,
       statusModalImportMultiCSV: false,
 
       showModalErrorImportCSV: false,
+
       error_data_import: [],
+
       data_success: [],
+
       is_data_success: false,
+
       reRender: 0,
 
       currentPage: 1,
+
       totalRows: 0,
-      perPage: 20,
+
+      perPage: PAGINATION_CONSTANT.DEFALT_PER_PAGE,
 
       hrFields: [
         {
@@ -457,27 +656,90 @@ export default {
           thClass: 'col-8',
         },
       ],
-      hrFieldsError: [
+
+      hrFieldsNotCheckbox: [
+        {
+          key: 'id',
+          sortable: true,
+          label: 'ID',
+          class: 'id',
+          thClass: 'col-2',
+        },
         {
           key: 'full_name',
+          sortable: true,
           label: this.$t('HR_REGISTER.FULL_NAME'),
           class: 'fullName',
           thClass: 'col-3',
         },
         {
-          key: 'full_name_ja',
+          key: 'corporate_name',
+          sortable: true,
+          label: this.$t('HR_REGISTER.ORGANIZATION_NAME'),
+          class: 'organization_name',
+          thClass: 'col-4',
+        },
+        {
+          key: 'age',
+          sortable: true,
+          label: this.$t('HR_REGISTER.AGE'),
+          class: 'age',
+          thClass: 'col-5',
+        },
+        {
+          key: 'japanese_level',
+          sortable: true,
+          label: this.$t('HR_REGISTER.JAPANESE_LEVEL'),
+          class: 'japanese_level',
+          thClass: 'col-6',
+        },
+        {
+          key: 'status',
+          sortable: true,
+          label: this.$t('HR_REGISTER.STATUS'),
+          class: 'status',
+          thClass: 'col-7',
+        },
+        {
+          key: 'detail',
+          sortable: false,
+          label: this.$t('HR_LIST_FORM.DETAIL'),
+          class: 'detail',
+          thClass: 'col-8',
+        },
+      ],
+
+      hrFieldsError: [
+        {
+          key: 'full_name',
           label: this.$t('HR_REGISTER.FULL_NAME'),
           class: 'fullName',
-          thClass: 'col-3',
+          // thClass: 'col-3',
+          thStyle: {
+            width: '338px',
+          },
+        },
+        {
+          key: 'full_name_ja',
+          label: this.$t('HR_REGISTER.FULL_NAMEFURIGANA'),
+          class: 'fullName',
+          // thClass: 'col-3',
+          thStyle: {
+            width: '338px',
+          },
         },
 
         {
           key: 'message',
           label: 'エラー',
           class: 'organization_name',
-          thClass: 'col-4',
+          // thClass: 'col-4',
+          thStyle: {
+            width: '453px',
+          },
         },
       ],
+
       hrItems: [],
       selectedItems: [],
       satateSelectAllHrItem: false,
@@ -486,12 +748,14 @@ export default {
         field: '',
         sort_by: '',
       },
+
       paramSearch: null,
+
       file_import_id: 0,
       file_import_name: '',
+      file_import_name_select: '',
     };
   },
-
   computed: {
     dateSuccessLength() {
       return this.data_success.length;
@@ -500,37 +764,25 @@ export default {
       const total = this.data_success.length + this.error_data_import.length;
       return total;
     },
-    query() {
-      return Cookies.get('searchParams');
+    permissionCheck() {
+      return this.$store.getters.permissionCheck;
     },
   },
-
-  watch: {
-    sortHRs: {
-      handler: function() {
-        this.getListHrData();
-      },
-      deep: true,
-    },
-    currentPage: {
-      handler: function() {
-        this.getListHrData();
-      },
-      deep: true,
-    },
-    paramSearch: {
-      handler: function() {
-        this.currentPage = 1;
-        this.getListHrData();
-      },
-      deep: true,
-    },
-  },
-
+  watch: {},
   created() {
+    // Get query list from store
+    const queries = this.$store.getters.routerInfo[this.$route.name]?.queries;
+    if (queries) {
+      this.currentPage = queries?.page;
+      this.perPage = queries?.per_page;
+      this.stateCollaseHrFormSearch = !!queries?.openToggle;
+      this.sortHRs.sort_by = queries.sort_by;
+      this.sortHRs.field = queries.field;
+    }
     this.getListHrData();
+    // Clear after created compenent
+    pushParamOrQueryToRouter(this.$route.name);
   },
-
   methods: {
     toggleHrFormSearch() {
       if (this.stateCollaseHrFormSearch) {
@@ -539,23 +791,24 @@ export default {
         this.stateCollaseHrFormSearch = true;
       }
     },
-    // Tải lại bảng - table list gp
     reloadTable() {
       this.reRender++;
     },
-
     onSelectAllCheckboxChange() {
+      const tempArr = this.hrItems.filter((item) => !item.on_job);
       if (this.satateSelectAllHrItem) {
-        this.selectedItems = [...this.hrItems];
+        this.selectedItems = [...tempArr];
       } else {
         this.selectedItems = [];
       }
-      this.hrItems.forEach((item) => {
+      tempArr.forEach((item) => {
         item._isSelected = this.satateSelectAllHrItem;
       });
     },
-
     onItemCheckboxChange(item) {
+      const newArray = this.hrItems.filter((element) => {
+        return !element.on_job;
+      });
       if (item._isSelected) {
         this.selectedItems.push(item);
       } else {
@@ -565,39 +818,37 @@ export default {
         this.selectedItems.splice(index, 1);
       }
       this.satateSelectAllHrItem =
-        this.selectedItems.length === this.hrItems.length;
+        this.selectedItems.length === newArray.length;
     },
 
-    async handleSort(ctx) {
-      // console.log('handleSort');
-    },
-    // this.id_hr
-    goToHRDetail(detail_data) {
+    async goToHRDetail(detail_data) {
+      // Save list query
+      pushParamOrQueryToRouter(this.$route.name, {
+        page: this.currentPage,
+        per_page: this.perPage,
+        field: this.sortHRs.field,
+        sort_by: this.sortHRs.sort_by,
+        openToggle: this.stateCollaseHrFormSearch,
+      });
       const hr_detail_id = detail_data.item.id;
       this.$router.push(
         { path: `/hr/detail/${hr_detail_id}` },
         (onAbort) => {}
       );
     },
-
-    // Register HR / CV
     handleOpenRegisterForm() {
-      console.log('handleOpenRegisterForm');
       this.$router.push({ path: `/hr/create` }, (onAbort) => {});
     },
-    // Import multi CSV
     handleToggleAddGroupModal() {
-      console.log('handleToggleAddGroupModal 222 ', this.selectedItems);
       // this.$refs['my-modal'].show();
       if (this.statusModalImportMultiCSV === true) {
         this.statusModalImportMultiCSV = false;
+        this.file_import_name_select = '';
       } else {
         this.statusModalImportMultiCSV = true;
       }
     },
-    // Delete
     async handleConfirmDeleteAllHRitem() {
-      console.log('handleDeleteAllHRitem ===== ', this.selectedItems);
       if (this.selectedItems.length === 0) {
         MakeToast({
           variant: 'warning',
@@ -608,10 +859,9 @@ export default {
       }
       try {
         const array = [];
-        this.selectedItems.map(item => {
+        this.selectedItems.map((item) => {
           array.push(item.id);
         });
-        console.log('array delete: ', array);
         const PARAM = {
           ids: array,
         };
@@ -637,7 +887,6 @@ export default {
       // if
       this.statusModalConfirmDelAll = false;
     },
-
     handleToggleDeleteAllItemModal() {
       if (!this.selectedItems.length) {
         MakeToast({
@@ -653,42 +902,59 @@ export default {
         this.statusModalConfirmDelAll = true;
       }
     },
-
-    // toggleModal() {
-    //   this.$refs['my-modal'].toggle('#toggle-btn');
-    // },
     async handleImportMultiCSV(event) {
       const rowFileData = event.target.files[0];
       if (!rowFileData) {
         return 0;
       }
+      if (
+        !FILE_CAN_UPLOAD.includes(rowFileData.type) ||
+        rowFileData.size > LIMIT_FILE_SIZE.NORMAL_UPLOAD_FILE
+      ) {
+        MakeToast({
+          variant: 'warning',
+          title: this.$t('WARNING'),
+          content: this.$t('VALIDATE.FILE_CSV_UPLOAD_ERORR'),
+        });
+        return;
+      }
       const formDataCertificate = new FormData();
       formDataCertificate.append('file', rowFileData);
       try {
+        this.overlay.show = true;
         const res = await uploadFile(formDataCertificate);
-        // console.log('res ==>', res);
-        const { code, data } = res.data;
+        const { code, data, message } = res.data;
         if (code === 200) {
           this.file_import_id = data.id;
           this.file_import_name = data.file_name;
+          this.file_import_name_select = data.file_name;
+          this.overlay.show = false;
+        } else {
+          MakeToast({
+            variant: 'danger',
+            title: this.$t('DANGER'),
+            content: message,
+          });
+          this.overlay.show = false;
         }
       } catch (error) {
-        console.log(' uploadFile error ==>', error);
+        console.log(error);
+        this.overlay.show = false;
       }
     },
-
     async handleConfirmImportMultiCSV() {
       // this.handleToggleAddGroupModal();
       // return;
       if (!this.file_import_id) {
-        MakeToast({
-          variant: 'warning',
-          title: this.$t('WARNING'),
-          content: this.$t('PLEASE_CHOOSE_FILE'),
-        });
+        // MakeToast({
+        //   variant: 'warning',
+        //   title: this.$t('WARNING'),
+        //   content: this.$t('PLEASE_CHOOSE_FILE'),
+        // });
         return;
       }
       try {
+        this.overlay.show = true;
         const PARAM = {
           file_id: this.file_import_id,
         };
@@ -698,6 +964,9 @@ export default {
           if (data.success.length > 0) {
             this.is_data_success = true;
             this.data_success = data.success;
+            if (data.error.length < 1) {
+              this.handleImportCSV();
+            }
           }
           if (data.error.length > 0) {
             this.error_data_import = data.error;
@@ -711,12 +980,11 @@ export default {
           });
         }
       } catch (error) {
-        console.log('check file import error: ', error);
+        console.log(error);
       }
-      console.log('handleConfirmImportMultiCSV');
+      this.overlay.show = false;
       this.handleToggleAddGroupModal();
     },
-
     async handleImportCSV() {
       this.showModalErrorImportCSV = false;
       if (!this.file_import_id) {
@@ -748,14 +1016,26 @@ export default {
           });
         }
       } catch (error) {
-        console.log('import error: ', error);
+        console.log(error);
       }
     },
-
     handleShowErrorImportCSV() {
       this.showModalErrorImportCSV = true;
     },
-    // Table
+    convertField() {
+      const desc = this.sortHRs.sort_by === 'desc';
+      let field = this.sortHRs.field;
+      if (field === 'corporate_name_en') {
+        field = 'corporate_name';
+      }
+      if (field === 'date_of_birth') {
+        field = 'age';
+      }
+      return {
+        field,
+        desc,
+      };
+    },
     async handleSortTableHrList(ctx) {
       switch (ctx.sortBy) {
         case 'id':
@@ -786,63 +1066,244 @@ export default {
         default:
           break;
       }
+      this.currentPage = 1;
+      this.getListHrData();
+    },
+    async handleExportCsv() {
+      this.overlay.show = true;
+
+      let finalParamSearch = {};
+
+      this.paramSearch = this.$store.getters.searchParams;
+      console.log('this.paramSearch: ', this.paramSearch);
+
+      if (this.paramSearch) {
+        if (
+          ('final_education_date_from_year' in this.paramSearch &&
+            'final_education_date_from_month' in this.paramSearch) ||
+          ('final_education_date_to_year' in this.paramSearch &&
+            'final_education_date_to_month' in this.paramSearch)
+        ) {
+          finalParamSearch = {
+            ...this.paramSearch,
+            middle_class: this.paramSearch?.middle_class
+              ? this.paramSearch.middle_class.flatMap(
+                (item) => item.childOptions
+              )
+              : null,
+            main_job_ids: this.paramSearch?.main_job_ids
+              ? this.paramSearch.main_job_ids.flatMap(
+                (item) => item.childOptions
+              )
+              : null,
+            edu_date_from: this.handleMergeYearMonth(
+              this.paramSearch['final_education_date_from_year'],
+              this.paramSearch['final_education_date_from_month']
+            ),
+            edu_date_to: this.handleMergeYearMonth(
+              this.paramSearch['final_education_date_to_year'],
+              this.paramSearch['final_education_date_to_month']
+            ),
+          };
+
+          if (finalParamSearch.edu_date_from === '') {
+            delete finalParamSearch.edu_date_from;
+          }
+
+          if (finalParamSearch.edu_date_to === '') {
+            delete finalParamSearch.edu_date_to;
+          }
+        } else {
+          finalParamSearch = {
+            ...this.paramSearch,
+            middle_class: this.paramSearch?.middle_class
+              ? this.paramSearch.middle_class.flatMap(
+                (item) => item.childOptions
+              )
+              : null,
+            main_job_ids: this.paramSearch?.main_job_ids
+              ? this.paramSearch.main_job_ids.flatMap(
+                (item) => item.childOptions
+              )
+              : null,
+            edu_date_from: this.paramSearch['edu_date_from']
+              ? this.paramSearch['edu_date_from']
+              : null,
+            edu_date_to: this.paramSearch['edu_date_to']
+              ? this.paramSearch['edu_date_to']
+              : null,
+          };
+        }
+      }
+
+      const PARAM = finalParamSearch || {};
+
+      if (this.sortHRs.field) {
+        PARAM.field = this.sortHRs.field;
+        PARAM.sort_by = this.sortHRs.sort_by;
+      }
+
+      // PARAM = this.cleanObject(PARAM);
+
+      const STRING_QUERY = this.obj2Param(PARAM);
+      console.log('STRING_QUERY: ', STRING_QUERY);
+      const user_id = this.$store.getters.profile.id;
+
+      const fileLink = document.createElement('a');
+
+      fileLink.href = `${process.env.MIX_LARAVEL_TEST_URL}api/hr/download/${user_id}?${STRING_QUERY}`;
+      fileLink.setAttribute('target', '_blank');
+      document.body.appendChild(fileLink);
+
+      fileLink.click();
+
+      document.body.removeChild(fileLink);
+      this.overlay.show = false;
+
+      // try {
+      //   const PARAM = this.paramSearch || {};
+      //   if (this.sortHRs.field) {
+      //     PARAM.field = this.sortHRs.field;
+      //     PARAM.sort_by = this.sortHRs.sort_by;
+      //   }
+      //   const res = await downloadHrCsv(PARAM);
+      //   const headers =
+      //     res.headers['content-disposition'] &&
+      //     res.headers['content-disposition'].split(`filename=`)[1];
+      //   let filename = headers ?? 'HR_List.csv';
+
+      //   filename = filename.replaceAll('"', '');
+
+      //   await res.data.then((res) => {
+      //     FILE_DOWNLOAD = res;
+      //   });
+      //   const FILE_DOWNLOAD = res.data;
+      //   const fileURL = window.URL.createObjectURL(FILE_DOWNLOAD);
+      //   const fileLink = document.createElement('a');
+      //   console.log('fileURL: ', fileURL);
+
+      //   fileLink.href = fileURL;
+      //   fileLink.setAttribute('download', filename);
+      //   fileLink.setAttribute('target', '_blank');
+      //   console.log('fileLink: ', fileLink);
+      //   document.body.appendChild(fileLink);
+
+      //   fileLink.click();
+      // } catch (error) {
+      //   console.log(error);
+      // }
+      // this.overlay.show = false;
     },
 
-    async handleExportCsv() {
-      try {
-        const PARAM = this.paramSearch || {};
-        if (this.sortHRs.field) {
-          PARAM.field = this.sortHRs.field;
-          PARAM.sort_by = this.sortHRs.sort_by;
+    obj2Param(obj) {
+      var param = '';
+
+      for (var key in obj) {
+        if (obj[key]) {
+          if (Array.isArray(obj[key])) {
+            let idx = 0;
+            const len = obj[key].length;
+            while (idx < len) {
+              param += key + '[]=' + obj[key][idx] + '&';
+              idx++;
+            }
+          } else {
+            param += key + '=' + obj[key] + '&';
+          }
         }
-        const res = await downloadHrCsv(PARAM);
-        let filename = res.headers['content-disposition'].split(`filename=`)[1] || 'HR_List.csv';
-        console.log('file Name: ', filename);
-
-        filename = filename.replaceAll('"', '');
-
-        // await res.data.then((res) => {
-        //   FILE_DOWNLOAD = res;
-        // });
-        const FILE_DOWNLOAD = res.data;
-        const fileURL = window.URL.createObjectURL(FILE_DOWNLOAD);
-        const fileLink = document.createElement('a');
-
-        fileLink.href = fileURL;
-        fileLink.setAttribute('download', filename);
-        document.body.appendChild(fileLink);
-
-        fileLink.click();
-      } catch (error) {
-        console.log(error);
       }
+
+      return param.substring(0, param.length - 1);
     },
 
     handleSearch(param) {
       this.paramSearch = param;
-      // this.getListHrData(param);
+      this.currentPage = 1;
+      this.getListHrData();
     },
-
     async getListHrData() {
       this.overlay.show = true;
+
       this.hrItems = [];
+
+      let finalParamSearch = {};
+
+      this.paramSearch = this.$store.getters.searchParams;
+
+      if (this.paramSearch) {
+        if (
+          ('final_education_date_from_year' in this.paramSearch &&
+            'final_education_date_from_month' in this.paramSearch) ||
+          ('final_education_date_to_year' in this.paramSearch &&
+            'final_education_date_to_month' in this.paramSearch)
+        ) {
+          finalParamSearch = {
+            ...this.paramSearch,
+            middle_class: this.paramSearch?.middle_class
+              ? this.paramSearch.middle_class.flatMap(
+                (item) => item.childOptions
+              )
+              : null,
+            main_job_ids: this.paramSearch?.main_job_ids
+              ? this.paramSearch.main_job_ids.flatMap(
+                (item) => item.childOptions
+              )
+              : null,
+            edu_date_from: this.handleMergeYearMonth(
+              this.paramSearch['final_education_date_from_year'],
+              this.paramSearch['final_education_date_from_month']
+            ),
+            edu_date_to: this.handleMergeYearMonth(
+              this.paramSearch['final_education_date_to_year'],
+              this.paramSearch['final_education_date_to_month']
+            ),
+          };
+
+          if (finalParamSearch.edu_date_from === '-') {
+            delete finalParamSearch.edu_date_from;
+          }
+
+          if (finalParamSearch.edu_date_to === '-') {
+            delete finalParamSearch.edu_date_to;
+          }
+        } else {
+          finalParamSearch = {
+            ...this.paramSearch,
+            middle_class: this.paramSearch?.middle_class
+              ? this.paramSearch.middle_class.flatMap(
+                (item) => item.childOptions
+              )
+              : null,
+            main_job_ids: this.paramSearch?.main_job_ids
+              ? this.paramSearch.main_job_ids.flatMap(
+                (item) => item.childOptions
+              )
+              : null,
+            edu_date_from: this.paramSearch['edu_date_from']
+              ? this.paramSearch['edu_date_from']
+              : null,
+            edu_date_to: this.paramSearch['edu_date_to']
+              ? this.paramSearch['edu_date_to']
+              : null,
+          };
+        }
+      }
+
       try {
-        const PARAM = this.paramSearch || {};
-        // if (this.paramSearch) {
-        //   this.currentPage = 1;
-        //   PARAM.page = 1;
-        // } else {
-        //   PARAM.page = this.currentPage;
-        // }
+        const PARAM = finalParamSearch || {};
+
         PARAM.page = this.currentPage;
         PARAM.per_page = this.perPage;
+
         if (this.sortHRs.field) {
           PARAM.field = this.sortHRs.field;
           PARAM.sort_by = this.sortHRs.sort_by;
         }
+
         const response = await getHrs(PARAM);
+
         const { code, data } = response.data;
-        // console.log('response list HRs: ', response);
+
         if (code === 200) {
           this.hrItems = data.result.map((item) => {
             return {
@@ -850,20 +1311,63 @@ export default {
               _isSelected: false,
             };
           });
-          console.log('panigation: ', data.pagination);
+
           this.totalRows = data.pagination.total_records;
+          this.satateSelectAllHrItem = false;
         } else {
           MakeToast({
             variant: 'warning',
             title: this.$t('WARNING'),
             content: response.data.message,
           });
+
           this.totalRows = 0;
         }
       } catch (error) {
-        console.log('get list HRs error: ', error);
+        console.log(error);
       }
+
       this.overlay.show = false;
+    },
+
+    handleMergeYearMonth(year, month) {
+      let result = '';
+      if (year && month) {
+        result = `${year}-${this.handleFormatMonthDate(month)}`;
+      }
+      return result;
+      // return `${year}-${this.handleFormatMonthDate(month)}`;
+    },
+
+    handleFormatMonthDate(string) {
+      // let result;
+      // if (string) {
+      //   if (parseInt(string) < 10) {
+      //     result = `${string}`;
+      //   } else {
+      //     result = string;
+      //   }
+      // }
+      // return result;
+
+      if (string) {
+        if (parseInt(string) < 10) {
+          return `${string}`;
+        } else {
+          return string;
+        }
+      } else {
+        return '';
+      }
+    },
+    onPageChange(page) {
+      this.currentPage = page;
+      this.getListHrData();
+    },
+    changeSize(size) {
+      this.perPage = size;
+      this.currentPage = 1;
+      this.getListHrData();
     },
   },
 };
@@ -873,6 +1377,13 @@ export default {
 @import '@/scss/_variables.scss';
 @import '@/scss/modules/common/common.scss';
 @import '@/components/Modal/ModalStyle.scss';
+
+.import-csv-file {
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
 .hr-list {
   width: 100%;
@@ -1067,31 +1578,45 @@ export default {
   }
 }
 // Ghi đè /3x2
+$-col-1-width: 52px;
+// $-col-2-width: 52px;
+$-col-2-width: 80px;
+$-col-3-width: 240px;
+$-col-4-width: 240px;
+$-col-5-6-width: 128px;
+$-col-7-width: 120px;
+$-col-8-width: 60px;
+.hr-fullname-col {
+  width: $-col-3-width;
+}
+.hr-ogranization-col {
+  width: $-col-4-width;
+}
+
 ::v-deep .col-1 {
-  width: 52px;
+  width: $-col-1-width;
 }
 ::v-deep .col-2 {
-  width: 38px;
+  width: $-col-2-width;
 }
 ::v-deep .col-3 {
-  width: 240px;
+  width: $-col-3-width;
 }
 ::v-deep .col-4 {
-  width: 240px;
+  width: $-col-4-width;
 }
 ::v-deep .col-5,
 ::v-deep .col-6 {
   border: 1px solid red;
-  width: 128px;
+  width: $-col-5-6-width;
 }
 // status
 ::v-deep .col-7 {
-  width: 64px;
-  width: 108px;
+  width: $-col-7-width;
 }
 
 ::v-deep .col-8 {
-  width: 60px;
+  width: $-col-8-width;
 }
 
 // ::v-deep  .col8, ::v-deep  .col9 {
@@ -1113,7 +1638,9 @@ export default {
   background: #f9be00 !important;
   border-color: #f9be00 !important;
 }
-
+::v-deep .dropdown-item:active {
+  background-color: #e9ecef !important;
+}
 //  Ghi đè Moddal  - import CSV
 // End modal - import CSV
 </style>

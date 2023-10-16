@@ -3,197 +3,477 @@
     :show="overlay.show"
     :blur="overlay.blur"
     :rounded="overlay.sm"
-    :style="'min-height: 100vh; height: 100%'"
     :variant="overlay.variant"
     :opacity="overlay.opacity"
+    :style="'min-height: 100vh; height: 100%'"
   >
     <template #overlay>
       <div class="text-center">
         <b-icon icon="arrow-clockwise" font-scale="3" animation="spin" />
-        <p style="margin-top: 10px">
-          {{ $t('PLEASE_WAIT') }}
-        </p>
+        <p style="margin-top: 10px">{{ $t('PLEASE_WAIT') }}</p>
       </div>
     </template>
-    <!--  -->
-    <div class="display-user-management-list">
-      <!-- <b-row class="mb-4">
-      <b-col cols="12" class="d-flex justify-content-end">
-        <b-button variant="outline-dark" @click="goToDistribute">
-          {{ $t('BUTTON.DISTRIBUTE') }}
-          <i class="fa fa-light fa-pencil" />
-        </b-button>
-      </b-col>
-    </b-row> -->
 
-      <!--  Table 1 -->
+    <div class="display-user-management-list">
+      <!-- Table 1 msg matching related / Other -->
       <b-row class="mb-4">
         <b-col cols="12">
-          <b-card :title="$t('TITLE.NEW_MSG')">
-            <b-tabs class="tab-active">
-              <!-- 1 -->
-              <b-tab>
+          <b-card class="d-flex flex-column">
+            <h4 class="card-title">
+              {{ $t('TITLE.NEW_MSG') }}
+            </h4>
+            <!-- DOT Read all -->
+            <div
+              :class="
+                [ROLE.TYPE_SUPER_ADMIN].includes(permissionCheck)
+                  ? 'unread-all-head'
+                  : 'd-none'
+              "
+            >
+              <div class="unread-all-tab">
+                <span>{{ $t('TAB.MATCHING_RELATION') }}</span>
+                <span
+                  v-if="!is_read_all_new_msg_matching_related"
+                  class="unread-all-dot"
+                />
+              </div>
+            </div>
+
+            <!-- Admin 1 Tab -->
+            <div v-if="[ROLE.TYPE_SUPER_ADMIN].includes(permissionCheck)">
+              <b-tabs class="tab-active">
+                <b-tab id="read-all-msg" active>
+                  <template #title>
+                    <span>{{ $t('TAB.MATCHING_RELATION') }}</span>
+                  </template>
+
+                  <b-table
+                    id="new-msg"
+                    :items="table_new_msg_matching_related_items"
+                    :fields="table_new_msg_matching_related_fields"
+                    bordered
+                    hover
+                    :current-page="
+                      table_new_msg_matching_related_pagination.current_page
+                    "
+                  >
+                    <template #cell(title)="data">
+                      <div class="table-cell">
+                        <span
+                          v-if="!data.item.read_at"
+                          class="dot-unread-item"
+                        />
+                        <span v-if="data.item.read_at" class="dot-hidden" />
+                        <b-link
+                          @click="handleNavigateToMessageDetail(data.item.id)"
+                        >
+                          <span class="card-link">{{ data.item.title }}</span>
+                        </b-link>
+                      </div>
+                    </template>
+
+                    <template #cell(reception_time)="data">
+                      <div
+                        class="w-100 h-100 d-flex justify-center align-center"
+                      >
+                        <span>{{ data.item.reception_time }}</span>
+                      </div>
+                    </template>
+                  </b-table>
+
+                  <b-link
+                    v-if="
+                      table_new_msg_matching_related_pagination.total_rows > 5
+                    "
+                    id="show-more-msg"
+                    dusk="show-more-msg"
+                    style="color: #5141a4"
+                    class="d-flex justify-content-end mt-1"
+                    @click="showMore('new-msg', 'matching-relation')"
+                  >
+                    <span>{{ $t('TITLE.SHOW_MORE_MESSAGES') }}</span>
+                  </b-link>
+                </b-tab>
+              </b-tabs>
+            </div>
+            <!-- None Admin Have Tab other -->
+            <!-- DOT Read all -->
+            <div
+              :class="
+                [
+                  ROLE.TYPE_COMPANY_ADMIN,
+                  ROLE.TYPE_HR_MANAGER,
+                  ROLE.TYPE_COMPANY,
+                  ROLE.TYPE_HR,
+                ].includes(permissionCheck)
+                  ? 'unread-all-head'
+                  : 'd-none'
+              "
+            >
+              <div class="unread-all-tab">
+                <span>{{ $t('TAB.MATCHING_RELATION') }}</span>
+                <span
+                  v-if="!is_read_all_new_msg_matching_related"
+                  class="unread-all-dot"
+                />
+              </div>
+              <div class="unread-all-tab">
+                <span>{{ $t('TITLE.OTHERS') }}</span>
+                <span
+                  v-if="!is_read_all_distribution_msg"
+                  class="unread-all-dot"
+                />
+              </div>
+            </div>
+
+            <b-tabs
+              v-if="
+                [
+                  ROLE.TYPE_COMPANY_ADMIN,
+                  ROLE.TYPE_HR_MANAGER,
+                  ROLE.TYPE_COMPANY,
+                  ROLE.TYPE_HR,
+                ].includes(permissionCheck)
+              "
+              class="tab-active"
+            >
+              <!-- Tab msg matching related -->
+              <b-tab active>
                 <template #title>
-                  {{ $t('TAB.MATCHING_RELATION') }}
-                  <span v-if="!readAll" class="dot" />
-                  <!-- <span class="dot" /> -->
+                  <span>{{ $t('TAB.MATCHING_RELATION') }}</span>
                 </template>
-                <!--  -->
-                <b-table :items="itemsNewMsg" :fields="fields1" :bordered="true">
-                  <!-- 1 -->
+
+                <b-table
+                  id="new-msg"
+                  :items="table_new_msg_matching_related_items"
+                  :fields="table_new_msg_matching_related_fields"
+                  hover
+                  bordered
+                  :current-page="
+                    table_new_msg_matching_related_pagination.current_page
+                  "
+                >
                   <template #cell(title)="data">
                     <div class="table-cell">
-                      <!-- {{ data.item }} -->
-                      <span v-if="!data.item.read_at" class="dot-unread" />
-                      <b-link class="card-link" @click="detailMsg(data.item.id)">
-                        {{ data.item.title }}
+                      <span v-if="!data.item.read_at" class="dot-unread-item" />
+                      <span v-if="data.item.read_at" class="dot-hidden" />
+                      <b-link
+                        class="card-link text-link"
+                        @click="handleNavigateToMessageDetail(data.item.id)"
+                      >
+                        <span>{{ data.item.title }}</span>
                       </b-link>
                     </div>
                   </template>
-                  <!-- 2 -->
+
                   <template #cell(reception_time)="data">
                     <div class="w-100 h-100 d-flex justify-center align-center">
                       <span>{{ data.item.reception_time }}</span>
                     </div>
                   </template>
-
                 </b-table>
 
                 <b-link
-                  class="d-flex justify-content-end"
-                >{{ $t('TITLE.SHOW_MORE_MESSAGES') }}
+                  v-if="
+                    table_new_msg_matching_related_pagination.total_rows > 5
+                  "
+                  style="color: #5141a4"
+                  class="d-flex justify-content-end mt-1"
+                  @click="showMore('new-msg', 'matching-relation')"
+                >
+                  <span>{{ $t('TITLE.SHOW_MORE_MESSAGES') }}</span>
                 </b-link>
               </b-tab>
-              <!-- 2 -->
+
+              <!-- Tab その他  Other (Not admin)  -->
               <b-tab>
                 <template #title>
-                  {{ $t('TITLE.OTHERS') }} <span class="dot" />
+                  <span>{{ $t('TITLE.OTHERS') }}</span>
+                  <!-- <span v-if="!is_read_all_distribution_msg" class="dot" /> -->
                 </template>
                 <b-table
-                  :items="itemsNewMsg"
-                  :fields="fields1"
-                  :bordered="true"
-                />
+                  id="new-msg-other"
+                  :items="table_distribution_msg_items"
+                  :fields="table_distribution_msg_fields"
+                  hover
+                  bordered
+                >
+                  <template #cell(title)="data">
+                    <div class="table-cell">
+                      <span v-if="!data.item.read_at" class="dot-unread-item" />
+                      <span v-if="data.item.read_at" class="dot-hidden" />
+
+                      <b-link
+                        class="card-link text-link"
+                        @click="handleNavigateToMessageDetail(data.item.id)"
+                      >
+                        <span>{{ data.item.title }}</span>
+                      </b-link>
+                    </div>
+                  </template>
+
+                  <template #cell(reception_time)="data">
+                    <div class="w-100 h-100 d-flex justify-center align-center">
+                      <span>{{ data.item.reception_time }}</span>
+                    </div>
+                  </template>
+                </b-table>
+
                 <b-link
-                  class="d-flex justify-content-end"
-                >{{ $t('TITLE.SHOW_MORE_MESSAGES') }}
+                  v-if="table_distribution_msg_pagination.total_rows > 5"
+                  style="color: #5141a4"
+                  class="d-flex justify-content-end mt-1"
+                  @click="showMore('new-msg', 'others')"
+                >
+                  <span>{{ $t('TITLE.SHOW_MORE_MESSAGES') }}</span>
                 </b-link>
               </b-tab>
-            <!--  -->
             </b-tabs>
           </b-card>
         </b-col>
       </b-row>
-      <!-- Table 2 -->
-      <b-row class="mb-4">
+
+      <!-- Table 2: distribution msg (Only Role 1 - Admin) -->
+      <b-row
+        v-if="[ROLE.TYPE_SUPER_ADMIN].includes(permissionCheck)"
+        class="mb-4"
+      >
         <b-col cols="12">
           <b-card>
-            <div class="d-flex justify-content-between">
-              <h4 class="card-title">
+            <div class="d-flex justify-content-between mb-1">
+              <h4 class="card-title mb-0">
                 {{ $t('HOME_MANAGEMENT.DISTRIBUTION_MSG') }}
               </h4>
+
               <b-button
-                variant="warning"
-                class="text-white"
-                @click="goToDistribute"
+                class="btn_save--custom"
+                dusk="create_msg"
+                @click="handleNavigateToDistributionScreen()"
               >
-                {{ $t('HOME_MANAGEMENT.CREATE_MESSAGE') }}
+                <span>{{ $t('HOME_MANAGEMENT.CREATE_MESSAGE') }}</span>
               </b-button>
             </div>
 
+            <!-- DOT Read all -->
+            <div
+              :class="
+                [ROLE.TYPE_SUPER_ADMIN].includes(permissionCheck)
+                  ? 'unread-all-head'
+                  : 'd-none'
+              "
+            >
+              <div class="unread-all-tab">
+                <span>{{ $t('TITLE.MSG') }}</span>
+                <span
+                  v-if="!is_read_all_distribution_msg"
+                  class="unread-all-dot"
+                />
+              </div>
+            </div>
+
             <b-tabs class="tab-active">
-              <b-tab :title="$t('TITLE.MSG')">
-                <b-table :items="items2" :fields="fields2" :bordered="true">
-                  <template #cell(title)="row">
-                    <b-link :to="'/home/detail'" class="card-link">{{
-                      row.item.title
-                    }}</b-link>
+              <b-tab id="read-all-msg" active>
+                <template #title>
+                  <span>{{ $t('TITLE.MSG') }}</span>
+                  <!-- <span v-if="!is_read_all_distribution_msg" class="dot" /> -->
+                </template>
+
+                <b-table
+                  id="distribution-msg-table"
+                  :items="table_distribution_msg_items"
+                  :fields="table_distribution_msg_fields"
+                  :hover="true"
+                  bordered
+                  :current-page="table_distribution_msg_pagination.current_page"
+                >
+                  <template #cell(title)="data">
+                    <div class="table-cell">
+                      <span v-if="!data.item.read_at" class="dot-unread-item" />
+                      <span v-if="data.item.read_at" class="dot-hidden" />
+                      <b-link
+                        class="card-link text-link"
+                        @click="handleNavigateToMessageDetail(data.item.id)"
+                      >
+                        <span>{{ data.item.title }}</span>
+                      </b-link>
+                    </div>
+                  </template>
+
+                  <template #cell(reception_time)="data">
+                    <div class="w-100 h-100 d-flex justify-center align-center">
+                      <span>{{ data.item.reception_time }}</span>
+                    </div>
                   </template>
                 </b-table>
+
                 <b-link
-                  class="d-flex justify-content-end"
-                >{{ $t('TITLE.SHOW_MORE_MESSAGES') }}
+                  v-if="table_distribution_msg_pagination.total_rows > 5"
+                  dusk="show-more-msg"
+                  style="color: #5141a4"
+                  class="d-flex justify-content-end mt-1"
+                  @click="showMore('distribution-msg')"
+                >
+                  <span>{{ $t('TITLE.SHOW_MORE_MESSAGES') }}</span>
                 </b-link>
               </b-tab>
             </b-tabs>
           </b-card>
         </b-col>
       </b-row>
-      <!-- Table 3 -->
-      <b-row class="mb-4">
+
+      <!-- Table 3 進行中の案件 On-going Job -->
+      <b-row id="dusk_on_going_job" class="mb-4">
         <b-col cols="12">
-          <b-card :title="$t('HOME_MANAGEMENT.ON_GOING_JOB')">
-            <b-table :items="items3" :fields="fields3" :bordered="true">
+          <b-card>
+            <h4 class="card-title">
+              {{ $t('HOME_MANAGEMENT.ON_GOING_JOB') }}
+            </h4>
+            <b-table
+              id="on-going-job-table"
+              :items="table_on_going_job_items"
+              :fields="table_on_going_job_fields"
+              :hover="true"
+              bordered
+              responsive
+              class="table-scroll"
+              :current-page="table_on_going_job_pagination.current_page"
+            >
+              <template #empty="">
+                <div class="w-100 d-flex justify-center align-center">
+                  <span>{{ $t('NOT_DATA') }}</span>
+                </div>
+              </template>
+
+              <!-- 1 日時 Date -->
+              <template #cell(date)="row">
+                <div
+                  class="d-flex justify-center align-center"
+                  :style="`width: calc( ${on_going_job_width_col.date}px - 1.5rem )`"
+                >
+                  <span>{{ row.item.date }}</span>
+                </div>
+              </template>
+
+              <!-- 2 種類 Occupation -->
+              <!-- <template #cell(occupation)="row">
+                <div class="w-100 justify-space-between flex-column">
+                  <div class="w-100 justify-space-between flex-column">
+                    <div class="text-overflow-ellipsis">
+                      <span>{{ row.item.occupation_ja }}</span>
+                    </div>
+                  </div>
+                </div>
+              </template> -->
+
+              <!-- 3 氏名 Name -->
+              <template #cell(name)="row">
+                <div class="w-100 justify-flex-start flex-column">
+                  <b-link
+                    :to="`hr/detail/${row.item.id_hrs}`"
+                    class="w-100 justify-space-between flex-column text-dark"
+                  >
+                    <div
+                      :title="row.item.name"
+                      class="one-line-paragraph"
+                      :style="`width: calc( ${on_going_job_width_col.name}px - 1.5rem )`"
+                    >
+                      {{ row.item.name }}
+                    </div>
+                    <div
+                      :title="row.item.name_ja"
+                      class="one-line-paragraph"
+                      :style="`width: calc( ${on_going_job_width_col.name}px - 1.5rem )`"
+                    >
+                      {{ row.item.name_ja }}
+                    </div>
+                  </b-link>
+                </div>
+              </template>
+              <!-- 4 求人名 job name -->
+              <template #cell(job_name)="row">
+                <div
+                  class="d-flex justify-space-between flex-column w-fit-content"
+                >
+                  <b-link
+                    :to="`job/detail/${row.item.id_job}`"
+                    class="d-flex justify-flex-start align-center text-dark"
+                    :style="`width: calc( ${on_going_job_width_col.job_name}px - 1.5rem )`"
+                  >
+                    <div class="one-line-paragraph" :title="row.item.job_name">
+                      {{ row.item.job_name }}
+                    </div>
+                  </b-link>
+                </div>
+              </template>
+              <!-- 5 企業名 company name -->
+              <template #cell(company_name)="row">
+                <div
+                  :title="row.item.company_name"
+                  class="one-line-paragraph"
+                  :style="`width: calc( ${on_going_job_width_col.company_name}px - 1.5rem )`"
+                >
+                  {{ row.item.company_name }}
+                </div>
+              </template>
+              <!-- 6 詳細 Detail -->
               <template #cell(detail)="detail">
                 <button
                   class="btn-go-detail"
-                  @click="goToDetail(detail.item.id, detail.item.status)"
+                  :style="`width: calc( ${on_going_job_width_col.detail}px - 1.5rem )`"
+                  @click="handleNavigateToDetailScreen(detail.item.to_link)"
                 >
                   <i class="fas fa-eye icon-detail" />
                 </button>
               </template>
             </b-table>
+
             <b-link
-              class="d-flex justify-content-end"
-            >{{ $t('TITLE.SHOW_MORE_MESSAGES') }}
+              v-if="table_on_going_job_pagination.total_rows > 5"
+              id="view-more-ongoing-projects"
+              style="color: #5141a4"
+              class="d-flex justify-content-end mt-1"
+              dusk="show_more_on_going_job"
+              @click="showMore('on-going-job')"
+            >
+              <span>{{ $t('TITLE.SHOW_MORE_MESSAGES_ON_GOING_JOB') }}</span>
             </b-link>
           </b-card>
         </b-col>
       </b-row>
     </div>
   </b-overlay>
-
 </template>
 
 <script>
-// import {
-//   getAllUserManagement,
-//   deleteUserManagement,
-//   deleteAllUserManagement,
-// } from '@/api/modules/userManagement';
-// import { obj2Path } from '@/utils/obj2Path';
 import { MakeToast } from '@/utils/toastMessage';
-import { listNoti } from '@/api/user.js';
+import {
+  listNoti,
+  listDistribution,
+  listGoingJob,
+  getUnread,
+} from '@/api/user.js';
 
-// const urlAPI = {
-//   urlGetLisUser: '/user',
-//   urlDeleAll: 'user/destroyMany',
-// };
+import moment from 'moment';
+import ROLE from '@/const/role.js';
+
 export default {
   name: 'Home',
   data() {
     return {
-      noSort: true,
-      checkbox: false,
-      listId: [],
-      closeMess: true,
-      showModal: false,
-
-      readAll: true,
-
-      message: {
-        isShowMessage: false,
-        isMessage: '',
-      },
+      ROLE: ROLE,
 
       overlay: {
+        opacity: 1,
         show: false,
-        variant: 'light',
-        opacity: 0,
         blur: '1rem',
         rounded: 'sm',
+        variant: 'light',
       },
 
-      queryData: {
-        page: 1,
-        per_page: 20,
-        total_records: 0,
-        search: '',
-        order_type: '',
-        order_column: '',
-      },
+      // -------------------- TABLE 1 ---------------------
+      is_read_all_new_msg_matching_related: true,
 
-      fields1: [
+      table_new_msg_matching_related_fields: [
         {
           key: 'title',
           sortable: false,
@@ -204,6 +484,7 @@ export default {
             textAlign: 'center',
             backgroundColor: '#F0ECFF',
             color: '#69609C',
+            fontSize: '14px',
           },
         },
         {
@@ -216,10 +497,23 @@ export default {
             textAlign: 'center',
             backgroundColor: '#F0ECFF',
             color: '#69609C',
+            fontSize: '14px',
           },
         },
       ],
-      fields2: [
+
+      table_new_msg_matching_related_items: [],
+
+      table_new_msg_matching_related_pagination: {
+        current_page: 1,
+        total_rows: null,
+        per_page: 5,
+      },
+
+      // -------------------- TABLE 2 ---------------------
+      is_read_all_distribution_msg: true,
+
+      table_distribution_msg_fields: [
         {
           key: 'title',
           sortable: false,
@@ -230,6 +524,7 @@ export default {
             textAlign: 'center',
             backgroundColor: '#F0ECFF',
             color: '#69609C',
+            fontSize: '14px',
           },
         },
         {
@@ -242,41 +537,67 @@ export default {
             textAlign: 'center',
             backgroundColor: '#F0ECFF',
             color: '#69609C',
+            fontSize: '14px',
           },
         },
       ],
-      fields3: [
+
+      table_distribution_msg_items: [],
+
+      table_distribution_msg_pagination: {
+        current_page: 1,
+        total_rows: null,
+        per_page: 5,
+      },
+
+      // -------------------- TABLE 3 ---------------------
+      on_going_job_width_col: {
+        date: '152',
+        name: '208',
+        job_name: '316',
+        company_name: '288',
+        detail: '76',
+      },
+      table_on_going_job_fields: [
         {
           key: 'date',
           sortable: false,
           label: '日時',
           class: 'date',
           thStyle: {
+            width: '152px',
+            // width: '18%',
             textAlign: 'center',
             backgroundColor: '#F0ECFF',
             color: '#69609C',
+            fontSize: '14px',
           },
         },
-        {
-          key: 'occupation',
-          sortable: false,
-          label: '種類',
-          class: 'occupation',
-          thStyle: {
-            textAlign: 'center',
-            backgroundColor: '#F0ECFF',
-            color: '#69609C',
-          },
-        },
+        // {
+        //   key: 'occupation',
+        //   sortable: false,
+        //   label: '種類',
+        //   class: 'occupation',
+        //   thStyle: {
+        //     width: '10%',
+        //     textAlign: 'center',
+        //     backgroundColor: '#F0ECFF',
+        //     color: '#69609C',
+        //     fontSize: '14px',
+        //   },
+        // },
         {
           key: 'name',
           sortable: false,
           label: '氏名',
           class: 'name',
           thStyle: {
+            // width: '20%',
+            width: '208px',
             textAlign: 'center',
             backgroundColor: '#F0ECFF',
             color: '#69609C',
+            fontSize: '14px',
           },
         },
         {
@@ -285,9 +606,12 @@ export default {
           label: '求人名  ',
           class: 'job_name',
           thStyle: {
+            // width: '20%',
+            width: '316px',
             textAlign: 'center',
             backgroundColor: '#F0ECFF',
             color: '#69609C',
+            fontSize: '14px',
           },
         },
         {
@@ -296,9 +620,12 @@ export default {
           label: '企業名',
           class: 'company_name',
           thStyle: {
+            // width: '25%',
+            width: '288px',
             textAlign: 'center',
             backgroundColor: '#F0ECFF',
             color: '#69609C',
+            fontSize: '14px',
           },
         },
         {
@@ -307,245 +634,258 @@ export default {
           label: this.$t('BUTTON.DETAIL'),
           class: 'detail',
           thStyle: {
+            // width: '7%',
+            width: '76px',
             textAlign: 'center',
             backgroundColor: '#F0ECFF',
             color: '#69609C',
+            fontSize: '14px',
           },
           tdClass: 'text-center',
         },
       ],
+      table_on_going_job_items: [],
 
-      reRender: 0,
-      itemsNewMsg: [
-        // {
-        //   id: 1,
-        //   status: 'interview-zoom',
-        //   title: '面接Zoom URL発行',
-        //   reception_time: '2023/02/01 13:21',
-        // },
-      ],
-      items2: [
-        {
-          id: 1,
-          title: 'システム停止のお知らせ ',
-          reception_time: '2023/02/01　13:21',
-        },
-        {
-          id: 2,
-          title: 'ABC人材団体',
-          reception_time: '2023/02/02　15:30',
-        },
-      ],
-      items3: [
-        {
-          date: '2023年3月2日（木） ',
-          occupation: 'エントリー',
-          name: 'Nguyen Thi Anh　ｸﾞｴﾝ ﾁｰ ｱﾝ',
-          job_name: '電気設計/制御設計',
-          company_name: 'シティコンピュータ株式会社',
-          detail: '詳細',
-        },
-        {
-          date: '2023年3月2日（木） ',
-          occupation: 'エントリー',
-          name: 'Nguyen Thi Anh　ｸﾞｴﾝ ﾁｰ ｱﾝ',
-          job_name: '電気制御エンジニア',
-          company_name: 'シティコンピュータ株式会社',
-          detail: '詳細',
-        },
-        {
-          date: '2023年3月1日（木） ',
-          occupation: 'オファー',
-          name: 'Nguyen Thi Anh　ｸﾞｴﾝ ﾁｰ ｱﾝ',
-          job_name: 'ITエンジニア BE',
-          company_name: 'シティコンピュータ株式会社',
-          detail: '詳細',
-        },
-      ],
+      table_on_going_job_pagination: {
+        current_page: 1,
+        total_rows: null,
+        per_page: 5,
+      },
     };
   },
-
   computed: {
-    listUser() {
-      return this.$store.getters.listUser;
-    },
-    currChange() {
-      return this.queryData.page;
+    permissionCheck() {
+      return this.$store.getters.permissionCheck;
     },
   },
-
-  watch: {
-    currChange() {
-      this.getListAllData();
-    },
-  },
-
   created() {
-    this.getListNoti();
+    this.handleInitialComponentData();
   },
-
   methods: {
-    // Table 1:
-    async getListNoti() {
+    async handleInitialComponentData() {
+      this.overlay.show = true;
+
+      await this.handleGetListNotification();
+      await this.handleGetListDistributionMSG();
+      await this.handleGetListGoingJob();
+
+      this.overlay.show = false;
+    },
+    async handleGetListNotification() {
+      const params = {
+        page: this.table_new_msg_matching_related_pagination.current_page,
+        per_page: this.table_new_msg_matching_related_pagination.per_page,
+      };
+
       try {
-        this.overlay.show = true;
-        const response = await listNoti();
-        const { code, message } = response.data;
-        const { result } = response.data.data;
+        const response = await listNoti(params);
+
+        const { code, message } = response['data'];
+
         if (code === 200) {
-          const array = [];
-          result.forEach(item => {
-            array.push(item['read_at']);
-          });
-          if (array.includes(null)) {
-            this.readAll = false;
-          } else {
-            this.readAll = true;
+          const result = response['data']['data']['result'];
+          const total_records =
+            response['data']['data']['pagination']['total_records'] || 0;
+          const responseUnreadNum = await getUnread();
+
+          const codeUnreadNum = responseUnreadNum['data']['code'];
+
+          if (codeUnreadNum === 200) {
+            const mesNotificationNum =
+              responseUnreadNum['data']['data']['mesNotification'];
+
+            if (mesNotificationNum > 0) {
+              this.is_read_all_new_msg_matching_related = false;
+            } else {
+              this.is_read_all_new_msg_matching_related = true;
+            }
           }
+
+          this.table_new_msg_matching_related_pagination.total_rows =
+            total_records;
+
+          this.table_new_msg_matching_related_items = [];
 
           result.map((item) => {
             const itemDataParse = JSON.parse(item.data);
-            this.itemsNewMsg.push({
+
+            const date = new Date(item.created_at * 1000);
+            this.table_new_msg_matching_related_items.push({
               id: item.id,
               read_at: item.read_at ? item.read_at : '',
               title: itemDataParse.subject ? itemDataParse.subject : '',
-              reception_time: itemDataParse.date ? itemDataParse.date : '',
+              reception_time: moment(date).format('YYYY/MM/DD HH:mm'),
             });
           });
-          this.overlay.show = false;
         } else {
-          this.overlay.show = false;
           MakeToast({
             variant: 'warning',
-            title: 'WARNING',
+            title: this.$t('WARNING'),
             content: message || '',
           });
         }
       } catch (error) {
-        this.overlay.show = false;
         console.log(error);
+
+        MakeToast({
+          variant: 'danger',
+          title: this.$t('DANGER'),
+          content: error['message'] || '',
+        });
       }
     },
+    async handleGetListDistributionMSG() {
+      const params = {
+        page: this.table_distribution_msg_pagination.current_page,
+        per_page: this.table_distribution_msg_pagination.per_page,
+      };
 
-    fillterListUser($event) {
-      this.overlay.show = true;
-      this.getListAllData($event);
-    },
+      try {
+        const response = await listDistribution(params);
 
-    selectItem(id) {
-      if (this.listId.includes(id) && this.listId.length > 0) {
-        this.listId.splice(this.listId.indexOf(id), 1);
-      } else {
-        this.listId.push(id);
+        const { code, message } = response['data'];
+
+        if (code === 200) {
+          const result = response['data']['data']['result'];
+          const total_records =
+            response['data']['data']['pagination']['total_records'];
+          const responseUnreadNum = await getUnread();
+          const codeUnreadNum = responseUnreadNum['data']['code'];
+
+          if (codeUnreadNum === 200) {
+            const mesOtherListNum =
+              responseUnreadNum['data']['data']['mesOtherList'];
+
+            if (mesOtherListNum > 0) {
+              this.is_read_all_distribution_msg = false;
+            } else {
+              this.is_read_all_distribution_msg = true;
+            }
+          }
+
+          this.table_distribution_msg_pagination.total_rows = total_records;
+
+          this.table_distribution_msg_items = [];
+
+          result.map((item) => {
+            const itemDataParse = JSON.parse(item.data);
+
+            const date = new Date(item.created_at * 1000);
+
+            this.table_distribution_msg_items.push({
+              id: item.id,
+              read_at: item.read_at ? item.read_at : '',
+              title: itemDataParse.title ? itemDataParse.title : '',
+              reception_time: moment(date).format('YYYY/MM/DD HH:mm'),
+            });
+          });
+        } else {
+          MakeToast({
+            variant: 'warning',
+            title: this.$t('WARNING'),
+            content: message || '',
+          });
+        }
+      } catch (error) {
+        console.log(error);
+
+        MakeToast({
+          variant: 'danger',
+          title: this.$t('DANGER'),
+          content: error['message'] || '',
+        });
       }
     },
+    async handleGetListGoingJob() {
+      const params = {
+        page: this.table_on_going_job_pagination.current_page,
+        per_page: this.table_on_going_job_pagination.per_page,
+      };
 
-    showDelete() {
-      if (this.listId.length > 0) {
-        this.showModal = true;
-      } else {
-        this.closeMess = true;
-        this.message.isShowMessage = true;
-        this.checkbox = true;
-        this.getListAllData();
+      try {
+        const response = await listGoingJob(params);
+
+        const { code, message } = response.data;
+
+        if (code === 200) {
+          const {
+            data: { result, pagination },
+          } = response.data;
+
+          this.table_on_going_job_pagination.total_rows =
+            pagination.total_records;
+
+          this.table_on_going_job_items = result.map((item) => {
+            return {
+              date: item.dateJa,
+              occupation: item.occupation,
+              occupation_ja: item.occupation_ja,
+              name: item.full_name,
+              name_ja: item.full_name_ja,
+              job_name: item.job_name,
+              company_name: item.company_name,
+              id_hrs: item.id_hrs,
+              id_job: item.id_job,
+              to_link: item.to_link,
+            };
+          });
+        } else {
+          MakeToast({
+            variant: 'warning',
+            title: this.$t('WARNING'),
+            content: message || '',
+          });
+        }
+      } catch (error) {
+        console.log(error);
+
+        MakeToast({
+          variant: 'danger',
+          title: this.$t('DANGER'),
+          content: error['message'] || '',
+        });
       }
     },
-    createNewUser() {
-      this.$router.push('/usermanagement/create');
-    },
+    showMore(type_table, type_tab) {
+      if (type_table === 'new-msg') {
+        if (type_tab === 'matching-relation') {
+          this.$router.push({ path: `/home/show-more-msg/${1}` });
+        }
 
-    goToDetailScreen(id) {
-      this.$router.push(
-        { path: `/usermanagement/detail/${id}` },
-        (onAbort) => {}
-      );
-    },
+        if (type_tab === 'others') {
+          this.$router.push({ path: `/home/show-more-msg/${2}` });
+        }
+      }
 
-    goToEditScreen(id) {
-      this.$router.push(
-        { path: `/usermanagement/edit/${id}` },
-        (onAbort) => {}
-      );
-    },
+      if (type_table === 'distribution-msg') {
+        this.$router.push({ path: `/home/show-more-distribution-msg` });
+      }
 
-    goToDistribute() {
-      // this.$router.push({ path: `/distribute-msg-create` }, (onAbort) => {});
+      if (type_table === 'on-going-job') {
+        this.$router.push({ path: `/on-going-job` });
+      }
+    },
+    handleNavigateToDistributionScreen() {
       this.$router.push({ path: `/home/distribute` }, (onAbort) => {});
     },
-
-    async confirmationForm(id, name) {
-      this.$bvModal
-        .msgBoxConfirm(
-          this.$t('MODAL_MESSAGE_CONFIRM_DELETE', { name: name }),
-          {
-            title: this.$t('MODAL_CONFIRM_DELETE'),
-            okVariant: 'danger',
-            okTitle: this.$t('MODAL_BUTTON_DELETE'),
-            cancelVariant: 'secondary ',
-            cancelTitle: this.$t('MODAL_BUTTON_CANCEL'),
-            centered: true,
-            size: 'lg',
-          }
-        )
-        .then((value) => {
-          this.confirmStatus = value;
-          if (this.confirmStatus === true) {
-            // deleteUserManagement(`${urlAPI.urlGetLisUser}/${id}`).then(() => {
-            //   MakeToast({
-            //     variant: 'success',
-            //     title: this.$t('SUCCESS'),
-            //     content: this.$t('CONTENT_SUSS'),
-            //   });
-            //   this.reRender++;
-            //   this.getListAllData();
-            // });
-          }
-          this.getListAllData();
-        });
+    async handleNavigateToMessageDetail(id) {
+      await this.$store.dispatch('message/setMessageID', id);
+      this.$router.push({ path: `/home/detail-msg` });
     },
-
-    ConfirmClose() {
-      this.checkbox = false;
-      this.closeMess = false;
-      this.getListAllData();
-    },
-
-    sortingChanged(ctx) {
-      this.queryData.order_column =
-        ctx.sortBy === 'role[0].name' ? 'role[0].name' : ctx.sortBy;
-      this.queryData.order_column = ctx.sortBy === 'name' ? 'name' : ctx.sortBy;
-      this.queryData.order_column =
-        ctx.sortBy === 'email' ? 'email' : ctx.sortBy;
-      this.queryData.order_type = ctx.sortDesc === true ? 'ASC' : 'DESC';
-      this.getListAllData();
-    },
-
-    async DeleteAll() {
-      // await deleteAllUserManagement(urlAPI.urlDeleAll, {
-      //   id: this.listId,
-      // }).then(() => {
-      //   MakeToast({
-      //     variant: 'success',
-      //     title: this.$t('SUCCESS'),
-      //     content: this.$t('CONTENT_SUSS'),
-      //   });
-      //   this.listId.length = 0;
-      //   this.reRender++;
-      //   this.showModal = false;
-      //   this.getListAllData();
-      // });
-    },
-
-    handleClickTab1() {
-      console.log('handleClickTab1');
-    },
-
-    handleClickTab2() {
-      console.log('handleClickTab2');
-    },
-    detailMsg(id){
-      // console.log('id: ', id);
-      this.$router.push({ path: `/home/detail-msg/${id}` });
+    handleNavigateToDetailScreen(to_link) {
+      if (to_link === 'entry') {
+        this.$store.dispatch('app/saveTabIndex', 0);
+        this.$router.push({ path: `/matching-management` });
+      } else if (to_link === 'offer') {
+        this.$store.dispatch('app/saveTabIndex', 1);
+        this.$router.push({ path: `/matching-management` });
+      } else if (to_link === 'interview') {
+        this.$store.dispatch('app/saveTabIndex', 2);
+        this.$router.push({ path: `/matching-management` });
+      } else if (to_link === 'result') {
+        this.$store.dispatch('app/saveTabIndex', 3);
+        this.$router.push({ path: `/matching-management` });
+      }
     },
   },
 };
@@ -568,28 +908,49 @@ export default {
 }
 
 .distribute-msg-frame {
-  background: #FFFFFF;
-  border: 1px solid #999;
+  display: flex;
   margin-top: 1rem;
   padding: 4rem 8rem;
-  display: flex;
+  background: #ffffff;
+  border: 1px solid #999;
   flex-direction: column;
 }
 
 .table-cell {
-  // border: 1px solid red;
+  // border: 1px solid green;
   width: 100%;
   height: 40px;
-	// padding: 1.2rem 0.5rem ;
-	display: flex;
-	justify-content: flex-start;
-	align-items: center;
+  display: flex;
   position: relative;
+  align-items: center;
+  justify-content: flex-start;
 }
 
-.dot-unread {
-  border: 1px solid #FF0000;
-  background: #FF0000;
+.dot-unread-all {
+  width: 8px;
+  height: 8px;
+  top: -1.2rem;
+  left: -0.3rem;
+  border-radius: 50%;
+  position: relative;
+  background: #ff0000;
+  border: 1px solid #ff0000;
+}
+
+.dot-unread-item {
+  border: 1px solid #ff0000;
+  background: #ff0000;
+  border-radius: 50%;
+  width: 8px;
+  height: 8px;
+  position: relative;
+  top: -1.2rem;
+  left: -0.3rem;
+}
+
+.dot-hidden {
+  border: 1px solid #ff0000;
+  background: #ff0000;
   border-radius: 50%;
   width: 8px;
   height: 8px;
@@ -597,16 +958,66 @@ export default {
   top: -1.2rem;
   left: -0.3rem;
 
+  visibility: hidden !important;
+}
+.unread-all-head {
+  // border: 1px solid #000;
+  width: 100%;
+  display: flex;
+  justify-content: flex;
+  align-items: center;
+}
+.unread-all-tab {
+  position: relative;
+  padding: 0 1rem;
+  height: 0;
+  & span:nth-child(1) {
+    visibility: hidden;
+  }
+}
+::v-deep .nav-link {
+  border-top: 4px solid $white !important;
+}
+.unread-all-dot {
+  background: #ff0000;
+  border: 1px solid #ff0000;
+  border-radius: 50%;
+  width: 8px;
+  height: 8px;
+  position: absolute;
+  top: 0.25rem;
+  right: 0.15rem;
+  z-index: 1;
+  transform: translateY(4px);
 }
 
-// .dot {
-//   display: inline-block;
-//   position: absolute;
-//   width: 8px;
-//   height: 8px;
-//   border-radius: 50%;
-//   background-color: red;
-//   margin-left: 6px;
-//   margin-top: -6px;
-// }
+::v-deep .text-link {
+  // border: 1px solid #ff0000;
+  color: $titleClassify;
+  &:hover {
+    text-decoration: underline;
+    color: $titleClassify;
+  }
+}
+.w-fit-content {
+  width: fit-content !important;
+  color: $titleClassify;
+  &:hover {
+    color: $titleClassify;
+  }
+}
+
+:v-deep .table {
+  color: $titleClassify;
+}
+.table-scroll {
+  overflow-y: auto;
+  max-height: 500px;
+}
+
+.card-title {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 36px;
+}
 </style>

@@ -4,6 +4,7 @@ return [
      * Work
      */
     'work.title.required' => 'Title not null',
+    'work.update.status' => 'Invalid status',
     'work.major_classification_id.required' => 'Major classification not null',
     'work.middle_classification_id.required' => 'Middle classification not null',
     'work.company_id.required' => 'Company not null',
@@ -62,10 +63,10 @@ return [
     'offer.middle.class.array' => 'Invalid middle class',
     'offer.main_job_ids.invalid' => 'Main job is not valid',
     'offer.ids.array' => 'Invalid data',
-    'field.search' => 'Invalid search field',
-    'sort_by.search' => 'Invalid search sort by',
     'offer.delete.request' => 'You do not have the right to perform data deletion in the status of request to accept offer',
     'offer.status' => 'The selected status is invalid.',
+    'offer.check.list-hrs.create' => 'The candidate on the list has been selected for this job. Please check again',
+    'offer.status.invalid' => 'Invalid change status. Please check again.',
 
     //favorite
     'favorite.checkFavoriteHr' => "The Hrs does not exist or has status other than 'public'",
@@ -94,6 +95,11 @@ return [
     'entry.main_job_ids.invalid' => 'Main job is not valid',
     'entry.ids.array' => 'Invalid data',
     'entry.delete.request' => 'You do not have the right to perform data deletion in the status of request to accept entry',
+    'entry.check.list-hrs.create' => 'The candidate on the list has been selected for this job. Please check again',
+
+
+
+    'entry.status.invalid' => 'Invalid change status. Please check again.',
 
     /*
      * HR table
@@ -159,8 +165,104 @@ return [
     'hrs.search.edu_course' => 'The final education course search end time is invalid',
     'hrs.search.work_forms' => 'The final education course search end time is invalid',
 
+    'hrs.edit.ongoing-job' => "Can't be changed to private due to in-transaction data. Set after completing all transactions",
+    'hrs.edit.success' => 'update success',
+    'hrs.edit.delete.ongoing-job' => 'The candidate cannot be deleted at this time. Some candidates are scheduled for interviews. Please check again',
+
     'results.node.required' => 'Node is Required',
     'results.hire_date.required' => 'Hire date is Required',
     'result.status' => 'The selected status is invalid.',
     'result.hire_date.date_format' => 'Hire date does not match the format.',
+    'interview.info.check.create' => 'Unable to create a new interview schedule for this case. This employee has an interview schedule or is no longer being interviewed',
+    'interview.info.error.create' => 'There was an error while creating a new interview schedule. Please contact admin',
+    'interview.error.update.display' => 'Unable to update interview. Invalid interview information - 001.',
+    'interview.error.update' => 'There was an error while updating interview information. Please contact admin.',
+    'interview.create.calendar.type' => 'The selected interview type is invalid.',
+    'interview.create.calendar.time.required' => 'Time to create an interview schedule cannot be left blank.',
+    'interview.create.calendar.time.size' => 'The interview schedule should not exceed 5 timelines.',
+    'interview.create.calendar.time.start_time' => 'Invalid calendar creation time. The time to create an interview schedule must be between 08:00 ~ 22:00',
+    'interview.create.calendar.time.start_time_at' => 'Invalid time of day. Please choose morning or afternoon',
+    'interview.create.calendar.time.expected_time' => 'Invalid interview time. Interview time must be within 30,60,90 minutes',
+    'interview.confrim.calendar.time' => 'Invalid time selected. Please check again',
+    'interview.confrim.calendar.check' => 'The candidate interview schedule does not exist' ,
+    'interview.confrim.calendar.url.empty' => 'There was an error in verifying the interview schedule for Zoom updates. Please check again' ,
+    'interview.create.calendar.time.date' => 'Interview schedule must be greater than or equal to the current date. Please check again' ,
+
+    'interview.hr.decline' => 'Interview schedule has been canceled previously. Please check again' ,
+    'interview.hr.beginning' => 'The interview schedule has not been created yet. You cannot delete at this time' ,
+    'interview.hr.url_zoom' => 'Invalid zoom path. The path cannot be empty and must be no more than 50 characters in length' ,
+    'interview.hr.id_zoom' => 'Invalid zoom id. ID cannot be blank and must not exceed 50 characters' ,
+    'interview.hr.password_zoom' => 'Interview schedule has been canceled previously. Please check again' ,
+    'interview.hr.zoom.permission' => 'You do not have permission to make Zoom updates to the interview schedule' ,
+
+
+    'interview.hr.comfim.cancel' => 'Successfully canceled the interview' ,
+    'interview.review.date' => 'Invalid appointment date. The date must be after the current date 7 days' ,
+    'interview.review.status' => 'Invalid review status. Please check again' ,
+    'interview.review.action' => 'The next round of interviews is not valid. Please check again' ,
+    'interview.review.check.status' => 'Interview information could not be updated. There was an error during verification. Please check again' ,
+
+    'interview.review.check.status.offer' => 'The appointment date cannot be left blank. Please check.' ,
+    'interview.review.check.pass.action' => 'Please select the next round of interviews' ,
+    'interview.review.check.pass.round' => 'The next round of interviews is not valid. Please check again' ,
+    'interview.review.check.pass.round.end' => 'Please select offer or no pass result. This is the last round of interviews' ,
+
+    'interview.review.check.type' => 'The status does not correspond to the candidate profile. Please check',
+
+    //result
+    'result.hrs.invalid' =>'HR information not invalid',
+    'result.gender.invalid' =>'Invalid gender',
+    'result.age.from.numeric' => 'Age must be in numeric form',
+    'result.age.from.numeric.min' => 'Age must be between 16 and 60 years old',
+    'result.age.from.numeric.max' => 'Age must be between 16 and 60 years old',
+    'result.age.to.numeric' => 'Age must be in numeric form',
+    'result.age.to.numeric.min' => 'Age must be between 16 and 60 years old',
+    'result.age.to.numeric.max' => 'Age must be between 16 and 60 years old',
+    'result.edu.date_from.format' => 'Invalid graduation time. Time must be Y-m',
+    'result.edu.date_to.format' => 'Invalid graduation time. Time must be Y-m',
+    'result.edu.date_to.greater_than' => 'The time selected in the final education must be greater than the start date',
+    'result.edu.edu_class.array' => 'Invalid profession',
+    'result.edu.edu_degree.array' => 'Invalid education degree',
+    'result.work.forms.array' => 'Invalid working time',
+    'result.work.hour.array' => 'Hour working time',
+    'result.japan.levels' => 'Invalid Japanese level',
+    'result.middle.class.array' => 'Invalid middle class',
+    'result.main_job_ids.invalid' =>'Main job is not valid',
+    'result.ids.array' =>'Invalid data',
+    'field.search' => 'Invalid search field',
+    'sort_by.search' => 'Invalid search sort by',
+    'result.delete.request' => 'You do not have the right to perform data deletion in the status of request to accept result',
+    'result.status.required' => 'Status is Required',
+    'result.note.required' => 'Note is Required',
+    'result.time.required' => 'Time is Required',
+    'result.hire_date.required' => 'Hire date is Required',
+
+    'interview.hrs.invalid' => 'HR information not invalid',
+    'interview.gender.invalid' => 'Invalid gender',
+    'interview.age.from.numeric' => 'Age must be in numeric form',
+    'interview.age.from.numeric.min' => 'Age must be between 16 and 60 years old',
+    'interview.age.from.numeric.max' => 'Age must be between 16 and 60 years old',
+    'interview.age.to.numeric' => 'Age must be in numeric form',
+    'interview.age.to.numeric.min' => 'Age must be between 16 and 60 years old',
+    'interview.age.to.numeric.max' => 'Age must be between 16 and 60 years old',
+    'interview.edu.date_from.format' => 'Invalid graduation time. Time must be Y-m',
+    'interview.edu.date_to.format' => 'Invalid graduation time. Time must be Y-m',
+    'interview.edu.date_to.greater_than' => 'The time selected in the final education must be greater than the start date',
+    'interview.edu.edu_class.array' => 'Invalid profession',
+    'interview.edu.edu_degree.array' => 'Invalid education degree',
+    'interview.work.forms.array' => 'Invalid working time',
+    'interview.work.hour.array' => 'Hour working time',
+    'interview.japan.levels' => 'Invalid Japanese level',
+    'interview.middle.class.array' => 'Invalid middle class',
+    'interview.main_job_ids.invalid' => 'Main job is not valid',
+    'interview.ids.array' => 'Invalid data',
+    'interview.delete.request' => 'You do not have the right to perform data deletion in the status of request to accept interview',
+    'interview.status' => 'The selected status is invalid.',
+
+    //uploadFile
+    'uploadFile.size' => 'File is too large.',
+
+    //company
+    'cannot_stop_status_user' => 'トランザクション中のデータがあるため利用停止に変更できません。全てのトランザクションを終えてから設定してください。',
+    'subject_stop_user' => 'Stop user'
 ];

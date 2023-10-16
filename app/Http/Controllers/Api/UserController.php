@@ -531,4 +531,75 @@ class UserController extends BaseController
             return $this->responseJsonError($e->getCode(), $e->getMessage());
         }
     }
+    /**
+     * @OA\Get(
+     *   path="/api/user/on-going-job",
+     *   tags={"User"},
+     *   summary="Get on going job",
+     *   operationId="On going job_list",
+     *   @OA\Parameter(
+     *     name="page",
+     *     in="query",
+     *     @OA\Schema(
+     *      type="integer",
+     *     ),
+     *   ),
+     *   @OA\Parameter(
+     *     name="per_page",
+     *     in="query",
+     *     @OA\Schema(
+     *      type="integer",
+     *     ),
+     *   ),
+     *   @OA\Response(
+     *     response=200,
+     *     description="Gửi yêu cầu thành công",
+     *     @OA\MediaType(
+     *      mediaType="application/json",
+     *      example={"code":200,"data":{}}
+     *     )
+     *   ),
+     *   security={{"auth": {}}},
+     * )
+     * @param RegisterRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
+    public function onGoingJob(Request $request){
+        try{
+            $data =  $this->repository->onGoingJob($request);
+            if ($data['status']!='success'){
+                return $this->responseJsonError($data['code'],$data['message'],$data['message']);
+            }
+            return $this->responseJson($data['code'],isset($data['data'])?$data['data']:[]);
+
+        } catch (\Exception $e) {
+            return $this->responseJsonError($e->getCode(), $e->getMessage());
+        }
+    }
+
+    /**
+     * @OA\Get(
+     *   path="/api/user/unread-messages",
+     *   tags={"User"},
+     *   summary="Getunread-messages",
+     *   operationId="On unread-messages",
+     *   @OA\Response(
+     *     response=200,
+     *     description="Gửi yêu cầu thành công",
+     *     @OA\MediaType(
+     *      mediaType="application/json",
+     *      example={"code":200,"data":{}}
+     *     )
+     *   ),
+     *   security={{"auth": {}}},
+     * )
+     * @param RegisterRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
+    public function unreadMessages(){
+        $data =  $this->repository->unreadMessages();
+        return $this->responseJson($data['code'],isset($data['data'])?$data['data']:[]);
+    }
 }

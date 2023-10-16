@@ -1,4 +1,5 @@
 import Layout from '@/layout';
+import ROLE from '@/const/role.js';
 
 const hrManagement = {
   path: '/hr',
@@ -6,8 +7,7 @@ const hrManagement = {
   meta: {
     title: 'ROUTER_HR_LIST',
     breadcrumb: 'BREADCRUMB_HR_MANAGEMENT',
-    // permissions: [1, 2, 3],
-    role: [1, 3, 5],
+    role: [ROLE.TYPE_SUPER_ADMIN, ROLE.TYPE_HR_MANAGER, ROLE.TYPE_HR],
   },
   component: Layout,
   redirect: { name: 'Hr' },
@@ -29,6 +29,7 @@ const hrManagement = {
       meta: {
         title: 'ROUTER_HR_MANAGEMENT_LIST',
         breadcrumb: 'BREADCRUMB_HR_MANAGEMENT_LIST',
+        role: [ROLE.TYPE_SUPER_ADMIN, ROLE.TYPE_HR_MANAGER, ROLE.TYPE_HR],
       },
       component: () => import('@/pages/Hr/index.vue'),
     },
@@ -49,6 +50,7 @@ const hrManagement = {
       meta: {
         title: 'ROUTER_HR_MANAGEMENT_EDIT',
         breadcrumb: 'BREADCRUMB_HR_MANAGEMENT_EDIT',
+        role: [ROLE.TYPE_SUPER_ADMIN, ROLE.TYPE_HR_MANAGER, ROLE.TYPE_HR],
       },
       component: () => import('../../pages/Hr/Edit/HrEdit.vue'),
     },

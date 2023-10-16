@@ -139,4 +139,17 @@ class User extends Authenticatable implements JWTSubject
             STOP_USING => '利用停止 ',
         ];
     }
+
+    public static function getPermissionName($user)
+    {
+        if(in_array($user->type, [SUPER_ADMIN, COMPANY_MANAGER, HR_MANAGER])){
+            return PERMISSION_NAME[$user->type];
+        }
+        if($user->type == COMPANY){
+            return @$user->company->company_name;
+        }
+        if ($user->type == HR){
+            return @$user->hrOrganization->corporate_name_ja;
+        }
+    }
 }

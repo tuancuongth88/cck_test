@@ -1,4 +1,5 @@
 import Layout from '@/layout';
+import ROLE from '@/const/role.js';
 
 const JobSearch = {
   path: '/job-search',
@@ -7,7 +8,7 @@ const JobSearch = {
   meta: {
     title: 'TAB_JOB_SEARCH',
     breadcrumb: 'BREADCRUMB_COMPANY_MANAGEMENT',
-    role: [5, 3],
+    role: [ROLE.TYPE_HR, ROLE.TYPE_HR_MANAGER], // quyền 1.Super admin cũng được truy cập vào router này
   },
   component: Layout,
   redirect: { name: 'JobList' },
@@ -19,6 +20,7 @@ const JobSearch = {
       meta: {
         title: 'ROUTER_COMPANY_MANAGEMENT_EDIT',
         breadcrumb: 'BREADCRUMB_COMPANY_MANAGEMENT_EDIT',
+        role: [ROLE.TYPE_HR, ROLE.TYPE_HR_MANAGER, ROLE.TYPE_SUPER_ADMIN],
       },
       component: () => import('@/pages/JobSearch/search.vue'),
     },
@@ -29,6 +31,7 @@ const JobSearch = {
       meta: {
         title: 'ROUTER_COMPANY_MANAGEMENT_EDIT',
         breadcrumb: 'BREADCRUMB_COMPANY_MANAGEMENT_EDIT',
+        role: [ROLE.TYPE_HR, ROLE.TYPE_HR_MANAGER, ROLE.TYPE_SUPER_ADMIN],
       },
       component: () => import('@/pages/JobSearch/index.vue'),
     },
@@ -39,15 +42,17 @@ const JobSearch = {
       meta: {
         title: 'ROUTER_JOB_DETAIL_FOR_HR',
         breadcrumb: 'BREADCRUMB_JOB_DETAIL_FOR_HR',
+        role: [ROLE.TYPE_HR, ROLE.TYPE_HR_MANAGER, ROLE.TYPE_SUPER_ADMIN],
       },
       component: () => import('@/pages/JobSearch/JobDetailForHr'),
     },
     {
-      path: 'job-entry',
-      name: 'JobEntry',
+      path: 'select-entry-hr',
+      name: 'SelectEntryHr',
       meta: {
         title: 'ROUTER_JOB_ENTRY',
         breadcrumb: 'BREADCRUMB_JOB_ENTRY',
+        role: [ROLE.TYPE_HR, ROLE.TYPE_HR_MANAGER, ROLE.TYPE_SUPER_ADMIN],
       },
       component: () => import('@/pages/JobSearch/JobEntry/index'),
     },
@@ -57,15 +62,27 @@ const JobSearch = {
       meta: {
         title: 'ROUTER_JOB_ENTRY',
         breadcrumb: 'BREADCRUMB_JOB_ENTRY',
+        role: [ROLE.TYPE_HR, ROLE.TYPE_HR_MANAGER, ROLE.TYPE_SUPER_ADMIN],
       },
       component: () => import('@/pages/JobSearch/JobEntry/information'),
     },
     {
-      path: 'job-information-entry-complete',
-      name: 'JobInformationEntryComplete',
+      path: 'job-confirmation-entry',
+      name: 'JobConfirmationEntry',
       meta: {
         title: 'ROUTER_JOB_ENTRY',
         breadcrumb: 'BREADCRUMB_JOB_ENTRY',
+        role: [ROLE.TYPE_HR, ROLE.TYPE_HR_MANAGER, ROLE.TYPE_SUPER_ADMIN],
+      },
+      component: () => import('@/pages/JobSearch/JobEntry/confirmation'),
+    },
+    {
+      path: 'job-information-entry-complete',
+      name: 'JobEntryComplete',
+      meta: {
+        title: 'ROUTER_JOB_ENTRY',
+        breadcrumb: 'BREADCRUMB_JOB_ENTRY',
+        role: [ROLE.TYPE_HR, ROLE.TYPE_HR_MANAGER, ROLE.TYPE_SUPER_ADMIN],
       },
       component: () => import('@/pages/JobSearch/JobEntry/complete'),
     },

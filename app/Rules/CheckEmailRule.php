@@ -33,29 +33,39 @@ class CheckEmailRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        $hr = HrOrganization::where(HrOrganization::MAIL_ADDRESS, $value)->whereNull(HrOrganization::USER_ID)->first();
-        $company = Company::where(Company::MAIL_ADDRESS, $value)->whereNull(Company::USER_ID)->first();
-        if ($hr || $company) {
-            return false;
+        $hr = HrOrganization::where(HrOrganization::MAIL_ADDRESS, $value)->first();
+        $company = Company::where(Company::MAIL_ADDRESS, $value)->first();
+        if ($this->model && $this->id) {
+            $object = $this->model::query()
+                ->where('id', '!=', $this->id)
+                ->where($this->model::MAIL_ADDRESS, $value)
+                ->first();
+
+            if ($object) {
+                return false;
+            } else {
+                $userId = $this->model::find($this->id)->user_id;
+                if ($userId){
+                    $user = User::where(User::MAIL_ADDRESS, $value)->where('id', '<>', $userId)->first();
+                }else{
+                    $user = User::where(User::MAIL_ADDRESS, $value)->first();
+                }
+                if ($this->model == Company::class)
+                    $object = HrOrganization::where(HrOrganization::MAIL_ADDRESS, $value)->first();
+                else
+                    $object = Company::where(Company::MAIL_ADDRESS, $value)->first();
+                if ($user || $object)
+                    return false;
+            }
         } else {
-            if(!$this->model && !$this->id) {
+            if ($hr || $company) {
+                return false;
+            } else {
                 $user = User::where(User::MAIL_ADDRESS, $value)->first();
-                if($user)
+                if ($user)
                     return false;
             }
         }
-
-        if($this->model && $this->id) {
-            $object = $this->model::query()->find($this->id);
-            $user = User::query()
-                ->where(User::MAIL_ADDRESS, $value)
-                ->where('id', '!=', $object->user_id)
-                ->first();
-            if ($user) {
-                return false;
-            }
-        }
-
         return true;
     }
 

@@ -8,7 +8,7 @@
     <div class="distribute_msg-line"></div>
     @if($data['image'])
     <div>
-        <img src="{{ asset($data['image']) }}" alt="Example Image">
+        <img style="width: 100%" src="{{ asset($data['image']) }}" alt="Example Image">
     </div>
     @endif
     <div class="distribute-msg-content">

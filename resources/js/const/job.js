@@ -1,22 +1,22 @@
 const incomeOption = [
-  { key: null, value: '指定なし' }, // Không xác định
-  { key: '2,000,000', value: '￥2,000,000' },
-  { key: '2,500,000', value: '￥2,500,000' },
-  { key: '3,000,000', value: '￥3,000,000' },
-  { key: '3,500,000', value: '￥3,500,000' },
-  { key: '4,000,000', value: '￥4,000,000' },
-  { key: '4,500,000', value: '￥4,500,000' },
-  { key: '5,000,000', value: '￥5,000,000' },
-  { key: '5,500,000', value: '￥5,500,000' },
-  { key: '6,000,000', value: '￥6,000,000' },
-  { key: '6,500,000', value: '￥6,500,000' },
-  { key: '7,000,000', value: '￥7,000,000' },
-  { key: '7,500,000', value: '￥7,500,000' },
-  { key: '8,000,000', value: '￥8,000,000' },
-  { key: '8,500,000', value: '￥8,500,000' },
-  { key: '9,000,000', value: '￥9,000,000' },
-  { key: '9,500,000', value: '￥9,500,000' },
-  { key: '10,000,000', value: '￥10,000,000' },
+  { key: null, value: '指定なし' },
+  { key: '200', value: '200' },
+  { key: '250', value: '250' },
+  { key: '300', value: '300' },
+  { key: '350', value: '350' },
+  { key: '400', value: '400' },
+  { key: '450', value: '450' },
+  { key: '500', value: '500' },
+  { key: '550', value: '550' },
+  { key: '600', value: '600' },
+  { key: '650', value: '650' },
+  { key: '700', value: '700' },
+  { key: '750', value: '750' },
+  { key: '800', value: '800' },
+  { key: '850', value: '850' },
+  { key: '900', value: '900' },
+  { key: '950', value: '950' },
+  { key: '1000', value: '1000' },
 ];
 
 const jaLevelOption = [
@@ -25,7 +25,7 @@ const jaLevelOption = [
   { key: 3, value: 'N3' },
   { key: 4, value: 'N4' },
   { key: 5, value: 'N5' },
-  { key: 6, value: 'なし' },
+  { key: 6, value: '問わない' },
 ];
 
 const formEmployeeOption = [
@@ -49,19 +49,28 @@ const passionOption = [
 ];
 
 const countryOptions = [
-  { key: 1, value: 'ベトナム', transtate: 'Vietnam' },
-  { key: 2, value: 'ミャンマー', transtate: 'Myanmar' },
-  { key: 3, value: 'フィリピン', transtate: 'Philippines' },
-  { key: 4, value: 'バングラデシュ', transtate: 'Bangladesh' },
-  { key: 5, value: 'ネパール', transtate: 'Nepal' },
-  { key: 6, value: 'カンボジア', transtate: 'Cambodia' },
-  { key: 7, value: 'タイ', transtate: 'Thailand' },
+  { value: null, text: '選択してください', disabled: true },
+  { value: 1, text: 'ベトナム', disabled: false },
+  { value: 2, text: 'ミャンマー', disabled: false },
+  { value: 3, text: 'フィリピン', disabled: false },
+  { value: 4, text: 'バングラデシュ', disabled: false },
+  { value: 5, text: 'ネパール', disabled: false },
+  { value: 6, text: 'カンボジア', disabled: false },
+  { value: 7, text: 'タイ', disabled: false },
+  { value: 8, text: '問わない', disabled: false },
 ];
+
+const STATUS_JOB = {
+  RECRUITING: 1,
+  PAUSE: 2,
+  OUT_OF_RECRUITMENT: 3,
+};
 
 export {
   incomeOption,
   jaLevelOption,
   formEmployeeOption,
   passionOption,
-  countryOptions
+  countryOptions,
+  STATUS_JOB
 };
