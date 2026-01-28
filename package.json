@@ -46,7 +46,7 @@
     "dependencies": {
         "babel-eslint": "^10.1.0",
         "bootstrap-vue": "^2.21.2",
-        "eslint": "^7.32.0",
+        "eslint": "^9.26.0",
         "eslint-loader": "^4.0.2",
         "eslint-plugin-vue": "^7.16.0",
         "eslint-webpack-plugin": "^2.5.0",
@@ -63,7 +63,7 @@
         "vue-multiselect": "^2.1.7",
         "vue-router": "^3.5.2",
         "vuex": "^3.6.2",
-        "webpack-bundle-analyzer": "^4.2.0",
+        "webpack-bundle-analyzer": "^5.2.0",
         "webpack-chunk-rename-plugin": "^1.0.3"
     }
 }
